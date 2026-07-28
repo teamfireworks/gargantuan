@@ -85,11 +85,11 @@ namespace gargantuan {
 	}
 
 	Engine::~Engine() {
-		// auto serialized = InstanceFormat::SerializeJson(DataModel);
-		// auto contents = serialized.dump();
-		// std::fstream temp("test.model.json", std::ios::out);
-		// temp << contents;
-		// temp.close();
+		auto serialized = InstanceFormat::SerializeJson(DataModel);
+		auto contents = serialized.dump();
+		std::fstream temp("test.model.json", std::ios::out);
+		temp << contents;
+		temp.close();
 
 		SDL_Log("destroying window");
 		SDL_ReleaseWindowFromGPUDevice(Gpu, Window);

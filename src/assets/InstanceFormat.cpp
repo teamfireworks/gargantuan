@@ -11,6 +11,7 @@
 #include <cstring>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -117,10 +118,11 @@ namespace gargantuan::InstanceFormat {
 		auto properties = json::object();
 		SerializeProperties(definition, instance, properties);
 
-		json serialized;
+		nlohmann::ordered_json serialized;
+		serialized["Name"] = instance->Name;
 		serialized["ClassName"] = definition->Name;
-		serialized["Children"] = children;
 		serialized["Properties"] = properties;
+		serialized["Children"] = children;
 
 		state.InstanceMap.emplace(instance, serialized);
 		return serialized;
