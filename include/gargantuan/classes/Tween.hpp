@@ -6,7 +6,8 @@
 #include "gargantuan/datatypes/TweenInfo.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
 #include "gargantuan/reflection/Enums.hpp"
-#include <ext/vector_float3.hpp>
+
+#include <glm/ext/vector_float3.hpp>
 #include <lua.h>
 #include <string>
 #include <unordered_map>

@@ -14,10 +14,10 @@ namespace gargantuan {
 		.Superclass = "Instance",
 		.Constructor = ClassDefinition::WrapConstructor<Camera>(),
 		.Properties = {
-			{"CameraType", Property::fromSimple<&Camera::CameraType>(true, true)},
-			{"CFrame", Property::fromSimple<&Camera::CFrame>(true, true)},
-			{"FieldOfView", Property::fromSimple<&Camera::FieldOfView>(true, true)},
-			{"ViewportSize", Property::fromSimple<&Camera::ViewportSize>(true, true)},
+			{"CameraType", Property::fromSimple<&Camera::CameraType>(true, true).SetSerializable()},
+			{"CFrame", Property::fromSimple<&Camera::CFrame>(true, true).SetSerializable()},
+			{"FieldOfView", Property::fromSimple<&Camera::FieldOfView>(true, true).SetSerializable()},
+			{"ViewportSize", Property::fromSimple<&Camera::ViewportSize>(true, true).SetSerializable()},
 			{
 				"HorizontalFieldOfView",
 				Property::fromReadWrite<float>(

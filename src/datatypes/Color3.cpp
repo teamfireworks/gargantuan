@@ -1,7 +1,7 @@
 #include "gargantuan/datatypes/Color3.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 
-#include <common.hpp>
+#include <glm/glm.hpp>
 
 namespace gargantuan {
 	G_UD_IMPL_PRELUDE(Color3);

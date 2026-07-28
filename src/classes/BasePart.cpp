@@ -8,13 +8,13 @@ namespace gargantuan {
 		.Name = "BasePart",
 		.Superclass = "Instance",
 		.Properties = {
-			{"Anchored", Property::fromSimple<&BasePart::Anchored>(true, true)},
-			{"CanCollide", Property::fromSimple<&BasePart::CanCollide>(true, true)},
-			{"CastShadow", Property::fromSimple<&BasePart::CastShadow>(true, true)},
-			{"CFrame", Property::fromSimple<&BasePart::CFrame>(true, true)},
-			{"Color", Property::fromSimple<&BasePart::Color>(true, true)},
-			{"Size", Property::fromSimple<&BasePart::Size>(true, true)},
-			{"Transparency", Property::fromSimple<&BasePart::Transparency>(true, true)},
+			{"Anchored", Property::fromSimple<&BasePart::Anchored>(true, true).SetSerializable()},
+			{"CanCollide", Property::fromSimple<&BasePart::CanCollide>(true, true).SetSerializable()},
+			{"CastShadow", Property::fromSimple<&BasePart::CastShadow>(true, true).SetSerializable()},
+			{"CFrame", Property::fromSimple<&BasePart::CFrame>(true, true).SetSerializable()},
+			{"Color", Property::fromSimple<&BasePart::Color>(true, true).SetSerializable()},
+			{"Size", Property::fromSimple<&BasePart::Size>(true, true).SetSerializable()},
+			{"Transparency", Property::fromSimple<&BasePart::Transparency>(true, true).SetSerializable()},
 			{
 				"Position",
 				Property::fromReadWrite<glm::vec3>(

@@ -1,4 +1,6 @@
 #include "gargantuan/Engine.hpp"
+#include "gargantuan/Paths.hpp"
+#include "gargantuan/assets/InstanceFormat.hpp"
 #include "gargantuan/classes/DataModel.hpp"
 #include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/render/MeshProvider.hpp"
@@ -11,16 +13,19 @@
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_storage.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <cstdlib>
 #include <cstring>
-#include <fwd.hpp>
+#include <fstream>
 #include <glm/glm.hpp>
+#include <ios>
 #include <lua.h>
 #include <luacode.h>
 #include <lualib.h>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <stdexcept>
 
 namespace gargantuan {
@@ -63,6 +68,12 @@ namespace gargantuan {
 	}
 
 	Engine::~Engine() {
+		auto serialized = InstanceFormat::SerializeJson(DataModel);
+		auto contents = serialized.dump();
+		std::fstream temp("test.model.json", std::ios::out);
+		temp << contents;
+		temp.close();
+
 		SDL_Log("destroying window");
 		SDL_ReleaseWindowFromGPUDevice(Gpu, Window);
 		SDL_DestroyWindow(Window);

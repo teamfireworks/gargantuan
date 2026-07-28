@@ -18,11 +18,16 @@ namespace gargantuan {
 		typedef Userdata<Class, StoredAs> This;
 
 		struct Property {
+			using Self = Property;
 			int (*PushStack)(lua_State *L, std::any value) = nullptr;
 			std::any (*Read)(Class *instance) = nullptr;
 
 			std::any (*CheckStack)(lua_State *L, int idx) = nullptr;
 			void (*Write)(Class *instance, std::any value) = nullptr;
+
+			// Only relevant with instances, but I'm too lazy to make a
+			// ClassProperty and then do some bullshit for the constructors
+			bool Serializable = false;
 
 			template <typename MemberType> struct MemberTraits;
 			template <typename C, typename T> struct MemberTraits<T C::*> {
@@ -35,7 +40,7 @@ namespace gargantuan {
 				using MemberClass = typename MemberTraits<decltype(MemberPointer)>::Target;
 				using Value = typename MemberTraits<decltype(MemberPointer)>::Value;
 
-				Property self{nullptr, nullptr};
+				Property self;
 
 				if (enableRead) {
 					self.PushStack = [](lua_State *L, std::any value) -> int {
@@ -58,6 +63,7 @@ namespace gargantuan {
 
 			template <typename Reader> static Property fromRead(Reader &&read) {
 				using ReadType = std::invoke_result_t<Reader, Class *>;
+
 				Property self;
 
 				self.PushStack = [](lua_State *L, std::any value) -> int {
@@ -87,6 +93,11 @@ namespace gargantuan {
 				};
 
 				return self;
+			}
+
+			Property &SetSerializable(bool serializable = true) {
+				Serializable = serializable;
+				return *this;
 			}
 		};
 

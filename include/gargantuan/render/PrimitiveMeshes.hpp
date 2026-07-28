@@ -2,7 +2,7 @@
 
 #include "gargantuan/render/Mesh.hpp"
 
-#include <ext/vector_float4.hpp>
+#include <glm/ext/vector_float4.hpp>
 
 namespace gargantuan::PrimitiveMeshes {
 	Mesh Block();

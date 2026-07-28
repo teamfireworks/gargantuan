@@ -13,7 +13,7 @@ namespace gargantuan {
 		.Superclass = "BasePart",
 		.Constructor = ClassDefinition::WrapConstructor<Part>(),
 		.Properties = {
-			{"Shape", Property::fromSimple<&Part::Shape>(true, true)},
+			{"Shape", Property::fromSimple<&Part::Shape>(true, true).SetSerializable()},
 		}
 	};
 

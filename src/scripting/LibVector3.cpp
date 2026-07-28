@@ -2,13 +2,9 @@
 #include "gargantuan/scripting/ScriptEngine.hpp"
 
 #include <SDL3/SDL_log.h>
-#include <common.hpp>
 #include <cstring>
-#include <exponential.hpp>
 #include <functional>
-#include <fwd.hpp>
-#include <glm/geometric.hpp>
-#include <glm/trigonometric.hpp>
+#include <glm/glm.hpp>
 #include <lua.h>
 #include <lualib.h>
 #include <string_view>

@@ -8,6 +8,8 @@
 #include <typeindex>
 #include <vector>
 
+// TODO: refactor this into reflection/InstanceClasses.hpp, employ the same
+// trick used by Enums.hpp for registering instance definitions
 namespace gargantuan::ClassRegistry {
 	std::unordered_map<std::type_index, Instance::ClassDefinition> &GetDefinitionsMap();
 

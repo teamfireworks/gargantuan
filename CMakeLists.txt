@@ -72,6 +72,7 @@ set(GLM_ENABLE_CXX_20 ON CACHE BOOL "" FORCE)
 
 add_subdirectory(vendor/box3d)
 add_subdirectory(vendor/glm)
+add_subdirectory(vendor/json)
 add_subdirectory(vendor/luau)
 add_subdirectory(vendor/sdl)
 add_subdirectory(vendor/spdlog)
@@ -90,8 +91,8 @@ target_include_directories(gargantuan PRIVATE
 
 target_include_directories(gargantuan SYSTEM PRIVATE
 	"vendor/box3d/include"
-	"vendor/glaze/include"
-	"vendor/glm/glm"
+	"vendor/glm"
+	"vendor/json/include"
 	"vendor/luau/Common/include"
 	"vendor/luau/Compiler/include"
 	"vendor/luau/Ast/include"
@@ -108,8 +109,8 @@ target_link_libraries(gargantuan
 	PRIVATE
 		SDL3::SDL3
 		box3d
-		glaze
 		glm
+		nlohmann_json
 		spdlog::spdlog
 		Luau.Compiler
 		Luau.CodeGen
