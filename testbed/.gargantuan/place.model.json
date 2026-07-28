@@ -1,0 +1,51 @@
+{
+	"version": 0,
+	"className": "DataModel",
+	"children": [
+		{
+			"id": "2qw3456789u0i8ftrcygvhbjnih1iu4h",
+			"className": "Workspace",
+			"properties": {
+				"Name": "Workspace",
+				"LuauTypeCheckMode": ["Enum", "LuauTypeCheckMode", "Nonstrict"]
+			},
+			"attributes": {
+				"Color": ["Color3", 1, 0.5, 0],
+				"CFrame": ["CFrame", 2, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				"Enum": ["Enum", "EasingStyle", "Linear"],
+				"Instance": ["InstanceHandle", "tyfvuhbwijoiefhugrhiojpnjk398"],
+				"UDim": ["UDim", 0.5, 24],
+				"Vector2": ["Vector2", 10, 10],
+				"Vector3": ["Vector3", 10, 20, 30],
+				"number": ["number", 3.14],
+				"string": ["string", "Hello Gargantuan"],
+				"boolean": ["boolean", true],
+				"nil": ["nil"],
+				"vector": ["vector", 1, 2, 3],
+				"---- The data types below are not yet implemented ----": "",
+				"RelativePath": ["Path", "./Module"],
+				"AliasedPath": ["Path", "@project://src/server"],
+				"ColorSequence": ["ColorSequence", 0, 1, 0.5, 0, 1, 0, 0.5, 1],
+				"Table": [
+					"Table",
+					[
+						["string", "Example Value"],
+						["string", "Hello Gargantuan"]
+					],
+					[
+						["number", 1],
+						["string", "Mixed keys??"]
+					]
+				]
+			},
+			"children": [
+				{
+					"id": "tyfvuhbwijoiefhugrhiojpnjk398",
+					"className": "Part",
+					"attributes": {},
+					"children": []
+				}
+			]
+		}
+	]
+}

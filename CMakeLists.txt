@@ -90,6 +90,7 @@ target_include_directories(gargantuan PRIVATE
 
 target_include_directories(gargantuan SYSTEM PRIVATE
 	"vendor/box3d/include"
+	"vendor/glaze/include"
 	"vendor/glm/glm"
 	"vendor/luau/Common/include"
 	"vendor/luau/Compiler/include"
@@ -107,6 +108,7 @@ target_link_libraries(gargantuan
 	PRIVATE
 		SDL3::SDL3
 		box3d
+		glaze
 		glm
 		spdlog::spdlog
 		Luau.Compiler
