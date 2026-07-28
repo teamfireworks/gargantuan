@@ -36,6 +36,7 @@ namespace gargantuan {
 		static const ClassDefinition DEFINITION;
 
 		virtual ~Instance() = default;
+		void Destroy() {};
 
 		std::string_view Name = DEFINITION.Name;
 		std::vector<std::shared_ptr<Instance>> Children;

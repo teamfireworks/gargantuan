@@ -6,6 +6,7 @@
 namespace gargantuan {
 	const ServiceProvider::ClassDefinition ServiceProvider::DEFINITION = {
 		.Name = "ServiceProvider",
+		.Superclass = "Instance",
 		.Methods = {
 			{"FindService", Method::Wrap<&ServiceProvider::FindService>()},
 			{"GetService", Method::Wrap<&ServiceProvider::GetService>()},
@@ -26,12 +27,16 @@ namespace gargantuan {
 		if (it == Services.end()) {
 			const ServiceConstructors &constructors = GetServiceConstructors();
 			if (auto constructor = constructors.find(name); constructor != constructors.end()) {
+				if (auto existing = FindFirstChild(name)) {
+					Services.emplace(name, existing);
+					return existing;
+				}
+
 				if (!constructor->second) {
 					throw std::runtime_error("Missing constructor for service " + std::string(name));
 				}
 				auto service = constructor->second();
 				// FIXME: instances should auto set names but im lazy
-				service->Name = name;
 				service->SetParent(this->shared_from_this());
 				Services.emplace(name, service);
 				return service;

@@ -9,6 +9,7 @@ namespace gargantuan {
 	const DataModel::ClassDefinition DataModel::DEFINITION = {
 		.Name = "DataModel",
 		.Superclass = "ServiceProvider",
+		.Constructor = ClassDefinition::WrapConstructor<DataModel>()
 	};
 
 	const DataModel::ServiceConstructors &DataModel::GetServiceConstructors() const {

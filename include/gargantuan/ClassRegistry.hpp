@@ -10,6 +10,8 @@
 
 // TODO: refactor this into reflection/InstanceClasses.hpp, employ the same
 // trick used by Enums.hpp for registering instance definitions
+//
+// Also include constructors for Serdes, by now we need a ScriptSecurity enum
 namespace gargantuan::ClassRegistry {
 	std::unordered_map<std::type_index, Instance::ClassDefinition> &GetDefinitionsMap();
 

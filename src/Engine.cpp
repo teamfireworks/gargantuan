@@ -10,6 +10,7 @@
 
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gpu.h>
+#include <SDL3/SDL_iostream.h>
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_mouse.h>
@@ -50,8 +51,24 @@ namespace gargantuan {
 		this->RenderProvider = new class RenderProvider(Window, Gpu);
 		this->ScriptEngine = new class ScriptEngine();
 
-		DataModel = std::make_shared<gargantuan::DataModel>();
-		DataModel->Name = "Welcome To Hell";
+		size_t modelSize = 0;
+		void *buffer = SDL_LoadFile("test.model.json", &modelSize);
+		auto jsonContent = nlohmann::json::parse(std::string_view((char *)buffer, modelSize));
+		SDL_free(buffer);
+		SDL_Log("starting the deserialization");
+		auto state = InstanceFormat::DeserializeJson(jsonContent);
+		if (!state.Ok) {
+			SDL_Log("Failed to load data model:");
+			for (auto &err : state.Errors) {
+				SDL_Log("%s", err.c_str());
+			}
+			std::abort();
+		}
+		SDL_Log("completed the deserialization");
+		this->DataModel = std::static_pointer_cast<gargantuan::DataModel>(state.Instance);
+
+		// DataModel = std::make_shared<gargantuan::DataModel>();
+		// DataModel->Name = "Welcome To Hell";
 
 		auto workspace = this->DataModel->GetService("Workspace");
 		this->Workspace = std::dynamic_pointer_cast<gargantuan::Workspace>(workspace);
@@ -68,11 +85,11 @@ namespace gargantuan {
 	}
 
 	Engine::~Engine() {
-		auto serialized = InstanceFormat::SerializeJson(DataModel);
-		auto contents = serialized.dump();
-		std::fstream temp("test.model.json", std::ios::out);
-		temp << contents;
-		temp.close();
+		// auto serialized = InstanceFormat::SerializeJson(DataModel);
+		// auto contents = serialized.dump();
+		// std::fstream temp("test.model.json", std::ios::out);
+		// temp << contents;
+		// temp.close();
 
 		SDL_Log("destroying window");
 		SDL_ReleaseWindowFromGPUDevice(Gpu, Window);
