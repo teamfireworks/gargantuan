@@ -19,6 +19,3 @@
 [submodule "vendor/json"]
 	path = vendor/json
 	url = https://github.com/nlohmann/json.git
-[submodule "vendor/tracy"]
-	path = vendor/tracy
-	url = https://github.com/wolfpld/tracy.git

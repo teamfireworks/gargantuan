@@ -3,4 +3,3 @@ cmake-build-debug
 .DS_Store
 .cache
 Testbed.luau
-.fetchcontent-cache

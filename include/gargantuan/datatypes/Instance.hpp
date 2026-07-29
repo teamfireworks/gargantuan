@@ -20,19 +20,6 @@ namespace gargantuan {
 		std::optional<std::string_view> Superclass = "Instance";
 		std::unordered_map<std::string_view, UserdataProperty<Instance>> Properties = {};
 		std::unordered_map<std::string_view, UserdataMethod<Instance>> Methods = {};
-
-		// The same members again, this class's own and every one it inherits,
-		// so a lookup is one probe instead of a walk up the chain doing a probe
-		// per level and resolving each superclass by name on the way. Filled in
-		// by InstanceClassRegistry the first time the class is asked about,
-		// because it cannot be built until every definition is registered.
-		//
-		// The entries point into the maps above, which stay put: nothing is
-		// ever erased from the registry, and inserting into an unordered_map
-		// does not move the elements already in it.
-		bool Flattened = false;
-		std::unordered_map<std::string_view, const UserdataProperty<Instance> *> AllProperties = {};
-		std::unordered_map<std::string_view, const UserdataMethod<Instance> *> AllMethods = {};
 	};
 
 	G_SHARED_USERDATA_DECL(
@@ -46,10 +33,6 @@ namespace gargantuan {
 		void Destroy() {}
 
 		std::string_view Name = CLASS_DEFINITION.ClassName;
-
-		// This instance's entry in the registry, worked out on first use and
-		// kept. Null until something asks.
-		InstanceClassDefinition *CachedDefinition = nullptr;
 		std::vector<std::shared_ptr<Instance>> Children;
 		Instance *Parent = nullptr;
 		void SetParent(std::shared_ptr<Instance> newParent);
@@ -59,12 +42,8 @@ namespace gargantuan {
 		G_SIGNAL(DescendantAdded, Instance::Pointer);
 		G_SIGNAL(DescendantRemoved, Instance::Pointer);
 
-		// Null when the class has no such member. Borrowed from the registry,
-		// which outlives every instance, so the result is never copied -- a
-		// Property holds two std::functions and this is the hottest path the
-		// scripting layer has.
-		const Self::Property *FindProperty(std::string_view name);
-		const Self::Method *FindMethod(std::string_view name);
+		std::optional<Self::Property> FindProperty(std::string_view name);
+		std::optional<Self::Method> FindMethod(std::string_view name);
 
 		static int LIndex(lua_State *L, Instance *instance);
 		static int LNewIndex(lua_State *L, Instance *instance);

@@ -77,68 +77,12 @@ add_subdirectory(vendor/luau)
 add_subdirectory(vendor/sdl)
 add_subdirectory(vendor/spdlog)
 
-# Tracing.
-#
-# The client is always compiled in. It collects nothing until Tracy's profiler
-# connects, which is what TRACY_ON_DEMAND buys: a build nobody is watching pays
-# an atomic read per zone and holds no buffers. Turn GARGANTUAN_TRACY off and
-# every G_PROFILE compiles to nothing at all.
-option(GARGANTUAN_TRACY "Compile in the Tracy client" ON)
-set(TRACY_ENABLE ${GARGANTUAN_TRACY} CACHE BOOL "" FORCE)
-set(TRACY_ON_DEMAND ON CACHE BOOL "" FORCE)
-# Traces leave the process over a socket. Refusing anything off this machine is
-# the right default for a profiler that is on in ordinary builds.
-set(TRACY_ONLY_LOCALHOST ON CACHE BOOL "" FORCE)
-add_subdirectory(vendor/tracy)
-
-# The viewer, the headless capture tool, and the one that turns a capture into
-# per-zone totals. Off by default because they are their own programs with
-# their own dependencies, and configuring them reaches the network for whatever
-# the system does not already have.
-#
-# ExternalProject rather than add_subdirectory: each is its own CMake project
-# and they declare targets of the same names (TracyServer, TracyCapstone,
-# libzstd), so they cannot share a build tree with us or with each other.
-#
-# They land in build/bin, which is where their own install rules put them.
-option(GARGANTUAN_TRACY_TOOLS "Build tracy-profiler, tracy-capture and tracy-csvexport" OFF)
-if(GARGANTUAN_TRACY_TOOLS)
-	include(ExternalProject)
-
-	# The viewer picks its window backend at build time and defaults to
-	# Wayland. Nothing detects this at runtime, so an X11 session gets a binary
-	# that cannot open a window unless it is told now.
-	if(NOT WIN32 AND NOT APPLE AND NOT DEFINED ENV{WAYLAND_DISPLAY})
-		set(GARGANTUAN_TRACY_LEGACY ON)
-	else()
-		set(GARGANTUAN_TRACY_LEGACY OFF)
-	endif()
-
-	foreach(GARGANTUAN_TRACY_TOOL capture csvexport profiler)
-		ExternalProject_Add(tracy-${GARGANTUAN_TRACY_TOOL}
-			SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/tracy/${GARGANTUAN_TRACY_TOOL}"
-			BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/tracy/${GARGANTUAN_TRACY_TOOL}"
-			CMAKE_ARGS
-				-DCMAKE_BUILD_TYPE=Release
-				-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
-				-DLEGACY=${GARGANTUAN_TRACY_LEGACY}
-		)
-	endforeach()
-endif()
-
 file(GLOB_RECURSE GARGANTUAN_SOURCES CONFIGURE_DEPENDS
 	"src/*.cpp"
 	"src/*.hpp"
 )
 
 add_executable(gargantuan ${GARGANTUAN_SOURCES} ${SHADER_OUTPUTS})
-
-# Members named after their own type (ScriptEngine::ThreadEngine ThreadEngine)
-# keep the Luau-facing API familiar, but GCC 13+ rejects them by default. Clang
-# does not implement this diagnostic, which is why it only bites on GCC.
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(gargantuan PRIVATE -Wno-changes-meaning)
-endif()
 
 target_include_directories(gargantuan PRIVATE
 	"src"
@@ -173,7 +117,6 @@ target_link_libraries(gargantuan
 		Luau.VM
 		Luau.Require
 		Luau.Config
-		Tracy::TracyClient
 )
 
 if(WIN32)

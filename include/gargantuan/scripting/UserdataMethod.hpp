@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gargantuan/scripting/StackValue.hpp"
-#include <functional>
 #include <lualib.h>
 #include <utility>
 
