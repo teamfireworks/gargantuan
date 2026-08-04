@@ -1,0 +1,145 @@
+#include "gargantuan.core/classes/Camera.hpp"
+#include "gargantuan.core/datatypes/CFrame.hpp"
+#include "gargantuan.core/datatypes/Vector2.hpp"
+#include "gargantuan.core/reflection/InstanceClassRegistry.hpp"
+#include "gargantuan.runtime/Userdata.hpp"
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_video.h>
+#include <glm/trigonometric.hpp>
+
+namespace gargantuan {
+	G_INSTANCE_IMPL(
+		Camera,
+		.Description = "Provides the 3D view of the workspace.",
+		.Properties = {
+			{"CameraType", Property::fromMember<&Camera::CameraType>(true, true).SetSerializable()},
+			{"CFrame", Property::fromMember<&Camera::CFrame>(true, true).SetSerializable()},
+			{"FieldOfView", Property::fromMember<&Camera::FieldOfView>(true, true).SetSerializable()},
+			{"ViewportSize", Property::fromMember<&Camera::ViewportSize>(true, false)},
+			{
+				"HorizontalFieldOfView",
+				Property::fromReadWrite<float>(
+					[](Instance *self) { return self->Cast<Camera>()->GetHorizontalFieldOfView(); },
+					[](Instance *self, float value) { self->Cast<Camera>()->SetHorizontalFieldOfView(value); }
+				),
+			},
+			{
+				"DiagonalFieldOfView",
+				Property::fromReadWrite<float>(
+					[](Instance *self) { return self->Cast<Camera>()->GetDiagonalFieldOfView(); },
+					[](Instance *self, float value) { self->Cast<Camera>()->SetDiagonalFieldOfView(value); }
+				),
+			},
+		},
+	);
+
+	float Camera::GetAspectRatio() {
+		return ViewportSize.GetY() > 0.0f ? ViewportSize.GetX() / ViewportSize.GetY() : 1.0f;
+	}
+
+	float Camera::GetHorizontalFieldOfView() {
+		return glm::degrees(2 * glm::atan(GetAspectRatio() * glm::tan(glm::radians(FieldOfView) / 2)));
+	}
+
+	void Camera::SetHorizontalFieldOfView(float fovy) {
+		FieldOfView = glm::degrees(2 * glm::atan(1 / GetAspectRatio() * glm::tan(glm::radians(fovy) / 2)));
+	}
+
+	float Camera::GetDiagonalFieldOfView() {
+		return glm::degrees(
+			2 * glm::atan(glm::sqrt(1 + glm::pow(GetAspectRatio(), 2)) * glm::tan(glm::radians(FieldOfView) / 2))
+		);
+	}
+
+	void Camera::SetDiagonalFieldOfView(float fovy) {
+		FieldOfView = glm::degrees(
+			2 * glm::atan(1 / glm::sqrt(1 + glm::pow(GetAspectRatio(), 2)) * glm::tan(glm::radians(fovy) / 2))
+		);
+	}
+
+	glm::mat4 Camera::GetProjectionMatrix() {
+		return glm::perspective(glm::radians(FieldOfView), GetAspectRatio(), 0.1f, 100000.0f);
+	}
+
+	glm::mat4 Camera::GetViewMatrix() {
+		glm::vec3 position = CFrame.Position;
+		return glm::lookAt(position, position + CFrame.GetLookVector(), CFrame.GetUpVector());
+	}
+
+	void Camera::OnEvent(SDL_Event &event) {
+		if (CameraType != Enums::CameraType::Freecam) {
+			return;
+		}
+
+		if (event.type == SDL_EVENT_WINDOW_RESIZED) {
+			int width, height;
+			auto window = SDL_GetWindowFromEvent(&event);
+			SDL_GetWindowSizeInPixels(window, &width, &height);
+			ViewportSize = Vector2(width, height);
+		} else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_RIGHT) {
+			auto window = SDL_GetWindowFromEvent(&event);
+			SDL_SetWindowRelativeMouseMode(window, true);
+		} else if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_RIGHT) {
+			auto window = SDL_GetWindowFromEvent(&event);
+			SDL_SetWindowRelativeMouseMode(window, false);
+		} else if (event.type == SDL_EVENT_MOUSE_MOTION &&
+				   SDL_GetWindowRelativeMouseMode(SDL_GetWindowFromEvent(&event))) {
+			AccumulatedDeltaX += event.motion.xrel;
+			AccumulatedDeltaY += event.motion.yrel;
+		}
+	}
+
+	void Camera::Step(float deltaTime) {
+		if (CameraType != Enums::CameraType::Freecam) {
+			return;
+		}
+
+		if (AccumulatedDeltaX != 0.0f || AccumulatedDeltaY != 0.0f) {
+			Yaw -= AccumulatedDeltaX * FreecamSensitivity;
+
+			Pitch -= AccumulatedDeltaY * FreecamSensitivity;
+			Pitch = glm::clamp(Pitch, -89.0f, 89.0f);
+
+			AccumulatedDeltaX = 0.0f;
+			AccumulatedDeltaY = 0.0f;
+
+			auto rotation = CFrame::fromEulerAnglesYXZ(glm::radians(Pitch), glm::radians(Yaw), 0.0f);
+			CFrame = gargantuan::CFrame(CFrame.Position, rotation.Rotation);
+		}
+
+		auto keys = SDL_GetKeyboardState(nullptr);
+
+		auto lookVector = CFrame.GetLookVector();
+		auto rightVector = CFrame.GetRightVector();
+		auto upVector = CFrame.GetUpVector();
+
+		if (keys[SDL_SCANCODE_W]) {
+			CFrame.Position += lookVector * FreecamSpeed * deltaTime;
+		}
+
+		if (keys[SDL_SCANCODE_S]) {
+			CFrame.Position -= lookVector * FreecamSpeed * deltaTime;
+		}
+
+		if (keys[SDL_SCANCODE_A]) {
+			CFrame.Position -= rightVector * FreecamSpeed * deltaTime;
+		}
+
+		if (keys[SDL_SCANCODE_D]) {
+			CFrame.Position += rightVector * FreecamSpeed * deltaTime;
+		}
+
+		if (keys[SDL_SCANCODE_SPACE]) {
+			CFrame.Position += glm::vec3(0, FreecamSpeed * deltaTime, 0);
+		}
+
+		// complex and volatile so i can screenshot on macos
+		bool shiftPressed = keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT];
+		bool guiPressed = (SDL_GetModState() & SDL_KMOD_GUI) != 0;
+		if (shiftPressed && !guiPressed) {
+			CFrame.Position -= glm::vec3(0, FreecamSpeed * deltaTime, 0);
+		}
+	}
+} // namespace gargantuan
