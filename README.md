@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="./assets/github/banner.png" alt="Gargantuan" width="656px" />
+<img src="./docs/github/banner.png" alt="Gargantuan" width="656px" />
 <br/>
-<img src="./assets/github/demo-sphere.gif" alt="Gargantuan" width="324px" />
-<img src="./assets/github/demo-waveform.gif" alt="Gargantuan" width="324px" />
+<img src="./docs/github/demo-sphere.gif" alt="Gargantuan" width="324px" />
+<img src="./docs/github/demo-waveform.gif" alt="Gargantuan" width="324px" />
 
 <h3>An Independent Game Engine for Roblox Developers</h3>
 
