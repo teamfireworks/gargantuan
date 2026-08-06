@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		InputObject,
 		.Description = "Describes a user input occuring at an instant.",
 		.Properties =

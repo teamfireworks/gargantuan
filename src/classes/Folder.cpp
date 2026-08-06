@@ -4,5 +4,5 @@
 #include <lua.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(Folder);
+	I_IMPL(Folder);
 }

@@ -2,5 +2,5 @@
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(TweenService);
+	I_IMPL(TweenService);
 }

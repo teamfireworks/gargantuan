@@ -5,7 +5,7 @@
 #include <lua.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		Tween,
 		.Properties =
 			{

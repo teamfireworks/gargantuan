@@ -3,7 +3,7 @@
 #include "gargantuan/scripting/Userdata.hpp"
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		Workspace,
 		.Superclass = "WorldRoot",
 		.Properties = {

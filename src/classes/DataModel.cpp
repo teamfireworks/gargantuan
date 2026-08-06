@@ -8,7 +8,7 @@
 #include "gargantuan/services/Workspace.hpp"
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		DataModel,
 		.Description = "The root hierachy and service provider for Gargantuan games.",
 		.Superclass = "ServiceProvider"

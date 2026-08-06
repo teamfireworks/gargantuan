@@ -10,7 +10,7 @@
 #include <glm/trigonometric.hpp>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		Camera,
 		.Description = "Provides the 3D view of the workspace.",
 		.Properties = {

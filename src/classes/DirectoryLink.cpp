@@ -16,7 +16,7 @@
 #include <string>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		DirectoryLink,
 		.Description = "Synchronizes a filesystem entry into the data model.",
 		.Properties = {
