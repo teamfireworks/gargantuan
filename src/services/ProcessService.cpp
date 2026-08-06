@@ -6,7 +6,7 @@
 #include <lualib.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		ProcessService,
 		.Description = "Provides runtime access to system processes",
 		.Methods = {

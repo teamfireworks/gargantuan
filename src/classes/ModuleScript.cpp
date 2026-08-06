@@ -5,5 +5,5 @@
 #include <lua.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(ModuleScript, .Superclass = "LuaSourceContainer");
+	I_IMPL(ModuleScript, .Superclass = "LuaSourceContainer");
 }

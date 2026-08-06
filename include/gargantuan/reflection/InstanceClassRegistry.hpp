@@ -1,12 +1,12 @@
 #pragma once
 
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/datatypes/instances/Instance.hpp"
 
 #include <string_view>
 #include <typeindex>
 #include <vector>
 
-#define G_INSTANCE_IMPL(instanceType, ...)                                                                             \
+#define I_IMPL(instanceType, ...)                                                                                      \
 	const gargantuan::InstanceClassDefinition instanceType::CLASS_DEFINITION = {                                       \
 		.ClassName = #instanceType,                                                                                    \
 		.Constructor = []() -> std::shared_ptr<gargantuan::Instance> {                                                 \

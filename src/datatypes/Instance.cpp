@@ -25,7 +25,7 @@ namespace gargantuan {
 			{"__namecall", Method{&Instance::LNamecall}},
 		}
 	);
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		Instance,
 		.Superclass = std::nullopt,
 		.Properties =

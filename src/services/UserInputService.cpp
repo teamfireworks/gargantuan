@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		UserInputService,
 		.Properties =
 			{

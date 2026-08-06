@@ -9,7 +9,7 @@
 #include <memory>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
+	I_IMPL(
 		Part,
 		.Superclass = "BasePart",
 		.Properties = {
