@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gargantuan/classes/WorldRoot.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
 #include "gargantuan/datatypes/Instance.hpp"
@@ -12,6 +13,8 @@ namespace gargantuan {
 	  public:
 		G_INSTANCE_DECL(BasePart);
 
+		WorldRoot *World = nullptr;
+
 		bool Anchored = false;
 		bool CanCollide = true;
 		bool CastShadow = true;
@@ -19,6 +22,10 @@ namespace gargantuan {
 		Color3 Color;
 		glm::vec3 Size = glm::vec3(2, 1, 4);
 		float Transparency = 0.0f;
+
+		G_SIGNAL(Touched, BasePart *);
+		G_SIGNAL(TouchEnded, BasePart *);
+		void ApplyImpulse(glm::vec3 force);
 
 		glm::mat4 GetModelMatrix();
 		virtual std::unique_ptr<GpuMesh> &GetMesh() const = 0;
