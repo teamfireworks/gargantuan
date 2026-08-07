@@ -1,7 +1,13 @@
- {
-	"languageMode" : "strict",
-	"lint" : { "*": true },
-	"aliases" : {
-		"lest" : ".lest/core",
-	}
+{
+    "languageMode": "strict",
+    "aliases": {
+        "std": "~/.lute/typedefs/1.0.0/std",
+        "lint": "~/.lute/typedefs/1.0.0/lint",
+        "lute": "~/.lute/typedefs/1.0.0/lute",
+        "lest": ".lest/core",
+        "tools": "tools/libs"
+    },
+    "lint": {
+        "*": true
+    }
 }
