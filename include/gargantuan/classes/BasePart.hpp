@@ -1,12 +1,16 @@
 #pragma once
 
-#include "gargantuan/classes/WorldRoot.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
 #include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/render/GpuMesh.hpp"
 
 #include <glm/glm.hpp>
+class BasePart;
+class WorldRoot {
+  public:
+	void ApplyImpulse(BasePart *part, glm::vec3 force);
+};
 
 namespace gargantuan {
 	class BasePart : public Instance {

@@ -1,6 +1,7 @@
 #include "gargantuan/classes/WorldRoot.hpp"
 #include "gargantuan/classes/BasePart.hpp"
 #include "gargantuan/classes/Part.hpp"
+#include "gargantuan/classes/WeldConstraint.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/physics/Conversions.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
@@ -8,6 +9,7 @@
 #include <SDL3/SDL_log.h>
 #include <box3d/box3d.h>
 #include <box3d/collision.h>
+#include <box3d/id.h>
 #include <box3d/math_functions.h>
 #include <box3d/types.h>
 #include <cstddef>
@@ -114,6 +116,18 @@ namespace gargantuan {
 				}
 
 				this->PartBodies[part.get()] = partId;
+			} else if (instance->IsA("WeldConstraint")) { // specific to weldconstraints, cuz it has specific properties
+														  // for the welded parts and doesn't just use the attachments'
+														  // parents
+				std::shared_ptr<WeldConstraint> weldconst = std::static_pointer_cast<WeldConstraint>(instance);
+
+				b3WeldJointDef welddef = b3DefaultWeldJointDef();
+				welddef.base.bodyIdA = PartBodies.at(weldconst->Part0.Cast<BasePart>());
+				welddef.base.bodyIdB = PartBodies.at(weldconst->Part1.Cast<BasePart>());
+				welddef.base.collideConnected = true; // i mean i guess bro
+				b3JointId jointid = b3CreateWeldJoint(World, &welddef);
+
+				this->Constraints[weldconst.get()] = jointid;
 			}
 		};
 
@@ -123,6 +137,10 @@ namespace gargantuan {
 				erase(Parts, part);
 				b3DestroyBody(this->PartBodies[part.get()]);
 				this->PartBodies.erase(part.get());
+			} else if (instance->IsA("Constraint")) {
+				std::shared_ptr<Constraint> constraint = std::static_pointer_cast<Constraint>(instance);
+				b3DestroyJoint(this->Constraints[constraint.get()], true);
+				this->Constraints.erase(constraint.get());
 			}
 		};
 
