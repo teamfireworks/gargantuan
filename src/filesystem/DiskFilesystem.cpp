@@ -1,5 +1,6 @@
 #include "gargantuan/filesystem/DiskFilesystem.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
+#include "gargantuan/filesystem/Paths.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_iostream.h>
@@ -78,7 +79,7 @@ namespace gargantuan {
 
 	FileMetadata DiskFilesystem::Metadata(const std::filesystem::path &path) const {
 		SDL_PathInfo info;
-		if (!SDL_GetPathInfo(path.c_str(), &info)) throw std::runtime_error(SDL_GetError());
+		if (!SDL_GetPathInfo(Paths::ToUtf8(path).c_str(), &info)) throw std::runtime_error(SDL_GetError());
 		return {
 			.Type = MapSDLPathType(info.type),
 			.Size = static_cast<unsigned int>(info.size),
@@ -90,7 +91,7 @@ namespace gargantuan {
 	}
 
 	std::unique_ptr<FileHandle> DiskFilesystem::Open(const std::filesystem::path &path, const FileOpen &mode) {
-		auto stream = SDL_IOFromFile(path.c_str(), MapFileOpen(mode));
+		auto stream = SDL_IOFromFile(Paths::ToUtf8(path).c_str(), MapFileOpen(mode));
 		if (!stream) throw SDL_GetError();
 		return std::make_unique<DiskFileHandle>(stream);
 	};
@@ -107,7 +108,7 @@ namespace gargantuan {
 		std::vector<DirectoryEntry> entries;
 		for (const auto &entry : std::filesystem::directory_iterator(path)) {
 			entries.push_back({
-				.Name = entry.path().filename(),
+				.Name = Paths::ToUtf8(entry.path().filename()),
 				.Path = entry.path(),
 				.Type = MapDirectoryEntryType(entry),
 			});
@@ -118,7 +119,7 @@ namespace gargantuan {
 	void CollectDescendants(std::vector<DirectoryEntry> &entries, const std::filesystem::path &path) {
 		for (const auto &entry : std::filesystem::directory_iterator(path)) {
 			entries.push_back({
-				.Name = entry.path().filename(),
+				.Name = Paths::ToUtf8(entry.path().filename()),
 				.Path = entry.path(),
 				.Type = MapDirectoryEntryType(entry),
 			});
@@ -137,7 +138,7 @@ namespace gargantuan {
 		if (!std::filesystem::exists(source)) throw std::runtime_error("Source does not exist");
 		if (std::filesystem::exists(destination)) throw std::runtime_error("Cannot copy to existing destination");
 		if (std::filesystem::is_regular_file(source)) {
-			SDL_CopyFile(source.c_str(), destination.c_str());
+			SDL_CopyFile(Paths::ToUtf8(source).c_str(), Paths::ToUtf8(destination).c_str());
 		}
 	};
 };

@@ -6,6 +6,7 @@
 
 #include <SDL3/SDL.h>
 #include <memory>
+#include <string_view>
 
 namespace gargantuan {
 	struct DrawContext {
@@ -32,7 +33,7 @@ namespace gargantuan {
 
 	class RenderPass {
 	  public:
-		static constexpr std::string LABEL;
+		static constexpr std::string_view LABEL;
 
 		Shader Shader;
 		SDL_GPUGraphicsPipeline *Pipeline = nullptr;
