@@ -1,6 +1,7 @@
 #include "gargantuan/classes/WorldRoot.hpp"
 #include "gargantuan/classes/BasePart.hpp"
 #include "gargantuan/classes/Part.hpp"
+#include "gargantuan/classes/WeldConstraint.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/physics/Conversions.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
@@ -8,6 +9,7 @@
 #include <SDL3/SDL_log.h>
 #include <box3d/box3d.h>
 #include <box3d/collision.h>
+#include <box3d/id.h>
 #include <box3d/math_functions.h>
 #include <box3d/types.h>
 #include <cstddef>
@@ -114,6 +116,18 @@ namespace gargantuan {
 				}
 
 				this->PartBodies[part.get()] = partId;
+			} else if (instance->IsA("WeldConstraint")) { // specific to weldconstraints, cuz it has specific properties
+														  // for the welded parts and doesn't just use the attachments'
+														  // parents
+				std::shared_ptr<WeldConstraint> weldconst = std::static_pointer_cast<WeldConstraint>(instance);
+
+				b3WeldJointDef welddef = b3DefaultWeldJointDef();
+				welddef.base.bodyIdA = PartBodies.at(weldconst->Part0.Cast<BasePart>());
+				welddef.base.bodyIdB = PartBodies.at(weldconst->Part1.Cast<BasePart>());
+				welddef.base.collideConnected = true; // i mean i guess bro
+				b3JointId jointid = b3CreateWeldJoint(World, &welddef);
+
+				this->Constraints[weldconst.get()] = jointid;
 			}
 		};
 
@@ -123,6 +137,10 @@ namespace gargantuan {
 				erase(Parts, part);
 				b3DestroyBody(this->PartBodies[part.get()]);
 				this->PartBodies.erase(part.get());
+			} else if (instance->IsA("Constraint")) {
+				std::shared_ptr<Constraint> constraint = std::static_pointer_cast<Constraint>(instance);
+				b3DestroyJoint(this->Constraints[constraint.get()], true);
+				this->Constraints.erase(constraint.get());
 			}
 		};
 
@@ -137,6 +155,7 @@ namespace gargantuan {
 		while (Accumulator >= TimeStep && steps < MAX_STEPS_PER_FRAME) {
 			b3World_Step(World, TimeStep, SubStepCount);
 			b3BodyEvents events = b3World_GetBodyEvents(World);
+			b3ContactEvents touchevents = b3World_GetContactEvents(World);
 			for (int i = 0; i < events.moveCount; ++i) {
 				const b3BodyMoveEvent &move = events.moveEvents[i];
 				BasePart *part = static_cast<BasePart *>(move.userData);
@@ -145,11 +164,35 @@ namespace gargantuan {
 					FromBox3(move.transform.p), glm::mat3_cast(FromBox3(move.transform.q))
 				);
 			}
+			for (int i = 0; i < touchevents.beginCount; ++i) {
+				const b3ContactBeginTouchEvent &begin = touchevents.beginEvents[i];
+				BasePart *partA = static_cast<BasePart *>(b3Body_GetUserData(b3Shape_GetBody(begin.shapeIdA)));
+				BasePart *partB = static_cast<BasePart *>(b3Body_GetUserData(b3Shape_GetBody(begin.shapeIdB)));
+				if (partA == nullptr) continue;
+				if (partB == nullptr) continue;
+				partA->Touched->Fire(partB);
+				partB->Touched->Fire(partA);
+			}
+			for (int i = 0; i < touchevents.endCount; ++i) {
+				const b3ContactEndTouchEvent &end = touchevents.endEvents[i];
+				BasePart *partA = static_cast<BasePart *>(b3Body_GetUserData(b3Shape_GetBody(end.shapeIdA)));
+				BasePart *partB = static_cast<BasePart *>(b3Body_GetUserData(b3Shape_GetBody(end.shapeIdB)));
+				if (partA == nullptr) continue;
+				if (partB == nullptr) continue;
+				partA->TouchEnded->Fire(partB);
+				partB->TouchEnded->Fire(partA);
+			}
 			Accumulator -= TimeStep;
 			++steps;
 		}
 
 		if (steps == MAX_STEPS_PER_FRAME) Accumulator = 0.0f;
+	}
+
+	void WorldRoot::ApplyImpulse(BasePart *part, glm::vec3 force) {
+		auto it = PartBodies.find(part);
+		if (it == PartBodies.end()) return;
+		b3Body_ApplyLinearImpulseToCenter(it->second, ToBox3(force), true);
 	}
 
 	void WorldRoot::KillWorld() {

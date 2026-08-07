@@ -1,4 +1,5 @@
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
+#include "gargantuan/filesystem/Paths.hpp"
 
 #include <format>
 #include <sstream>
@@ -10,12 +11,17 @@ namespace gargantuan {
 	}
 
 	void BaseFilesystem::Copy(const std::filesystem::path &source, const std::filesystem::path &destination) {
-		if (!Exists(source)) throw std::format("File {} does not exist", source.c_str());
-		if (Exists(destination)) throw std::format("Cannot copy to existing destination {}", destination.c_str());
+		if (!Exists(source)) throw std::format("File {} does not exist", Paths::ToUtf8(source).c_str());
+		if (Exists(destination))
+			throw std::format("Cannot copy to existing destination {}", Paths::ToUtf8(destination).c_str());
 
 		if (Type(source) == FileType::File) {
 			if (Exists(destination) && Type(source) != FileType::File) {
-				throw std::format("Cannot copy file {} to non-file {}", source.c_str(), destination.c_str());
+				throw std::format(
+					"Cannot copy file {} to non-file {}",
+					Paths::ToUtf8(source).c_str(),
+					Paths::ToUtf8(destination).c_str()
+				);
 			}
 
 			auto sourceHandle = Open(source, FileOpen::Read);
@@ -34,12 +40,17 @@ namespace gargantuan {
 	};
 
 	void BaseFilesystem::Move(const std::filesystem::path &source, const std::filesystem::path &destination) {
-		if (!Exists(source)) throw std::format("File {} does not exist", source.c_str());
-		if (Exists(destination)) throw std::format("Cannot move to existing destination {}", destination.c_str());
+		if (!Exists(source)) throw std::format("File {} does not exist", Paths::ToUtf8(source).c_str());
+		if (Exists(destination))
+			throw std::format("Cannot move to existing destination {}", Paths::ToUtf8(destination).c_str());
 
 		if (Type(source) == FileType::File) {
 			if (Exists(destination) && Type(source) != FileType::File) {
-				throw std::format("Cannot copy file {} to non-file {}", source.c_str(), destination.c_str());
+				throw std::format(
+					"Cannot copy file {} to non-file {}",
+					Paths::ToUtf8(source).c_str(),
+					Paths::ToUtf8(destination).c_str()
+				);
 			}
 
 			auto sourceHandle = Open(source, FileOpen::Read);
@@ -59,8 +70,8 @@ namespace gargantuan {
 	};
 
 	std::string BaseFilesystem::ReadFileToString(const std::filesystem::path &path) {
-		if (!Exists(path)) throw std::format("File {} does not exist", path.c_str());
-		if (Type(path) != FileType::File) throw std::format("{} is not a file", path.c_str());
+		if (!Exists(path)) throw std::format("File {} does not exist", Paths::ToUtf8(path).c_str());
+		if (Type(path) != FileType::File) throw std::format("{} is not a file", Paths::ToUtf8(path).c_str());
 
 		auto handle = Open(path, FileOpen::Read);
 
@@ -77,8 +88,8 @@ namespace gargantuan {
 	};
 
 	void BaseFilesystem::WriteStringToFile(const std::filesystem::path &path, std::string contents) {
-		if (!Exists(path)) throw std::format("File {} does not exist", path.c_str());
-		if (Type(path) != FileType::File) throw std::format("{} is not a file", path.c_str());
+		if (!Exists(path)) throw std::format("File {} does not exist", Paths::ToUtf8(path).c_str());
+		if (Type(path) != FileType::File) throw std::format("{} is not a file", Paths::ToUtf8(path).c_str());
 
 		auto handle = Open(path, FileOpen::Write);
 		handle->Write(contents.data(), contents.size());

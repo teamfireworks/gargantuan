@@ -26,7 +26,7 @@ namespace gargantuan {
 
 		std::tm tm_now{};
 #if defined(_WIN32)
-		localtime_s(&tm_now, &time_t_now);
+		localtime_s(&tm_now, &timeNow);
 #else
 		localtime_r(&timeNow, &tm_now);
 #endif

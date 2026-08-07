@@ -14,6 +14,15 @@ submodules:
     git submodule update --init --recursive
 
 # Configures the build directory
+[windows]
+configure tracy="OFF" build_type="Debug":
+    scripts/win-msvc.bat cmake -B {{ GARGANTUAN_BUILD_DIRECTORY }} -S . -G Ninja \
+        -DCMAKE_BUILD_TYPE={{ build_type }} \
+        -DGARGANTUAN_TRACY={{ tracy }} \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+# Configures the build directory
+[unix]
 configure tracy="OFF" build_type="Debug":
     cmake -B {{ GARGANTUAN_BUILD_DIRECTORY }} -S . -G Ninja \
         -DCMAKE_BUILD_TYPE={{ build_type }} \
@@ -21,6 +30,12 @@ configure tracy="OFF" build_type="Debug":
         -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
 # Builds the engine
+[windows]
+build:
+    scripts/win-msvc.bat cmake --build {{ GARGANTUAN_BUILD_DIRECTORY }} -j={{ num_cpus() }}
+
+# Builds the engine
+[unix]
 build:
     cmake --build {{ GARGANTUAN_BUILD_DIRECTORY }} -j={{ num_cpus() }}
 

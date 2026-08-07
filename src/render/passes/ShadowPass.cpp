@@ -1,3 +1,5 @@
+#include <string>
+#include <string_view>
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include "gargantuan/render/PipelineBuilder.hpp"
@@ -14,7 +16,7 @@ namespace gargantuan {
 
 	class ShadowPass final : public RenderPass {
 	  public:
-		static constexpr std::string LABEL = "Shadow";
+		static constexpr std::string_view LABEL = "Shadow";
 
 		struct alignas(16) Uniforms {
 			glm::mat4 ShadowMatrix;
