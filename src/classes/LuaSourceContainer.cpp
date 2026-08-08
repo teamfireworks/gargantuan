@@ -1,5 +1,5 @@
 #include "gargantuan/classes/LuaSourceContainer.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
 #include <SDL3/SDL.h>

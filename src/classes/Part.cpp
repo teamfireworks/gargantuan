@@ -1,5 +1,5 @@
 #include "gargantuan/classes/Part.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 #include "gargantuan/render/MeshProvider.hpp"
 #include "gargantuan/scripting/Userdata.hpp"

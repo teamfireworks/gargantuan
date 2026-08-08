@@ -1,9 +1,7 @@
 #pragma once
 
-#include "gargantuan/datatypes/CFrame.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
-#include "gargantuan/datatypes/Vector2.hpp"
-#include "gargantuan/reflection/Enums.hpp"
+#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/classes/generated/Camera.hpp"
 
 #include <SDL3/SDL.h>
 
@@ -31,30 +29,17 @@ namespace gargantuan {
 	);
 
 	class Camera : public Instance {
-	  public:
-		G_INSTANCE_DECL(Camera);
-
-		Enums::CameraType CameraType = Enums::CameraType::Freecam;
-		CFrame CFrame;
-		float Pitch = 0.0f, Yaw = -90.0f, Roll = 0.0f;
-		// Vertical field of view in degrees.
-		float FieldOfView = 70.0f;
-		Vector2 ViewportSize = gargantuan::Vector2(0.0f, 0.0f);
+		G_DECL_CAMERA;
 
 		float AccumulatedDeltaX = 0.0f;
 		float AccumulatedDeltaY = 0.0f;
 		float FreecamSpeed = 10.0f;
 		float FreecamSensitivity = 0.2f;
 
-		float GetAspectRatio();
-		float GetHorizontalFieldOfView();
-		float GetDiagonalFieldOfView();
-		void SetHorizontalFieldOfView(float fovy);
-		void SetDiagonalFieldOfView(float fovy);
 		glm::mat4 GetProjectionMatrix();
 		glm::mat4 GetViewMatrix();
 
 		void OnEvent(SDL_Event &event);
 		void Step(float deltaTime);
 	};
-} // namespace gargantuan
+}

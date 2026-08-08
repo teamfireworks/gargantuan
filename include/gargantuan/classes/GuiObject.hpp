@@ -1,8 +1,8 @@
 #pragma once
 
 #include "gargantuan/classes/GuiBase2d.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Rect.hpp"
 #include "gargantuan/datatypes/UDim.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"

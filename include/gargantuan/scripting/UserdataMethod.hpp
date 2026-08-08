@@ -3,16 +3,18 @@
 #include "gargantuan/scripting/StackValue.hpp"
 #include <functional>
 #include <lualib.h>
+#include <string>
 #include <utility>
 
 namespace gargantuan {
 	template <typename Self> struct UserdataMethod {
 	  public:
 		int (*Call)(lua_State *L, Self *instance);
+		std::string Signature{};
 
 		template <auto MethodPointer, typename Class, typename Returns, typename... Arguments>
 		static UserdataMethod fromMember(Returns (Class::*)(Arguments...)) {
-			return {[](lua_State *L, Self *instance) -> int {
+			return {.Call = [](lua_State *L, Self *instance) -> int {
 				auto *derived = static_cast<Class *>(instance);
 				return CallFromMember<MethodPointer, Class, Arguments...>(
 					L, derived, std::index_sequence_for<Arguments...>{}
@@ -22,7 +24,7 @@ namespace gargantuan {
 
 		template <auto MethodPointer, typename Class, typename Returns, typename... Arguments>
 		static UserdataMethod fromMember(Returns (Class::*)(Arguments...) const) {
-			return {[](lua_State *L, Self *instance) -> int {
+			return {.Call = [](lua_State *L, Self *instance) -> int {
 				auto *derived = static_cast<Class *>(instance);
 				return CallFromMember<MethodPointer, Class, Arguments...>(
 					L, derived, std::index_sequence_for<Arguments...>{}
@@ -43,8 +45,9 @@ namespace gargantuan {
 				std::invoke(MethodPointer, instance, StackValue<std::decay_t<Arguments>>::From(L, Indices + 2)...);
 				return 0;
 			} else {
-				auto &&res =
-					std::invoke(MethodPointer, instance, StackValue<std::decay_t<Arguments>>::From(L, Indices + 2)...);
+				auto &&res = std::invoke(
+					MethodPointer, instance, StackValue<std::decay_t<Arguments>>::From(L, Indices + 2)...
+				);
 				StackValue<std::decay_t<Ret>>::Push(L, std::forward<decltype(res)>(res));
 				return 1;
 			}

@@ -2,7 +2,7 @@
 
 #include "gargantuan/assets/InstanceSerialization.hpp"
 #include "gargantuan/classes/DataModel.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
 
 #include <filesystem>

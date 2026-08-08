@@ -1,10 +1,10 @@
 #include "gargantuan/classes/DirectoryLink.hpp"
 #include "gargantuan/Log.hpp"
 #include "gargantuan/classes/Folder.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/LuaSourceContainer.hpp"
 #include "gargantuan/classes/ModuleScript.hpp"
 #include "gargantuan/classes/Script.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/filesystem/Paths.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 

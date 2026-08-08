@@ -1,7 +1,7 @@
 #pragma once
 
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/datatypes/TweenInfo.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"

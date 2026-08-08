@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gargantuan/classes/DataModel.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/scripting/ThreadEngine.hpp"
 
 #include <Luau/Compiler.h>

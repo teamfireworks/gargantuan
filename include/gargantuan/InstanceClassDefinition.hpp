@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gargantuan/datatypes/instances/InstanceProperty.hpp"
+#include "gargantuan/InstanceProperty.hpp"
 #include "gargantuan/scripting/UserdataMethod.hpp"
 
 #include <optional>

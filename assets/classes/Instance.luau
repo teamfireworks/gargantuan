@@ -4,6 +4,7 @@ return c({
 	name = "Instance",
 	description = "Abstract class for all instances which can be part of the DataModel",
 	since = "0.1.0",
+	abstract = true,
 
 	properties = {
 		Archivable = {
@@ -72,6 +73,9 @@ return c({
 		GetFullName = {
 			description = "Returns the instance's ancestry as a period-separated path",
 			returns = t.String,
+		},
+		Destroy = {
+			description = "Destroys this instance",
 		},
 
 		IsPropertyModified = {

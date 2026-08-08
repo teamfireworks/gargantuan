@@ -1,39 +1,10 @@
 #include "gargantuan/classes/Camera.hpp"
-#include "gargantuan/datatypes/CFrame.hpp"
-#include "gargantuan/datatypes/Vector2.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
-#include "gargantuan/scripting/Userdata.hpp"
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_events.h>
-#include <SDL3/SDL_video.h>
-#include <glm/trigonometric.hpp>
+#include <glm/glm.hpp>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		Camera,
-		.Description = "Provides the 3D view of the workspace.",
-		.Properties = {
-			{"CameraType", Property::fromMember<&Camera::CameraType>(true, true).SetSerializable()},
-			{"CFrame", Property::fromMember<&Camera::CFrame>(true, true).SetSerializable()},
-			{"FieldOfView", Property::fromMember<&Camera::FieldOfView>(true, true).SetSerializable()},
-			{"ViewportSize", Property::fromMember<&Camera::ViewportSize>(true, false)},
-			{
-				"HorizontalFieldOfView",
-				Property::fromReadWrite<float>(
-					[](Instance *self) { return self->Cast<Camera>()->GetHorizontalFieldOfView(); },
-					[](Instance *self, float value) { self->Cast<Camera>()->SetHorizontalFieldOfView(value); }
-				),
-			},
-			{
-				"DiagonalFieldOfView",
-				Property::fromReadWrite<float>(
-					[](Instance *self) { return self->Cast<Camera>()->GetDiagonalFieldOfView(); },
-					[](Instance *self, float value) { self->Cast<Camera>()->SetDiagonalFieldOfView(value); }
-				),
-			},
-		},
-	);
+	G_IMPL_CAMERA;
 
 	float Camera::GetAspectRatio() {
 		return ViewportSize.GetY() > 0.0f ? ViewportSize.GetX() / ViewportSize.GetY() : 1.0f;
@@ -142,4 +113,4 @@ namespace gargantuan {
 			CFrame.Position -= glm::vec3(0, FreecamSpeed * deltaTime, 0);
 		}
 	}
-} // namespace gargantuan
+}

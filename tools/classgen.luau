@@ -6,8 +6,16 @@ local tableext = require("@std/tableext")
 local classes = require("@tools/classes")
 local types = require("@tools/types")
 
-const CLASSES_INPUT_PATH = path.join(process.cwd(), "assets/classes")
-const CLASSES_OUTPUT_PATH = path.join(process.cwd(), "include/gargantuan/classes/generated")
+const TARGETS = {
+	{
+		input = path.join(process.cwd(), "assets/classes"),
+		output = path.join(process.cwd(), "include/gargantuan/classes/generated"),
+	},
+	{
+		input = path.join(process.cwd(), "assets/services"),
+		output = path.join(process.cwd(), "include/gargantuan/services/generated"),
+	},
+}
 
 const function orderedPairs<K, V>(tbl: { [K]: V }): () -> (K, V)
 	const keys: { K } = {}
@@ -50,7 +58,7 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 					table.insert(publicBody, `{property.type.cType} {property.overrideRead}();`)
 				end
 				if property.overrideWrite then
-					table.insert(publicBody, `{property.type.cType} {property.overrideWrite}();`)
+					table.insert(publicBody, `void {property.overrideWrite}({property.type.cType} value);`)
 				end
 			else
 				table.insert(protectedBody, `{property.type.cType} {key} = {property.unmodified};`)
@@ -97,7 +105,7 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 		for key, method in orderedPairs(class.methods) do
 			if method.asLuau then
 				includes["<lua.h>"] = true
-				table.insert(publicBody, `int {key}(lua_State* L, Instance* inst);`)
+				table.insert(publicBody, `static int {key}(lua_State* L, Instance* inst);`)
 			else
 				const parameters = {}
 				if method.params then
@@ -118,16 +126,17 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 end
 
 const function makeClassImplementationBody(class: classes.Class, includes: { [string]: true })
+	-- InstanceClassDefinition
 	const body = {
 		`const InstanceClassDefinition {class.name}::CLASS_DEFINITION \{`,
-		`\t.ClassName = {class.name},`,
+		`\t.ClassName = {string.format("%q", class.name)},`,
 	}
 
 	if not class.abstract then
 		includes["<memory>"] = true
 		table.insert(
 			body,
-			`\t.Constructor = []() -> std::make_shared<gargantuan::Instance> \{ return std::make_shared<gargantuan::{class.name}>(); },`
+			`\t.Constructor = []() -> std::shared_ptr<gargantuan::Instance> \{ return std::make_shared<gargantuan::{class.name}>(); },`
 		)
 	end
 
@@ -140,24 +149,25 @@ const function makeClassImplementationBody(class: classes.Class, includes: { [st
 
 	table.insert(body, "\t.Properties = {")
 	if class.properties then
-		includes['"gargantuan/datatypes/instances/InstanceProperty.hpp"'] = true
+		includes['"gargantuan/InstanceProperty.hpp"'] = true
 		for key, property in orderedPairs(class.properties) do
 			table.insert(body, `\t\tInstanceProperty({string.format("%q", key)})`)
+			table.insert(body, `\t\t\t.SetReflectedTypedef({string.format("%q", property.type.luauType)})`)
+			table.insert(body, `\t\t\t.SetUnmodified({property.unmodified})`)
 			if property.serializable then
-				table.insert(body, `\t\t\t.Serializable()`)
+				table.insert(body, `\t\t\t.SetSerializable()`)
 			end
-			table.insert(body, `\t\t\t.LuauType({string.format("%q", property.type.luauType)})`)
 			if property.overrideRead or not property.overrideWrite then
-				table.insert(body, `\t\t\t.UseReader<{`&{class.name}::{property.overrideRead or `Get{key}`}`}>()`)
+				table.insert(body, `\t\t\t.UseRead<{`&{class.name}::{property.overrideRead or `Get{key}`}`}>()`)
 			end
 			if property.overrideWrite or not property.overrideRead then
-				table.insert(body, `\t\t\t.UseWriter<{`&{class.name}::{property.overrideWrite or `Set{key}`}`}>()`)
+				table.insert(body, `\t\t\t.UseWrite<{`&{class.name}::{property.overrideWrite or `Set{key}`}`}>()`)
 			end
 			table.insert(body, `\t\t\t.IntoPair(),`)
 		end
 	end
 	if class.signals then
-		includes['"gargantuan/datatypes/instances/InstanceProperty.hpp"'] = true
+		includes['"gargantuan/InstanceProperty.hpp"'] = true
 		for key, signal in orderedPairs(class.signals) do
 			const signalArgs = table.create<<string>>(signal.args and #signal.args or 0)
 			if signal.args then
@@ -167,10 +177,10 @@ const function makeClassImplementationBody(class: classes.Class, includes: { [st
 			end
 
 			table.insert(body, `\t\tInstanceProperty({string.format("%q", key)})`)
-			table.insert(body, `\t\t\t.Signal()`)
-			table.insert(body, `\t\t\t.LuauType("Signal<{table.concat(signalArgs, ", ")}>")`)
-			table.insert(body, `\t\t\t.UseReadonly<&{class.name}::{key}>()`)
-			table.insert(body, `\t\t\t.AsPair(),`)
+			table.insert(body, `\t\t\t.SetSignal()`)
+			table.insert(body, `\t\t\t.SetReflectedTypedef("Signal<{table.concat(signalArgs, ", ")}>")`)
+			table.insert(body, `\t\t\t.UseRead<&{class.name}::{key}>()`)
+			table.insert(body, `\t\t\t.IntoPair(),`)
 		end
 	end
 	table.insert(body, `\t},`)
@@ -181,7 +191,10 @@ const function makeClassImplementationBody(class: classes.Class, includes: { [st
 			if method.asLuau then
 				table.insert(
 					body,
-					`\t\t\{"{key}", Method\{.Signature = {string.format("%q", method.luauSignature or "")}, .Call = {key}}},`
+					`\t\t\{"{key}", Method\{.Call = &{class.name}::{key}, .Signature = {string.format(
+						"%q",
+						method.luauSignature or ""
+					)}}},`
 				)
 			else
 				table.insert(body, `\t\t\{"{key}", Method::fromMember<&{class.name}::{key}>()},`)
@@ -189,8 +202,19 @@ const function makeClassImplementationBody(class: classes.Class, includes: { [st
 		end
 	end
 	table.insert(body, `\t},`)
+	table.insert(body, "};")
 
-	table.insert(body, "}")
+	-- InstanceClassRegistry
+	includes['"gargantuan/reflection/InstanceClassRegistry.hpp"'] = true
+	table.insert(body, "namespace InstanceClassRegistry::__IGNORE__ {")
+	table.insert(body, `\tbool {class.name} = []() \{`)
+	table.insert(body, `\t\tInstanceClassRegistry::Register<gargantuan::{class.name}>({class.name}::CLASS_DEFINITION);`)
+	table.insert(body, `\t\treturn true;`)
+	table.insert(body, `\t}();`)
+	table.insert(body, "};")
+
+	-- Default implementations
+
 	return body
 end
 
@@ -219,18 +243,20 @@ const function makeClassContents(class: classes.Class)
 	return table.concat(rendered, "\n")
 end
 
-if not fs.exists(CLASSES_OUTPUT_PATH) then
-	fs.createDirectory(CLASSES_OUTPUT_PATH, { makeParents = true })
-end
+for _, target in TARGETS do
+	if not fs.exists(target.output) then
+		fs.createDirectory(target.output, { makeParents = true })
+	end
 
-for _, entry in fs.listDirectory(CLASSES_INPUT_PATH) do
-	if entry.type == "file" and entry.name ~= ".config.luau" and string.find(entry.name, ".luau$") ~= nil then
-		local inputFilepath = path.join(CLASSES_INPUT_PATH, entry.name)
-		local class: classes.Class = luau.loadModule(inputFilepath)
+	for _, entry in fs.listDirectory(target.input) do
+		if entry.type == "file" and entry.name ~= ".config.luau" and string.find(entry.name, ".luau$") ~= nil then
+			local inputFilepath = path.join(target.input, entry.name)
+			local class: classes.Class = luau.loadModule(inputFilepath)
 
-		local outputBasename = string.sub(entry.name, 1, -5)
-		local outputFilepath = path.join(CLASSES_OUTPUT_PATH, outputBasename .. "hpp")
-		print(`Writing {path.format(outputFilepath)}`)
-		fs.writeStringToFile(outputFilepath, makeClassContents(class))
+			local outputBasename = string.sub(entry.name, 1, -5)
+			local outputFilepath = path.join(target.output, outputBasename .. "hpp")
+			print(`Writing {path.format(outputFilepath)}`)
+			fs.writeStringToFile(outputFilepath, makeClassContents(class))
+		end
 	end
 end

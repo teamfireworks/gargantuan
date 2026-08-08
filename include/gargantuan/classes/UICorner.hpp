@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/UDim.hpp"
 
 namespace gargantuan {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "gargantuan/classes/InputObject.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
 #include "gargantuan/reflection/Enums.hpp"

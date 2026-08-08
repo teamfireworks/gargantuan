@@ -5,22 +5,18 @@
 
 #pragma once
 
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/classes/generated/DirectoryLink.hpp"
 
 #include <filesystem>
-#include <string>
 #include <vector>
 
 namespace gargantuan {
 	class DirectoryLink : public Instance {
-	  public:
-		G_INSTANCE_DECL(FileLink);
+		G_DECL_DIRECTORYLINK;
 
-		std::string Path;
 		std::vector<std::shared_ptr<Instance>> OwnedSiblings;
 		bool Synchronizing = false;
-		bool IgnoreErrors = false;
-		bool IgnoreUnknownDescendants = false;
 
 		// TODO: This syncs on engine start up. We should implement file
 		// watching. Also use the Filesystem classes

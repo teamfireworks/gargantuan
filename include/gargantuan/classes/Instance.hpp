@@ -1,11 +1,15 @@
 #pragma once
 
+#include "gargantuan/InstanceClassDefinition.hpp"
 #include "gargantuan/classes/generated/Instance.hpp"
-#include "gargantuan/datatypes/instances/InstanceClassDefinition.hpp"
+#include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 
 #include <memory>
+#include <string>
 #include <string_view>
+#include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace gargantuan {
@@ -18,32 +22,34 @@ namespace gargantuan {
 
 		virtual ~Instance() = default;
 
-		InstanceClassDefinition *CachedDefinition = nullptr;
 		std::vector<std::shared_ptr<Instance>> Children;
+		std::unordered_map<std::string, Signal<std::monostate>> PropertyChangedSignals;
 		Instance *ParentPointer = nullptr;
+		InstanceClassDefinition *CachedDefinition = nullptr;
 
-		const Self::Property *FindProperty(std::string_view name);
+		const InstanceProperty *FindProperty(std::string_view name);
 		const Self::Method *FindMethod(std::string_view name);
-
 		static int LIndex(lua_State *L, Instance *instance);
 		static int LNewIndex(lua_State *L, Instance *instance);
 		static int LNamecall(lua_State *L, Instance *instance);
 
 		template <typename T>
-		bool IsClass() const { return dynamic_cast<const T *>(this) != nullptr; }
+		[[deprecated("dynamic_cast it urself dummy")]] bool IsClass()
+			const { return dynamic_cast<const T *>(this) != nullptr; }
 
 		template <typename T>
-		T *Cast() const { return dynamic_cast<const T *>(this); }
+		[[deprecated("dynamic_cast it urself dummy")]] T *Cast() const { return dynamic_cast<const T *>(this); }
 
 		template <typename T>
-		T *Cast() { return dynamic_cast<T *>(this); }
+		[[deprecated("dynamic_cast it urself dummy")]] T *Cast() { return dynamic_cast<T *>(this); }
 
 		template <typename T>
+		[[deprecated("dynamic_cast it urself dummy")]]
 		const T *Cast() const { return dynamic_cast<const T *>(this); }
 
-		private : void CollectDescendants(std::vector<std::shared_ptr<Instance>> &descendants);
+		void CollectDescendants(std::vector<std::shared_ptr<Instance>> &descendants);
 		void FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent);
-
+		void AssertIsAlive();
 	);
 
 	template <typename Subclass>

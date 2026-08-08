@@ -1,7 +1,7 @@
 #pragma once
 
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/Tween.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/TweenInfo.hpp"
 #include <memory>
 

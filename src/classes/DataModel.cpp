@@ -1,6 +1,5 @@
 #include "gargantuan/classes/DataModel.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
+
 #include "gargantuan/services/ProcessService.hpp"
 #include "gargantuan/services/RunService.hpp"
 #include "gargantuan/services/TweenService.hpp"
@@ -8,11 +7,7 @@
 #include "gargantuan/services/Workspace.hpp"
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		DataModel,
-		.Description = "The root hierachy and service provider for Gargantuan games.",
-		.Superclass = "ServiceProvider"
-	);
+	G_IMPL_DATAMODEL;
 
 	const DataModel::ServiceDefinitions &DataModel::GetServiceDefinitions() const {
 		static const DataModel::ServiceDefinitions CONSTRUCTORS = {
