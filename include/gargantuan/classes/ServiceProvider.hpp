@@ -11,10 +11,10 @@ namespace gargantuan {
 		G_INSTANCE_DECL(ServiceProvider);
 
 		typedef std::unordered_map<std::string, InstanceClassDefinition> ServiceDefinitions;
-		std::unordered_map<std::string, Instance::Pointer> Services;
+		std::unordered_map<std::string, std::shared_ptr<Instance>> Services;
 
-		virtual Instance::Pointer FindService(std::string_view name);
-		virtual Instance::Pointer GetService(std::string_view name);
+		virtual std::shared_ptr<Instance> FindService(std::string_view name);
+		virtual std::shared_ptr<Instance> GetService(std::string_view name);
 		virtual const ServiceDefinitions &GetServiceDefinitions() const = 0;
 	};
 }

@@ -48,11 +48,11 @@ namespace gargantuan {
 		void FireAncestryChanged(std::shared_ptr<Instance> newParent);
 		void ClearAllChildren();
 
-		typedef std::tuple<Instance::Pointer, Instance::Pointer> AncestryChangedArguments;
-		G_SIGNAL(ChildAdded, Instance::Pointer);
-		G_SIGNAL(ChildRemoved, Instance::Pointer);
-		G_SIGNAL(DescendantAdded, Instance::Pointer);
-		G_SIGNAL(DescendantRemoved, Instance::Pointer);
+		typedef std::tuple<std::shared_ptr<Instance>, std::shared_ptr<Instance>> AncestryChangedArguments;
+		G_SIGNAL(ChildAdded, std::shared_ptr<Instance>);
+		G_SIGNAL(ChildRemoved, std::shared_ptr<Instance>);
+		G_SIGNAL(DescendantAdded, std::shared_ptr<Instance>);
+		G_SIGNAL(DescendantRemoved, std::shared_ptr<Instance>);
 		G_SIGNAL(AncestryChanged, AncestryChangedArguments);
 		G_SIGNAL(Destroying, std::monostate);
 
@@ -104,18 +104,20 @@ namespace gargantuan {
 		};
 
 		static bool Is(lua_State *L, int idx) {
-			if (!StackValue<Instance::Pointer>::Is(L, idx)) return false;
-			auto instance = StackValue<Instance::Pointer>::From(L, idx);
+			if (!StackValue<std::shared_ptr<Instance>>::Is(L, idx)) return false;
+			auto instance = StackValue<std::shared_ptr<Instance>>::From(L, idx);
 			return instance && instance->IsA(Subclass::CLASS_DEFINITION.ClassName);
 		};
 
 		static std::shared_ptr<Subclass> From(lua_State *L, int idx) {
-			auto instance = gargantuan::StackValue<Instance::Pointer>::From(L, idx);
+			auto instance = gargantuan::StackValue<std::shared_ptr<Instance>>::From(L, idx);
 			return instance ? std::dynamic_pointer_cast<Subclass>(instance) : nullptr;
 		};
 
 		static int Push(lua_State *L, std::shared_ptr<Subclass> value) {
-			return gargantuan::StackValue<Instance::Pointer>::Push(L, std::static_pointer_cast<Instance>(value));
+			return gargantuan::StackValue<std::shared_ptr<Instance>>::Push(
+				L, std::static_pointer_cast<Instance>(value)
+			);
 		};
 	};
 }

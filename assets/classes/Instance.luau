@@ -1,30 +1,35 @@
-const i, t, p = require("@tools/inst").unpack()
+const c, t, p = require("@tools/classes").unpack()
 
-return i.class({
+return c({
 	name = "Instance",
-	description = "Base class for all instances which can be part of the DataModel",
+	description = "Abstract class for all instances which can be part of the DataModel",
 	since = "0.1.0",
 
 	properties = {
 		Archivable = {
-			type = t.Bool,
 			description = "Whether this instance can be archived through clones and saves",
+			type = t.Bool,
 			unmodified = "false",
 		},
 		ClassName = {
-			type = t.String,
 			description = "The class this instance belongs to",
+			type = t.String,
 			unmodified = "CLASS_DEFINITION.ClassName",
 			overrideRead = "GetClassName",
 		},
+		Destroyed = {
+			description = "Whether this instance has been destroyed",
+			type = t.Bool,
+			unmodified = "false",
+		},
 		Name = {
-			type = t.String,
 			description = "Non-unique identifier of the instance",
+			type = t.String,
 			unmodified = "CLASS_DEFINITION.ClassName",
 		},
 		Parent = {
-			type = t.Optional(t.Instance),
 			description = "Hierarchical parent of the instance, instances are unparented on destruction",
+			type = t.Optional(t.Instance),
 			unmodified = "std::nullopt",
 			overrideRead = "GetParent",
 			overrideWrite = "SetParent",
@@ -68,6 +73,16 @@ return i.class({
 			description = "Returns the instance's ancestry as a period-separated path",
 			returns = t.String,
 		},
+
+		IsPropertyModified = {
+			description = "Whether the named property has been modified",
+			params = { p("propertyName", t.String) },
+			returns = t.Bool,
+		},
+		ResetPropertyToDefault = {
+			description = "Resets the named property to the base unmodified value",
+			params = { p("propertyName", t.String) },
+		},
 		GetPropertyChangedSignal = {
 			description = "Returns a signal that is fired when the specified property is changed",
 			params = { p("propertyName", t.String) },
@@ -77,6 +92,14 @@ return i.class({
 		GetChildren = {
 			description = "Returns all direct children of this instance",
 			returns = t.Array(t.Instance),
+		},
+		ClearAllChildren = {
+			description = "Unparents all direct children of this instance",
+		},
+		WaitForChild = {
+			description = "Yields until the named child is parented to this instance",
+			asLuau = true,
+			luauSignature = "(self: Instance, name: string, timeout: number?) -> Instance",
 		},
 		FindFirstChild = {
 			description = "Returns the first direct child that matches the specified name",

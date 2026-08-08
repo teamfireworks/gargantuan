@@ -15,7 +15,7 @@ namespace gargantuan {
 		},
 	);
 
-	Instance::Pointer ServiceProvider::FindService(std::string_view name) {
+	std::shared_ptr<Instance> ServiceProvider::FindService(std::string_view name) {
 		auto it = Services.find(std::string(name));
 		if (it != Services.end()) {
 			return it->second;
@@ -23,7 +23,7 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	Instance::Pointer ServiceProvider::GetService(std::string_view nameView) {
+	std::shared_ptr<Instance> ServiceProvider::GetService(std::string_view nameView) {
 		auto name = std::string(nameView);
 		auto it = Services.find(name);
 		if (it == Services.end()) {

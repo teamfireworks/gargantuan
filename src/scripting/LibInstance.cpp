@@ -21,7 +21,7 @@ namespace gargantuan {
 		}
 
 		auto instance = constructor();
-		StackValue<Instance::Pointer>::Push(L, instance);
+		StackValue<std::shared_ptr<Instance>>::Push(L, instance);
 		return 1;
 	};
 

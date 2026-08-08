@@ -38,7 +38,7 @@ namespace gargantuan {
 			return "Bytecode must be successfully compiled prior to LuaSourceContainer::LoadIntoState";
 		};
 
-		StackValue<Instance::Pointer>::Push(L, shared_from_this());
+		StackValue<std::shared_ptr<Instance>>::Push(L, shared_from_this());
 		lua_setglobal(L, "script");
 
 		luaL_sandboxthread(L);

@@ -41,7 +41,7 @@ namespace gargantuan::InstanceSerialization {
 		using json = nlohmann::json;
 
 		struct SerializationState {
-			std::unordered_map<Instance::Pointer, json> InstanceMap;
+			std::unordered_map<std::shared_ptr<Instance>, json> InstanceMap;
 		};
 
 		using SerializedPair = std::pair<const char *, json>;
@@ -91,7 +91,8 @@ namespace gargantuan::InstanceSerialization {
 			}
 		}
 
-		void SerializeProperties(InstanceClassDefinition *definition, Instance::Pointer instance, json &properties) {
+		void
+		SerializeProperties(InstanceClassDefinition *definition, std::shared_ptr<Instance> instance, json &properties) {
 			for (auto &[key, property] : definition->Properties) {
 				if (key == "Parent" || !property.Serializable || !property.Read || !property.Write) continue;
 
@@ -107,7 +108,7 @@ namespace gargantuan::InstanceSerialization {
 			}
 		}
 
-		nlohmann::ordered_json SerializeInstance(Instance::Pointer instance, SerializationState &state) {
+		nlohmann::ordered_json SerializeInstance(std::shared_ptr<Instance> instance, SerializationState &state) {
 			if (state.InstanceMap.contains(instance)) {
 				return state.InstanceMap.at(instance);
 			}
@@ -133,7 +134,7 @@ namespace gargantuan::InstanceSerialization {
 		}
 	}
 
-	std::string Serialize(InstanceFormat format, Instance::Pointer &instance) {
+	std::string Serialize(InstanceFormat format, std::shared_ptr<Instance> &instance) {
 		switch (format) {
 		case InstanceFormat::Json: {
 			Json::SerializationState state;
@@ -315,7 +316,7 @@ namespace gargantuan::InstanceSerialization {
 		return state.ReturnError("Unsupported property value: %s", unknown.dump());
 	};
 
-	std::optional<Instance::Pointer> TryDeserializeInstance(json contents, DeserializationState &state) {
+	std::optional<std::shared_ptr<Instance>> TryDeserializeInstance(json contents, DeserializationState &state) {
 		auto name = contents["Name"];
 		if (!name.is_string()) {
 			state.PushError("Child under {}has an invalid Name field", state.FormatCurrentPath());

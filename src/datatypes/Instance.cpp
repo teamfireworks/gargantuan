@@ -41,11 +41,11 @@ namespace gargantuan {
 				},
 				{
 					"Parent",
-					Property::fromReadWrite<Instance::Pointer>(
-						[](Instance *instance) -> std::optional<Instance::Pointer> {
+					Property::fromReadWrite<std::shared_ptr<Instance>>(
+						[](Instance *instance) -> std::optional<std::shared_ptr<Instance>> {
 							return instance->Parent ? instance->Parent->shared_from_this() : nullptr;
 						},
-						[](Instance *instance, Instance::Pointer newParent) { instance->SetParent(newParent); }
+						[](Instance *instance, std::shared_ptr<Instance> newParent) { instance->SetParent(newParent); }
 					),
 				},
 			},
@@ -171,7 +171,7 @@ namespace gargantuan {
 				}
 			} else if (auto child = self->FindFirstChild(key)) {
 				// lua_settop(L, 0);
-				StackValue<Instance::Pointer>::Push(L, child);
+				StackValue<std::shared_ptr<Instance>>::Push(L, child);
 				return 1;
 			}
 		}

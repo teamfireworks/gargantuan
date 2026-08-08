@@ -46,7 +46,7 @@ namespace gargantuan {
 		lua_pushcclosurek(L, warn, "warn", 0, nullptr);
 		lua_setglobal(L, "warn");
 
-		StackValue<Instance::Pointer>::Push(L, scriptEngine->DataModel);
+		StackValue<std::shared_ptr<Instance>>::Push(L, scriptEngine->DataModel);
 		lua_setglobal(L, "game");
 
 		lua_createtable(L, 0, 0);

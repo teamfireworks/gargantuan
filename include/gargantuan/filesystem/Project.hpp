@@ -20,7 +20,7 @@ namespace gargantuan {
 		static Project fromInit(
 			BaseFilesystem *fs,
 			std::string projectName = "Untitled",
-			Instance::Pointer instance = nullptr,
+			std::shared_ptr<Instance> instance = nullptr,
 			InstanceSerialization::InstanceFormat format = InstanceSerialization::InstanceFormat ::Json
 		);
 

@@ -17,7 +17,7 @@ namespace gargantuan {
 		G_INSTANCE_DECL(FileLink);
 
 		std::string Path;
-		std::vector<Instance::Pointer> OwnedSiblings;
+		std::vector<std::shared_ptr<Instance>> OwnedSiblings;
 		bool Synchronizing = false;
 		bool IgnoreErrors = false;
 		bool IgnoreUnknownDescendants = false;

@@ -10,7 +10,8 @@ namespace gargantuan {
 	  public:
 		G_INSTANCE_DECL(TweenService);
 
-		Tween::Pointer Create(Instance::Pointer instance, TweenInfo tweenInfo, Tween::GoalPropertyMap goalProperties) {
+		Tween::Pointer
+		Create(std::shared_ptr<Instance> instance, TweenInfo tweenInfo, Tween::GoalPropertyMap goalProperties) {
 			return nullptr;
 			// auto tween = std::make_shared<Tween>();
 

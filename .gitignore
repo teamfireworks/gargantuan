@@ -6,3 +6,4 @@ cmake-build-debug
 .fetchcontent-cache
 packages/
 .lpm-patch/
+include/gargantuan/classes/generated/

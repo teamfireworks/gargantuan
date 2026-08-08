@@ -38,8 +38,9 @@ namespace gargantuan {
 	Project::Project(BaseFilesystem *fs)
 		: Filesystem(fs), Root(fs->Root), RootConfiguration(fs->Root / ".gargantuan") {}
 
-	Project
-	Project::fromInit(BaseFilesystem *fs, std::string projectName, Instance::Pointer instance, InstanceFormat format) {
+	Project Project::fromInit(
+		BaseFilesystem *fs, std::string projectName, std::shared_ptr<Instance> instance, InstanceFormat format
+	) {
 		Project self(fs);
 		if (!SDL_CreateDirectory(self.RootConfiguration.c_str())) {
 			throw std::runtime_error(std::format("Failed to create .gargantuan directory: {}", SDL_GetError()));

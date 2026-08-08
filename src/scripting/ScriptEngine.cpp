@@ -174,7 +174,7 @@ namespace gargantuan {
 		return engine;
 	}
 
-	Instance::Pointer ScriptEngine::FindRequiredInstanceByPath(const char *rawPath) {
+	std::shared_ptr<Instance> ScriptEngine::FindRequiredInstanceByPath(const char *rawPath) {
 		LOG_INFO(App, "Attempting to find required instance %s", rawPath);
 
 		if (!rawPath || !DataModel || std::strcmp(rawPath, "\0") == 0) return nullptr;
@@ -191,7 +191,7 @@ namespace gargantuan {
 			}
 		}
 
-		Instance::Pointer currentInstance;
+		std::shared_ptr<Instance> currentInstance;
 		return nullptr;
 	}
 

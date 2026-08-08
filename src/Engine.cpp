@@ -26,7 +26,7 @@ namespace gargantuan {
 		  RunService(GetService<gargantuan::RunService>()), ProcessService(GetService<gargantuan::ProcessService>()),
 		  UserInputService(GetService<gargantuan::UserInputService>()) {
 
-		auto descendantAdded = [this](Instance::Pointer inst) {
+		auto descendantAdded = [this](std::shared_ptr<Instance> inst) {
 			if (inst->IsClass<gargantuan::Script>()) {
 				auto script = std::static_pointer_cast<gargantuan::Script>(inst);
 				this->Script->ScriptQueue.insert(script);
@@ -50,7 +50,7 @@ namespace gargantuan {
 			}
 		};
 
-		auto descendantRemoved = [this](Instance::Pointer inst) {
+		auto descendantRemoved = [this](std::shared_ptr<Instance> inst) {
 			if (inst->IsClass<gargantuan::Script>()) {
 				auto script = std::static_pointer_cast<gargantuan::Script>(inst);
 				if (Script->ScriptQueue.contains(script)) Script->ScriptQueue.erase(script);

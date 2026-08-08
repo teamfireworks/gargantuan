@@ -28,7 +28,7 @@ namespace gargantuan {
 	  public:
 		G_INSTANCE_DECL(Tween);
 
-		Instance::Pointer Instance;
+		std::shared_ptr<Instance> Instance;
 		TweenInfo TweenInfo;
 
 		using TweenableValue = std::variant<float, Color3, Vector2, glm::vec3>;
