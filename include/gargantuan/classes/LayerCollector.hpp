@@ -2,7 +2,7 @@
 
 #include "gargantuan/classes/GuiBase2d.hpp"
 #include "gargantuan/classes/GuiObject.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 
 #include <memory>

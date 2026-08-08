@@ -1,7 +1,7 @@
 #pragma once
 
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/datatypes/TweenInfo.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
@@ -28,7 +28,7 @@ namespace gargantuan {
 	  public:
 		G_INSTANCE_DECL(Tween);
 
-		Instance::Pointer Instance;
+		std::shared_ptr<Instance> Instance;
 		TweenInfo TweenInfo;
 
 		using TweenableValue = std::variant<float, Color3, Vector2, glm::vec3>;

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/LuaSourceContainer.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 
 #include <lua.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "nlohmann/json.hpp" // IWYU pragma: export
 
 #include <format>
@@ -15,7 +15,7 @@ namespace gargantuan::InstanceSerialization {
 
 	struct DeserializationState {
 		bool Ok = false;
-		Instance::Pointer Instance;
+		std::shared_ptr<Instance> Instance;
 		std::vector<std::string> Errors;
 
 		std::vector<std::string_view> CurrentPath{"(TOP)"};
@@ -33,6 +33,6 @@ namespace gargantuan::InstanceSerialization {
 		}
 	};
 
-	std::string Serialize(InstanceFormat format, Instance::Pointer &instance);
+	std::string Serialize(InstanceFormat format, std::shared_ptr<Instance> &instance);
 	DeserializationState Deserialize(InstanceFormat format, std::istream &input);
 }

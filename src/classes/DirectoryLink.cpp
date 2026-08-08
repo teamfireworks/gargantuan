@@ -1,10 +1,10 @@
 #include "gargantuan/classes/DirectoryLink.hpp"
 #include "gargantuan/Log.hpp"
 #include "gargantuan/classes/Folder.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/LuaSourceContainer.hpp"
 #include "gargantuan/classes/ModuleScript.hpp"
 #include "gargantuan/classes/Script.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/filesystem/Paths.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
@@ -50,7 +50,7 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	Instance::Pointer InstanceFromPath(const std::filesystem::path absolutePath) {
+	std::shared_ptr<Instance> InstanceFromPath(const std::filesystem::path absolutePath) {
 		SDL_PathInfo pathInfo;
 		if (!SDL_GetPathInfo(Paths::ToUtf8(absolutePath).c_str(), &pathInfo)) {
 			LOG_WARN(App, "Failed to synchronize %s: %s", Paths::ToUtf8(absolutePath).c_str(), SDL_GetError());

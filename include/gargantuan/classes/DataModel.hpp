@@ -1,14 +1,14 @@
 #pragma once
 
 #include "gargantuan/classes/ServiceProvider.hpp"
+#include "gargantuan/classes/generated/DataModel.hpp"
 // #include "gargantuan/filesystem/BaseFilesystem.hpp"
 
 #include <filesystem>
 
 namespace gargantuan {
 	class DataModel : public ServiceProvider {
-	  public:
-		G_INSTANCE_DECL(DataModel);
+		G_DECL_DATAMODEL;
 
 		const ServiceDefinitions &GetServiceDefinitions() const override;
 

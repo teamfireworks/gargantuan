@@ -1,21 +1,12 @@
 #include "gargantuan/classes/ServiceProvider.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
-#include <SDL3/SDL_log.h>
-#include <format>
-#include <stdexcept>
-#include <string_view>
+#include <SDL3/SDL.h>
+#include <optional>
 
 namespace gargantuan {
-	G_INSTANCE_ABSTRACT_IMPL(
-		ServiceProvider,
-		.Methods = {
-			{"FindService", Method::fromMember<&ServiceProvider::FindService>()},
-			{"GetService", Method::fromMember<&ServiceProvider::GetService>()},
-		},
-	);
+	G_IMPL_SERVICEPROVIDER;
 
-	Instance::Pointer ServiceProvider::FindService(std::string_view name) {
+	std::optional<std::shared_ptr<Instance>> ServiceProvider::FindService(std::string name) {
 		auto it = Services.find(std::string(name));
 		if (it != Services.end()) {
 			return it->second;
@@ -23,7 +14,7 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	Instance::Pointer ServiceProvider::GetService(std::string_view nameView) {
+	std::shared_ptr<Instance> ServiceProvider::GetService(std::string nameView) {
 		auto name = std::string(nameView);
 		auto it = Services.find(name);
 		if (it == Services.end()) {
@@ -31,7 +22,7 @@ namespace gargantuan {
 			if (auto it = constructors.find(name); it != constructors.end()) {
 				auto &definition = it->second;
 
-				if (auto existing = FindFirstChildOfClass(definition.ClassName)) {
+				if (auto existing = FindFirstChildOfClass(definition.ClassName, std::nullopt)) {
 					Services.emplace(name, existing);
 					return existing;
 				}
@@ -46,4 +37,4 @@ namespace gargantuan {
 		}
 		return it->second;
 	}
-} // namespace gargantuan
+}

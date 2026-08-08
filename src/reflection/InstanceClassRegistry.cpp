@@ -1,5 +1,5 @@
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 
 #include <SDL3/SDL_log.h>
 #include <cstddef>

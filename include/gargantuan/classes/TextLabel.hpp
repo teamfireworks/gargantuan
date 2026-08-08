@@ -1,8 +1,8 @@
 #pragma once
 
 #include "gargantuan/classes/GuiObject.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/Font.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 #include <string>

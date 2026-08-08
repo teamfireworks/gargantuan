@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gargantuan/classes/BasePart.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 
 #include <box3d/box3d.h>
 #include <box3d/id.h>

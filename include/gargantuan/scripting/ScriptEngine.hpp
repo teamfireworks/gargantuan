@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gargantuan/classes/DataModel.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/scripting/ThreadEngine.hpp"
 
 #include <Luau/Compiler.h>
@@ -55,9 +55,9 @@ namespace gargantuan {
 		std::unordered_set<std::shared_ptr<Script>> ScriptQueue;
 
 		std::shared_ptr<gargantuan::DataModel> DataModel;
-		Instance::Pointer RequireCurrentInstance = nullptr;
-		std::unordered_map<std::string, Instance::Pointer> RequirePathCache;
-		Instance::Pointer FindRequiredInstanceByPath(const char *path);
+		std::shared_ptr<Instance> RequireCurrentInstance = nullptr;
+		std::unordered_map<std::string, std::shared_ptr<Instance>> RequirePathCache;
+		std::shared_ptr<Instance> FindRequiredInstanceByPath(const char *path);
 
 		void Step();
 

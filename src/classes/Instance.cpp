@@ -1,5 +1,4 @@
-#include "gargantuan/datatypes/Instance.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 #include "gargantuan/scripting/UserdataTag.hpp"
 
@@ -10,11 +9,14 @@
 #include <lualib.h>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace gargantuan {
+	G_IMPL_INSTANCE;
+
 	G_USERDATA_IMPL(
 		Instance,
 		.Tag = UserdataTag::Instance,
@@ -25,100 +27,6 @@ namespace gargantuan {
 			{"__namecall", Method{&Instance::LNamecall}},
 		}
 	);
-
-	G_INSTANCE_IMPL(
-		Instance,
-		.Superclass = std::nullopt,
-		.Properties =
-			{
-				{"Archivable", Property::fromMember<&Instance::Name>()},
-				{"Name", Property::fromMember<&Instance::Name>()},
-				{
-					"ClassName",
-					Property::fromRead([](Instance *instance) -> std::string_view {
-						return InstanceClassRegistry::GetDefinition(instance)->ClassName;
-					}),
-				},
-				{
-					"Parent",
-					Property::fromReadWrite<Instance::Pointer>(
-						[](Instance *instance) -> std::optional<Instance::Pointer> {
-							return instance->Parent ? instance->Parent->shared_from_this() : nullptr;
-						},
-						[](Instance *instance, Instance::Pointer newParent) { instance->SetParent(newParent); }
-					),
-				},
-			},
-		.Methods = {
-			{"IsA", Method::fromMember<&Instance::IsA>()},
-			{"GetFullName", Method::fromMember<&Instance::GetFullName>()},
-			{"GetChildren", Method::fromMember<&Instance::GetChildren>()},
-			{"GetDescendants", Method::fromMember<&Instance::GetDescendants>()},
-			{"FindFirstChild", Method::fromMember<&Instance::FindFirstChild>()},
-			{"FindFirstChildOfClass", Method::fromMember<&Instance::FindFirstChildOfClass>()},
-			{"FindFirstChildWhichIsA", Method::fromMember<&Instance::FindFirstChildWhichIsA>()},
-			{"FindFirstDescendant", Method::fromMember<&Instance::FindFirstDescendant>()},
-			{"FindFirstDescendantOfClass", Method::fromMember<&Instance::FindFirstDescendantOfClass>()},
-			{"FindFirstDescendantWhichIsA", Method::fromMember<&Instance::FindFirstDescendantWhichIsA>()},
-			{"FindFirstAncestor", Method::fromMember<&Instance::FindFirstAncestor>()},
-			{"FindFirstAncestorOfClass", Method::fromMember<&Instance::FindFirstAncestorOfClass>()},
-			{"FindFirstAncestorWhichIsA", Method::fromMember<&Instance::FindFirstAncestorWhichIsA>()},
-		}
-	);
-
-	void Instance::SetParent(std::shared_ptr<Instance> newParent) {
-		if (Destroyed || Parent == newParent.get()) return;
-
-		std::shared_ptr<Instance> self = shared_from_this();
-
-		// This whole subtree leaves the old ancestry and joins the new one, so
-		// collect it once up front and reuse it for both sets of signals
-		std::vector<std::shared_ptr<Instance>> subtree = {self};
-		CollectDescendants(subtree);
-
-		if (Parent != nullptr) {
-			auto &oldChildren = Parent->Children;
-			if (auto it = std::find(oldChildren.begin(), oldChildren.end(), self); it != oldChildren.end()) {
-				oldChildren.erase(it);
-				Parent->ChildRemoved->Fire(self);
-			}
-
-			for (Instance *ancestor = Parent; ancestor != nullptr; ancestor = ancestor->Parent) {
-				for (auto &node : subtree) {
-					ancestor->DescendantRemoved->Fire(node);
-				}
-			}
-		}
-
-		Parent = newParent.get();
-
-		if (newParent != nullptr) {
-			newParent->Children.push_back(self);
-			newParent->ChildAdded->Fire(self);
-
-			for (Instance *ancestor = newParent.get(); ancestor != nullptr; ancestor = ancestor->Parent) {
-				for (auto &node : subtree) {
-					ancestor->DescendantAdded->Fire(node);
-				}
-			}
-		}
-
-		FireAncestryChanged(self, newParent);
-	}
-
-	void Instance::FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent) {
-		AncestryChanged->Fire({child, parent});
-		for (auto &descendant : Children) {
-			descendant->FireAncestryChanged(child, parent);
-		}
-	}
-
-	void Instance::ClearAllChildren() {
-		auto children = Children;
-		for (auto &child : children) {
-			child->Destroy();
-		}
-	}
 
 	void Instance::Destroy() {
 		if (Destroyed) {
@@ -136,7 +44,65 @@ namespace gargantuan {
 		Destroyed = true;
 	}
 
-	const Instance::Self::Property *Instance::FindProperty(std::string_view name) {
+	void Instance::AssertIsAlive() {
+		if (Destroyed) throw std::runtime_error("Instance is destroyed");
+	}
+
+	void Instance::FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent) {
+		AncestryChanged->Fire({child, parent});
+		for (auto &descendant : Children) {
+			descendant->FireAncestryChanged(child, parent);
+		}
+	}
+
+	void Instance::SetParent(std::optional<std::shared_ptr<Instance>> value) {
+		AssertIsAlive();
+		std::shared_ptr<Instance> newParent = value.has_value() ? value.value() : nullptr;
+		std::shared_ptr<Instance> self = shared_from_this();
+
+		// This whole subtree leaves the old ancestry and joins the new one, so
+		// collect it once up front and reuse it for both sets of signals
+		std::vector<std::shared_ptr<Instance>> subtree = {self};
+		CollectDescendants(subtree);
+
+		if (ParentPointer != nullptr) {
+			auto &oldChildren = ParentPointer->Children;
+			if (auto it = std::find(oldChildren.begin(), oldChildren.end(), self); it != oldChildren.end()) {
+				oldChildren.erase(it);
+				ParentPointer->ChildRemoved->Fire(self);
+			}
+
+			for (Instance *ancestor = ParentPointer; ancestor != nullptr; ancestor = ancestor->ParentPointer) {
+				for (auto &node : subtree) {
+					ancestor->DescendantRemoved->Fire(node);
+				}
+			}
+		}
+
+		ParentPointer = newParent.get();
+
+		if (newParent != nullptr) {
+			newParent->Children.push_back(self);
+			newParent->ChildAdded->Fire(self);
+
+			for (Instance *ancestor = newParent.get(); ancestor != nullptr; ancestor = ancestor->ParentPointer) {
+				for (auto &node : subtree) {
+					ancestor->DescendantAdded->Fire(node);
+				}
+			}
+		}
+
+		FireAncestryChanged(self, newParent);
+	}
+
+	void Instance::ClearAllChildren() {
+		auto children = Children;
+		for (auto &child : children) {
+			child->Destroy();
+		}
+	}
+
+	const InstanceProperty *Instance::FindProperty(std::string_view name) {
 		const InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(this);
 		if (!definition) {
 			return nullptr;
@@ -162,16 +128,14 @@ namespace gargantuan {
 		if (key && self) {
 			const auto *property = self->FindProperty(key);
 			if (property) {
-				if (property->Read) {
-					// lua_remove(L, 1);
-					// lua_remove(L, 1);
-					return property->PushStack(L, property->Read(self));
+				if (property->RawRead) {
+					return property->PushStack(L, property->RawRead(self));
 				} else {
 					luaL_error(L, "Property %s is write-only", key);
 				}
-			} else if (auto child = self->FindFirstChild(key)) {
+			} else if (auto child = self->FindFirstChild(key, std::nullopt)) {
 				// lua_settop(L, 0);
-				StackValue<Instance::Pointer>::Push(L, child);
+				StackValue<std::shared_ptr<Instance>>::Push(L, child);
 				return 1;
 			}
 		}
@@ -185,9 +149,10 @@ namespace gargantuan {
 		if (key && self) {
 			const auto *property = self->FindProperty(key);
 			if (property) {
-				if (property->Write) {
-					auto value = property->CheckStack(L, 3);
-					property->Write(self, value);
+				if (property->RawWrite) {
+					if (!property->IsStack(L, 3)) luaL_typeerrorL(L, 3, property->ReflectedTypedef.c_str());
+					auto value = property->FromStack(L, 3);
+					property->RawWrite(self, value);
 					return 0;
 				} else {
 					luaL_error(L, "Property %s is read-only", key);
@@ -224,7 +189,7 @@ namespace gargantuan {
 			auto &name = current->Name;
 			path.push_back(name);
 			totalLength += name.size() + 1;
-			current = current->Parent;
+			current = current->ParentPointer;
 		};
 
 		if (path.empty()) {
@@ -249,7 +214,7 @@ namespace gargantuan {
 		return fullName;
 	};
 
-	bool Instance::IsA(std::string_view className) {
+	bool Instance::IsA(std::string className) {
 		auto currentDefinition = InstanceClassRegistry::GetDefinition(this);
 		while (true) {
 			if (currentDefinition->ClassName == className) {
@@ -265,7 +230,7 @@ namespace gargantuan {
 		}
 	}
 
-	std::vector<std::shared_ptr<Instance>> &Instance::GetChildren() {
+	std::vector<std::shared_ptr<Instance>> Instance::GetChildren() {
 		return Children;
 	}
 
@@ -282,7 +247,7 @@ namespace gargantuan {
 		return descendants;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstChild(std::string_view name, bool recursive) {
+	std::shared_ptr<Instance> Instance::FindFirstChild(std::string name, std::optional<bool> recursive) {
 		for (const auto &child : Children) {
 			if (child->Name == name) return child;
 			if (recursive) {
@@ -292,7 +257,7 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstChildOfClass(std::string_view className, bool recursive) {
+	std::shared_ptr<Instance> Instance::FindFirstChildOfClass(std::string className, std::optional<bool> recursive) {
 		for (const auto &child : Children) {
 			if (InstanceClassRegistry::GetDefinition(child.get())->ClassName == className) return child;
 			if (recursive) {
@@ -302,7 +267,7 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstChildWhichIsA(std::string_view className, bool recursive) {
+	std::shared_ptr<Instance> Instance::FindFirstChildWhichIsA(std::string className, std::optional<bool> recursive) {
 		for (const auto &child : Children) {
 			if (InstanceClassRegistry::GetDefinition(child.get())->InheritedClasses.contains(className)) return child;
 			if (recursive) {
@@ -312,45 +277,45 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstDescendant(std::string_view name) {
+	std::shared_ptr<Instance> Instance::FindFirstDescendant(std::string name) {
 		return FindFirstChild(name, true);
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstDescendantOfClass(std::string_view className) {
+	std::shared_ptr<Instance> Instance::FindFirstDescendantOfClass(std::string className) {
 		return FindFirstChildOfClass(className, true);
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstDescendantWhichIsA(std::string_view className) {
+	std::shared_ptr<Instance> Instance::FindFirstDescendantWhichIsA(std::string className) {
 		return FindFirstChildWhichIsA(className, true);
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstAncestor(std::string_view name) {
-		auto *current = this->Parent;
+	std::shared_ptr<Instance> Instance::FindFirstAncestor(std::string name) {
+		auto *current = this->ParentPointer;
 		while (current) {
 			if (current->Name == name) return current->shared_from_this();
-			current = current->Parent;
+			current = current->ParentPointer;
 		}
 		return nullptr;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstAncestorOfClass(std::string_view className) {
-		auto *current = this->Parent;
+	std::shared_ptr<Instance> Instance::FindFirstAncestorOfClass(std::string className) {
+		auto *current = this->ParentPointer;
 		while (current) {
 			if (InstanceClassRegistry::GetDefinition(current)->ClassName == className) {
 				return current->shared_from_this();
 			}
-			current = current->Parent;
+			current = current->ParentPointer;
 		}
 		return nullptr;
 	}
 
-	std::shared_ptr<Instance> Instance::FindFirstAncestorWhichIsA(std::string_view className) {
-		auto *current = this->Parent;
+	std::shared_ptr<Instance> Instance::FindFirstAncestorWhichIsA(std::string className) {
+		auto *current = this->ParentPointer;
 		while (current) {
 			if (InstanceClassRegistry::GetDefinition(current)->InheritedClasses.contains(className)) {
 				return current->shared_from_this();
 			}
-			current = current->Parent;
+			current = current->ParentPointer;
 		}
 		return nullptr;
 	}

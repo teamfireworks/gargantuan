@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gargantuan/classes/GuiBase.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
 
 namespace gargantuan {

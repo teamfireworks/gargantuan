@@ -1,12 +1,12 @@
 #include "gargantuan/scripting/ScriptEngine.hpp"
 #include "gargantuan/Log.hpp"
 #include "gargantuan/classes/DataModel.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/Script.hpp"
 #include "gargantuan/datatypes/Axes.hpp"
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/datatypes/Color3.hpp"
 #include "gargantuan/datatypes/Enum.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/datatypes/Random.hpp"
 #include "gargantuan/datatypes/Rect.hpp"
 #include "gargantuan/datatypes/Signal.hpp"
@@ -174,7 +174,7 @@ namespace gargantuan {
 		return engine;
 	}
 
-	Instance::Pointer ScriptEngine::FindRequiredInstanceByPath(const char *rawPath) {
+	std::shared_ptr<Instance> ScriptEngine::FindRequiredInstanceByPath(const char *rawPath) {
 		LOG_INFO(App, "Attempting to find required instance %s", rawPath);
 
 		if (!rawPath || !DataModel || std::strcmp(rawPath, "\0") == 0) return nullptr;
@@ -191,7 +191,7 @@ namespace gargantuan {
 			}
 		}
 
-		Instance::Pointer currentInstance;
+		std::shared_ptr<Instance> currentInstance;
 		return nullptr;
 	}
 

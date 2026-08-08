@@ -1,8 +1,8 @@
 #pragma once
 
 #include "gargantuan/classes/GuiObject.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/UIGridStyleLayout.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 
 namespace gargantuan {

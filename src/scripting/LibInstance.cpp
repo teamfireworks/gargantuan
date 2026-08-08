@@ -1,4 +1,4 @@
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 #include "gargantuan/scripting/ScriptEngine.hpp"
 
@@ -21,7 +21,7 @@ namespace gargantuan {
 		}
 
 		auto instance = constructor();
-		StackValue<Instance::Pointer>::Push(L, instance);
+		StackValue<std::shared_ptr<Instance>>::Push(L, instance);
 		return 1;
 	};
 

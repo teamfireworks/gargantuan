@@ -1,5 +1,5 @@
 #include "gargantuan/classes/LuaSourceContainer.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
 #include <SDL3/SDL.h>
@@ -38,7 +38,7 @@ namespace gargantuan {
 			return "Bytecode must be successfully compiled prior to LuaSourceContainer::LoadIntoState";
 		};
 
-		StackValue<Instance::Pointer>::Push(L, shared_from_this());
+		StackValue<std::shared_ptr<Instance>>::Push(L, shared_from_this());
 		lua_setglobal(L, "script");
 
 		luaL_sandboxthread(L);

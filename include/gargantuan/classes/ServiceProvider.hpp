@@ -1,20 +1,16 @@
 #pragma once
 
-#include "gargantuan/datatypes/Instance.hpp"
-
-#include <string_view>
-#include <unordered_map>
+#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/classes/generated/ServiceProvider.hpp"
 
 namespace gargantuan {
 	class ServiceProvider : public Instance {
 	  public:
-		G_INSTANCE_DECL(ServiceProvider);
+		G_DECL_SERVICEPROVIDER;
 
 		typedef std::unordered_map<std::string, InstanceClassDefinition> ServiceDefinitions;
-		std::unordered_map<std::string, Instance::Pointer> Services;
+		std::unordered_map<std::string, std::shared_ptr<Instance>> Services;
 
-		virtual Instance::Pointer FindService(std::string_view name);
-		virtual Instance::Pointer GetService(std::string_view name);
 		virtual const ServiceDefinitions &GetServiceDefinitions() const = 0;
 	};
 }

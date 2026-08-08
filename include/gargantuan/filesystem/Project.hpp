@@ -2,7 +2,7 @@
 
 #include "gargantuan/assets/InstanceSerialization.hpp"
 #include "gargantuan/classes/DataModel.hpp"
-#include "gargantuan/datatypes/Instance.hpp"
+#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
 
 #include <filesystem>
@@ -20,7 +20,7 @@ namespace gargantuan {
 		static Project fromInit(
 			BaseFilesystem *fs,
 			std::string projectName = "Untitled",
-			Instance::Pointer instance = nullptr,
+			std::shared_ptr<Instance> instance = nullptr,
 			InstanceSerialization::InstanceFormat format = InstanceSerialization::InstanceFormat ::Json
 		);
 
