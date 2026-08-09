@@ -21,3 +21,6 @@ Thumbs.db
 include/gargantuan/classes/generated/
 include/gargantuan/services/generated/
 include/gargantuan/datatypes/generated/
+src/classes/generated/
+src/services/generated/
+src/datatypes/generated/
