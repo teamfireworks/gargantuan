@@ -4,8 +4,6 @@
 #include <optional>
 
 namespace gargantuan {
-	G_IMPL_SERVICEPROVIDER;
-
 	std::optional<std::shared_ptr<Instance>> ServiceProvider::FindService(std::string name) {
 		auto it = Services.find(std::string(name));
 		if (it != Services.end()) {

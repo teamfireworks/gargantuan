@@ -1,8 +1,6 @@
 #pragma once
 
-#include "gargantuan/classes/BasePart.hpp"
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/reflection/Enums.hpp"
+#include "gargantuan/classes/generated/Part.hpp"
 
 namespace gargantuan {
 	G_ENUM(
@@ -16,10 +14,8 @@ namespace gargantuan {
 	)
 
 	class Part : public BasePart {
-	  public:
-		G_INSTANCE_DECL(Part);
+		I_Part;
 
-		Enums::PartType Shape = Enums::PartType::Block;
 		std::unique_ptr<GpuMesh> &GetMesh() const override;
 	};
 } // namespace gargantuan

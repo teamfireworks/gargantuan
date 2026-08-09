@@ -59,7 +59,7 @@ namespace gargantuan {
 			SDL_BindGPUGraphicsPipeline(pass, Pipeline);
 
 			for (auto part : context.WorldRoot->Parts) {
-				if (!part->CastShadow) {
+				if (!part->GetCastShadow()) {
 					continue;
 				}
 

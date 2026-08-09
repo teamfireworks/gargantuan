@@ -27,17 +27,15 @@ namespace gargantuan {
 		  UserInputService(GetService<gargantuan::UserInputService>()) {
 
 		auto descendantAdded = [this](std::shared_ptr<Instance> inst) {
-			if (inst->IsClass<gargantuan::Script>()) {
-				auto script = std::static_pointer_cast<gargantuan::Script>(inst);
+			if (auto script = std::static_pointer_cast<gargantuan::Script>(inst)) {
 				this->Script->ScriptQueue.insert(script);
 				inst->Destroying->Once([ScriptEngine = this->Script, script](std::monostate _) {
 					if (ScriptEngine->ScriptQueue.contains(script)) ScriptEngine->ScriptQueue.erase(script);
 				});
 			}
 
-			if (inst->IsClass<gargantuan::FileLink>()) {
-				auto link = std::static_pointer_cast<gargantuan::FileLink>(inst);
-				auto relativePath = link->Path;
+			if (auto link = std::static_pointer_cast<gargantuan::FileLink>(inst)) {
+				auto relativePath = link->GetPath();
 				auto absolutePath = std::filesystem::absolute(this->DataModel->Root / relativePath);
 				LOG_INFO(
 					App,
@@ -51,9 +49,9 @@ namespace gargantuan {
 		};
 
 		auto descendantRemoved = [this](std::shared_ptr<Instance> inst) {
-			if (inst->IsClass<gargantuan::Script>()) {
-				auto script = std::static_pointer_cast<gargantuan::Script>(inst);
-				if (Script->ScriptQueue.contains(script)) Script->ScriptQueue.erase(script);
+			if (auto script = std::static_pointer_cast<gargantuan::Script>(inst);
+				script && Script->ScriptQueue.contains(script)) {
+				Script->ScriptQueue.erase(script);
 			}
 		};
 
@@ -100,7 +98,7 @@ namespace gargantuan {
 						SDL_GetWindowSizeInPixels(window, &width, &height);
 						Renderer->Resize(width, height);
 
-						Workspace->CurrentCamera->ViewportSize = Vector2(width, height);
+						Workspace->GetCurrentCamera()->SetViewportSize(Vector2(width, height));
 
 						continue;
 					}
@@ -112,7 +110,7 @@ namespace gargantuan {
 					}
 
 					UserInputService->ProcessEvent(event);
-					Workspace->CurrentCamera->OnEvent(event);
+					Workspace->GetCurrentCamera()->OnEvent(event);
 				}
 			}
 
@@ -120,7 +118,7 @@ namespace gargantuan {
 				G_PROFILE("Simulation");
 				RunService->PreSimulation->Fire(deltaTime);
 				WorldRoot->StepPhys(deltaTime);
-				Workspace->CurrentCamera->Step(deltaTime);
+				Workspace->GetCurrentCamera()->Step(deltaTime);
 				RunService->PostSimulation->Fire(deltaTime);
 			}
 
@@ -133,7 +131,7 @@ namespace gargantuan {
 				G_PROFILE("Draw");
 				Renderer->Draw({
 					.WorldRoot = WorldRoot,
-					.Camera = Workspace->CurrentCamera,
+					.Camera = Workspace->GetCurrentCamera(),
 				});
 			}
 

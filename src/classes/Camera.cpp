@@ -4,8 +4,6 @@
 #include <glm/glm.hpp>
 
 namespace gargantuan {
-	G_IMPL_CAMERA;
-
 	float Camera::GetAspectRatio() {
 		return ViewportSize.GetY() > 0.0f ? ViewportSize.GetX() / ViewportSize.GetY() : 1.0f;
 	}
@@ -15,7 +13,8 @@ namespace gargantuan {
 	}
 
 	void Camera::SetHorizontalFieldOfView(float fovy) {
-		FieldOfView = glm::degrees(2 * glm::atan(1 / GetAspectRatio() * glm::tan(glm::radians(fovy) / 2)));
+		SetFieldOfView(glm::degrees(2 * glm::atan(1 / GetAspectRatio() * glm::tan(glm::radians(fovy) / 2))));
+		GetPropertyChangedSignal("HorizontalFieldOfView")->Fire({});
 	}
 
 	float Camera::GetDiagonalFieldOfView() {
@@ -25,9 +24,12 @@ namespace gargantuan {
 	}
 
 	void Camera::SetDiagonalFieldOfView(float fovy) {
-		FieldOfView = glm::degrees(
-			2 * glm::atan(1 / glm::sqrt(1 + glm::pow(GetAspectRatio(), 2)) * glm::tan(glm::radians(fovy) / 2))
+		SetFieldOfView(
+			glm::degrees(
+				2 * glm::atan(1 / glm::sqrt(1 + glm::pow(GetAspectRatio(), 2)) * glm::tan(glm::radians(fovy) / 2))
+			)
 		);
+		GetPropertyChangedSignal("DiagonalFieldOfView")->Fire({});
 	}
 
 	glm::mat4 Camera::GetProjectionMatrix() {

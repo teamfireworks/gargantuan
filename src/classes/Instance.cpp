@@ -1,12 +1,15 @@
 #include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/InstanceProperty.hpp"
+#include "gargantuan/Log.hpp"
+#include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 #include "gargantuan/scripting/UserdataTag.hpp"
 
-#include <SDL3/SDL_log.h>
-#include <algorithm>
-#include <cstddef>
 #include <lua.h>
 #include <lualib.h>
+
+#include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -15,8 +18,6 @@
 #include <vector>
 
 namespace gargantuan {
-	G_IMPL_INSTANCE;
-
 	G_USERDATA_IMPL(
 		Instance,
 		.Tag = UserdataTag::Instance,
@@ -44,15 +45,27 @@ namespace gargantuan {
 		Destroyed = true;
 	}
 
-	void Instance::AssertIsAlive() {
+	void Instance::AssertIsAlive() const {
 		if (Destroyed) throw std::runtime_error("Instance is destroyed");
+	}
+
+	std::string Instance::GetClassName() const {
+		AssertIsAlive();
+		auto wtf = *this;
+		InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(&wtf);
+		return definition->ClassName;
 	}
 
 	void Instance::FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent) {
 		AncestryChanged->Fire({child, parent});
+		GetPropertyChangedSignal("Parent")->Fire({});
 		for (auto &descendant : Children) {
 			descendant->FireAncestryChanged(child, parent);
 		}
+	}
+
+	std::optional<std::shared_ptr<Instance>> Instance::GetParent() const {
+		return ParentPointer != nullptr ? std::optional(ParentPointer->shared_from_this()) : std::nullopt;
 	}
 
 	void Instance::SetParent(std::optional<std::shared_ptr<Instance>> value) {
@@ -102,11 +115,50 @@ namespace gargantuan {
 		}
 	}
 
+	bool Instance::IsPropertyModified(std::string propertyName) {
+		return true;
+		// auto property = FindProperty(propertyName);
+
+		// if (!property) throw std::runtime_error("Property does not exist");
+		// if (property->Signal) throw std::runtime_error("Property is a signal");
+		// if (!property->Read || property->ReadPermission == Enums::Permission::Never) {
+		// 	throw std::runtime_error("Property is read-only");
+		// };
+
+		// return property->Read(this) != property->Unmodified;
+	};
+
+	std::shared_ptr<BaseSignal> Instance::GetPropertyChangedSignal(std::string propertyName) {
+		if (PropertyChangedSignals.contains(propertyName)) return PropertyChangedSignals[propertyName];
+
+		LOG_DEBUG(App, "Finding %s", propertyName.c_str());
+		auto property = FindProperty(propertyName);
+
+		if (!property) throw std::runtime_error("Property does not exist");
+		if (!property->Write || property->WritePermission == Enums::Permission::Never) {
+			throw std::runtime_error("Property is read-only");
+		};
+
+		auto signal = std::make_shared<Signal<std::monostate>>();
+		PropertyChangedSignals.emplace(propertyName, signal);
+		return signal;
+	};
+
+	void Instance::ResetPropertyToDefault(std::string propertyName) {
+		auto property = FindProperty(propertyName);
+
+		if (!property) throw std::runtime_error("Property does not exist");
+		if (property->Signal) throw std::runtime_error("Property is a signal");
+		if (!property->Write || property->WritePermission == Enums::Permission::Never) {
+			throw std::runtime_error("Property is read-only");
+		};
+
+		property->Write(this, property->Unmodified);
+	};
+
 	const InstanceProperty *Instance::FindProperty(std::string_view name) {
 		const InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(this);
-		if (!definition) {
-			return nullptr;
-		}
+		if (!definition) return nullptr;
 
 		auto it = definition->AllProperties.find(name);
 		return it != definition->AllProperties.end() ? it->second : nullptr;
@@ -114,9 +166,7 @@ namespace gargantuan {
 
 	const Instance::Self::Method *Instance::FindMethod(std::string_view name) {
 		const InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(this);
-		if (!definition) {
-			return nullptr;
-		}
+		if (!definition) return nullptr;
 
 		auto it = definition->AllMethods.find(name);
 		return it != definition->AllMethods.end() ? it->second : nullptr;
@@ -128,8 +178,8 @@ namespace gargantuan {
 		if (key && self) {
 			const auto *property = self->FindProperty(key);
 			if (property) {
-				if (property->RawRead) {
-					return property->PushStack(L, property->RawRead(self));
+				if (property->Read) {
+					return property->PushStack(L, property->Read(self));
 				} else {
 					luaL_error(L, "Property %s is write-only", key);
 				}
@@ -149,10 +199,10 @@ namespace gargantuan {
 		if (key && self) {
 			const auto *property = self->FindProperty(key);
 			if (property) {
-				if (property->RawWrite) {
+				if (property->Write) {
 					if (!property->IsStack(L, 3)) luaL_typeerrorL(L, 3, property->ReflectedTypedef.c_str());
 					auto value = property->FromStack(L, 3);
-					property->RawWrite(self, value);
+					property->Write(self, value);
 					return 0;
 				} else {
 					luaL_error(L, "Property %s is read-only", key);

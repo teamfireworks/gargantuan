@@ -21,7 +21,7 @@ namespace gargantuan {
 		virtual ~Instance() = default;
 
 		std::vector<std::shared_ptr<Instance>> Children;
-		std::unordered_map<std::string, Signal<std::monostate>> PropertyChangedSignals;
+		std::unordered_map<std::string, std::shared_ptr<Signal<std::monostate>>> PropertyChangedSignals;
 		Instance *ParentPointer = nullptr;
 		InstanceClassDefinition *CachedDefinition = nullptr;
 
@@ -44,7 +44,7 @@ namespace gargantuan {
 
 		void CollectDescendants(std::vector<std::shared_ptr<Instance>> &descendants);
 		void FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent);
-		void AssertIsAlive();
+		void AssertIsAlive() const;
 	);
 
 	template <typename Subclass>

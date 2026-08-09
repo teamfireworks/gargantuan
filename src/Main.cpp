@@ -91,8 +91,8 @@ Engine *ConstructInstance(std::string path, BaseRenderer *renderer) {
 	std::shared_ptr<DataModel> game;
 
 	auto instance = deserialized.Instance;
-	if (instance->IsClass<DataModel>()) {
-		game = static_pointer_cast<DataModel>(instance);
+	if (auto maybeGame = static_pointer_cast<DataModel>(instance)) {
+		game = maybeGame;
 	} else {
 		game = std::make_shared<DataModel>();
 		instance->SetParent(game->GetService("Workspace"));

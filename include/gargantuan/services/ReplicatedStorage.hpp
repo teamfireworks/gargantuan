@@ -1,10 +1,9 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/services/generated/ReplicatedStorage.hpp"
 
 namespace gargantuan {
 	class ReplicatedStorage : public Instance {
-	  public:
-		G_INSTANCE_DECL(ReplicatedStorage);
+		I_ReplicatedStorage;
 	};
 }

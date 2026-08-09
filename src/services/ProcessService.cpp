@@ -1,39 +1,33 @@
 #include "gargantuan/services/ProcessService.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
 #include <iostream>
 #include <lua.h>
 #include <lualib.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		ProcessService,
-		.Description = "Provides runtime access to system processes",
-		.Methods = {
-			{"ExitAsync", Method{&ProcessService::LExitAsync}},
-			{"WriteToStdout", Method{&ProcessService::LWriteToStdout}},
-		}
-	);
-
-	void ProcessService::ExitAsync(int exitCode) {
+	void ProcessService::CExitAsync(int exitCode) {
 		Alive = false;
 		ExitCode = exitCode;
 	}
 
-	int ProcessService::LExitAsync(lua_State *L, Instance *self) {
-		auto processService = self->Cast<ProcessService>();
+	int ProcessService::ExitAsync(lua_State *L, Instance *self) {
+		auto processService = dynamic_cast<ProcessService *>(self);
 		int exitCode = luaL_checknumber(L, 2);
-		if (processService->Alive) processService->ExitAsync(exitCode);
+		if (processService->Alive) processService->CExitAsync(exitCode);
 		return lua_yield(L, 0);
 	}
 
-	int ProcessService::LWriteToStdout(lua_State *L, Instance *self) {
-		auto processService = self->Cast<ProcessService>();
+	int ProcessService::WriteToStdout(lua_State *L, Instance *self) {
+		auto processService = dynamic_cast<ProcessService *>(self);
 		auto numArguments = lua_gettop(L);
 		for (int idx = 2; idx <= numArguments; idx++) {
 			auto str = luaL_checkstring(L, idx);
 			std::cout << str;
 		}
 		return 0;
+	}
+
+	void ProcessService::FlushStdout() {
+		std::cout << std::flush;
 	}
 }

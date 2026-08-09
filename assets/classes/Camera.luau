@@ -33,16 +33,19 @@ return c({
 			description = "Local pitch of this camera",
 			type = t.Float,
 			unmodified = "0.0f",
+			writeLevel = "Never",
 		},
 		Yaw = {
 			description = "Local yaw of this camera",
 			type = t.Float,
 			unmodified = "0.0f",
+			writeLevel = "Never",
 		},
 		Roll = {
 			description = "Local pitch of this camera",
 			type = t.Float,
 			unmodified = "0.0f",
+			writeLevel = "Never",
 		},
 
 		-- TODO: Calculate unmodified values for fovies

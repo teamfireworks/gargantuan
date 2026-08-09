@@ -15,67 +15,90 @@ namespace gargantuan::InstanceClassRegistry {
 	}
 
 	namespace {
-		std::unordered_map<std::string_view, InstanceClassDefinition *> &GetNameIndex() {
-			static std::unordered_map<std::string_view, InstanceClassDefinition *> index;
+		std::unordered_map<std::string, std::type_index> &GetNameToTypeMap() {
+			static std::unordered_map<std::string, std::type_index> index;
 			return index;
 		}
 
 		bool NameIndexBuilt = false;
 
 		void EnsureNameIndex() {
-			if (NameIndexBuilt) {
-				return;
-			}
+			if (NameIndexBuilt) return;
 
-			auto &index = GetNameIndex();
-			index.clear();
-			for (auto &entry : GetDefinitionsMap()) {
-				index.emplace(entry.second.ClassName, &entry.second);
+			auto &nameMap = GetNameToTypeMap();
+			nameMap.clear();
+			for (auto &[type, def] : GetDefinitionsMap()) {
+				if (!def.ClassName.empty()) {
+					nameMap.emplace(def.ClassName, type);
+				}
 			}
 			NameIndexBuilt = true;
 		}
 
 		void Flatten(InstanceClassDefinition *definition) {
+			if (!definition || definition->Flattened) return;
+
+			// Guard against recursive cyclic flattening
+			definition->Flattened = true;
+
 			definition->AllProperties.clear();
 			definition->AllMethods.clear();
 
-			for (InstanceClassDefinition *current = definition; current;) {
-				for (auto &[name, property] : current->Properties) {
-					definition->AllProperties.emplace(name, &property);
+			// 1. Recurse up into Superclass FIRST
+			if (definition->Superclass.has_value()) {
+				const std::string superName = std::string(definition->Superclass.value());
+
+				EnsureNameIndex();
+				auto &nameMap = GetNameToTypeMap();
+				auto it = nameMap.find(superName);
+
+				if (it != nameMap.end()) {
+					InstanceClassDefinition *superDef = GetDefinitionByType(it->second);
+					if (superDef && superDef != definition) {
+						if (!superDef->Flattened) {
+							Flatten(superDef);
+						}
+
+						for (auto &[name, propPtr] : superDef->AllProperties) {
+							definition->AllProperties[name] = propPtr;
+						}
+						for (auto &[name, methodPtr] : superDef->AllMethods) {
+							definition->AllMethods[name] = methodPtr;
+						}
+
+						definition->InheritedClasses.insert(
+							superDef->InheritedClasses.begin(), superDef->InheritedClasses.end()
+						);
+						definition->InheritedClasses.emplace(superName);
+					}
 				}
-
-				for (auto &[name, method] : current->Methods) {
-					definition->AllMethods.emplace(name, &method);
-				}
-
-				if (!current->Superclass.has_value()) break;
-				definition->InheritedClasses.emplace(current->Superclass.value());
-
-				InstanceClassDefinition *next = GetDefinitionByName(current->Superclass.value());
-				if (next == current) break;
-				current = next;
 			}
 
-			definition->Flattened = true;
+			for (auto &entry : definition->Properties) {
+				definition->AllProperties[entry.first] = &entry.second;
+			}
+
+			for (auto &entry : definition->Methods) {
+				definition->AllMethods[entry.first] = &entry.second;
+			}
 		}
 	}
 
 	void InvalidateCaches() {
 		NameIndexBuilt = false;
-		GetNameIndex().clear();
+		GetNameToTypeMap().clear();
 		for (auto &entry : GetDefinitionsMap()) {
 			entry.second.Flattened = false;
 			entry.second.AllProperties.clear();
 			entry.second.AllMethods.clear();
+			entry.second.InheritedClasses.clear();
 		}
 	}
 
 	InstanceClassDefinition *GetDefinitionByType(std::type_index type) {
 		auto &map = GetDefinitionsMap();
 		auto it = map.find(type);
-		if (it == map.end()) {
-			return nullptr;
-		}
+		if (it == map.end()) return nullptr;
 
 		InstanceClassDefinition *definition = &it->second;
 		if (!definition->Flattened) {
@@ -88,27 +111,21 @@ namespace gargantuan::InstanceClassRegistry {
 	InstanceClassDefinition *GetDefinition(Instance *instance) {
 		if (!instance) return nullptr;
 
-		if (instance->CachedDefinition) {
-			if (!instance->CachedDefinition->Flattened) {
-				Flatten(instance->CachedDefinition);
-			}
-			return instance->CachedDefinition;
+		// Always resolve dynamically via typeid to guard against dangling/stale pointers
+		InstanceClassDefinition *def = GetDefinitionByType(std::type_index(typeid(*instance)));
+		if (def) {
+			instance->CachedDefinition = def;
 		}
-
-		instance->CachedDefinition = GetDefinitionByType(std::type_index(typeid(*instance)));
-		return instance->CachedDefinition;
-	};
+		return def;
+	}
 
 	InstanceClassDefinition *GetDefinitionByName(std::string_view name) {
 		EnsureNameIndex();
-		auto &index = GetNameIndex();
-		auto it = index.find(name);
-		if (it == index.end()) return nullptr;
+		auto &nameMap = GetNameToTypeMap();
+		auto it = nameMap.find(std::string(name));
+		if (it == nameMap.end()) return nullptr;
 
-		InstanceClassDefinition *definition = it->second;
-		if (!definition->Flattened) Flatten(definition);
-
-		return definition;
+		return GetDefinitionByType(it->second);
 	}
 
 	std::vector<std::string_view> GetClassNames() {

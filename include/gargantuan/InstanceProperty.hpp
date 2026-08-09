@@ -72,11 +72,11 @@ namespace gargantuan {
 		bool Serializable{false};
 
 		Enums::Permission ReadPermission = Enums::Permission::None;
-		std::function<std::any(Instance *self)> RawRead;
+		std::function<std::any(Instance *self)> Read;
 		std::function<int(lua_State *L, std::any value)> PushStack;
 
 		Enums::Permission WritePermission = Enums::Permission::None;
-		std::function<void(Instance *self, std::any value)> RawWrite;
+		std::function<void(Instance *self, std::any value)> Write;
 		std::function<bool(lua_State *L, int idx)> IsStack;
 		std::function<std::any(lua_State *L, int idx)> FromStack;
 
@@ -112,12 +112,15 @@ namespace gargantuan {
 			return *this;
 		}
 
-		std::pair<std::string_view, InstanceProperty> IntoPair() && {
-			return {std::string_view(Name.data(), Name.size()), std::move(*this)};
+		std::pair<std::string, InstanceProperty> IntoPair() && {
+			std::string propName = std::move(Name);
+			InstanceProperty prop = std::move(*this);
+			prop.Name = propName;
+			return {propName, std::move(prop)};
 		}
 
-		std::pair<std::string_view, InstanceProperty> IntoPair() & {
-			return {std::string_view(Name.data(), Name.size()), *this};
+		std::pair<std::string, InstanceProperty> IntoPair() & {
+			return {Name, *this};
 		}
 
 		template <auto Pointer> InstanceProperty &UseRead() {
@@ -126,19 +129,19 @@ namespace gargantuan {
 			using MemberType = typename Traits::MemberType;
 
 			if constexpr (std::is_member_function_pointer_v<decltype(Pointer)>) {
-				RawRead = [](Instance *self) -> std::any {
+				Read = [](Instance *self) -> std::any {
 					ClassType *obj = reinterpret_cast<ClassType *>(self);
 					return (obj->*Pointer)();
 				};
 			} else if constexpr (std::is_member_object_pointer_v<decltype(Pointer)>) {
-				RawRead = [](Instance *self) -> std::any {
+				Read = [](Instance *self) -> std::any {
 					ClassType *obj = reinterpret_cast<ClassType *>(self);
 					return obj->*Pointer;
 				};
 			}
 
 			PushStack = [](lua_State *L, const std::any &value) -> int {
-				if (auto val = std::any_cast<MemberType>(&value)) return StackValue<MemberType>::Push(L, val);
+				if (auto val = std::any_cast<MemberType>(&value)) return StackValue<MemberType>::Push(L, *val);
 				return 0;
 			};
 
@@ -150,10 +153,10 @@ namespace gargantuan {
 			using ClassType = typename Traits::ClassType;
 
 			if constexpr (std::is_member_function_pointer_v<decltype(Pointer)>) {
-				using RawArgType = std::tuple_element_t<0, typename Traits::ArgsTuple>;
+				using RawArgType = std::tuple_element_t<0, typename Traits::ArgsType>;
 				using ArgType = std::decay_t<RawArgType>;
 
-				RawWrite = [](Instance *self, const std::any &value) {
+				Write = [](Instance *self, const std::any &value) {
 					ClassType *obj = reinterpret_cast<ClassType *>(self);
 					if (auto val = std::any_cast<ArgType>(&value)) {
 						(obj->*Pointer)(*val);
@@ -165,7 +168,7 @@ namespace gargantuan {
 			} else {
 				using MemberType = typename Traits::MemberType;
 
-				RawWrite = [](Instance *self, const std::any &value) {
+				Write = [](Instance *self, const std::any &value) {
 					ClassType *obj = reinterpret_cast<ClassType *>(self);
 					if (auto val = std::any_cast<MemberType>(&value)) {
 						obj->*Pointer = *val;

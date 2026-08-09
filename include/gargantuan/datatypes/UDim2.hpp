@@ -1,7 +1,6 @@
-#include "gargantuan/classes/GuiObject.hpp"
-#include "gargantuan/scripting/Userdata.hpp"
+#include "gargantuan/datatypes/UDim.hpp"
+
 #include <glm/glm.hpp>
-#include <lua.h>
 
 namespace gargantuan {
 	G_USERDATA_DECL(

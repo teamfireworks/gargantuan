@@ -15,4 +15,4 @@ namespace gargantuan {
 		std::filesystem::path Root;
 		BaseFilesystem *Filesystem = nullptr;
 	};
-} // namespace gargantuan
+}

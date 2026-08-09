@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gargantuan/classes/BasePart.hpp"
-#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/classes/generated/WorldRoot.hpp"
 
 #include <box3d/box3d.h>
 #include <box3d/id.h>
@@ -10,8 +10,7 @@
 
 namespace gargantuan {
 	class WorldRoot : public Instance {
-	  public:
-		G_INSTANCE_DECL(WorldRoot);
+		I_WorldRoot;
 
 		b3WorldId World;
 
@@ -23,4 +22,4 @@ namespace gargantuan {
 
 		WorldRoot();
 	};
-} // namespace gargantuan
+}

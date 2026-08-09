@@ -67,7 +67,7 @@ const types = {
 	Vector3 = type({
 		kind = "datatype",
 		cType = "glm::vec3",
-		cIncludes = { "<glm/glm.hpp>" },
+		cIncludes = { '"gargantuan/datatypes/Vector3.hpp"' },
 		luauType = "Vector3",
 	}),
 }

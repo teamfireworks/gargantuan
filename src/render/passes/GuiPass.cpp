@@ -16,7 +16,7 @@ namespace gargantuan {
 
 		FileShader Shader{
 			.VertexFilepath = GetShaderPath("gui.vert"),
-			.VertexUniformBufferCount = 1,
+			.VertexUniformBufferCount = 0,
 			.FragmentFilepath = GetShaderPath("gui.frag"),
 			.FragmentUniformBufferCount = 0,
 		};

@@ -101,11 +101,11 @@ return c({
 		ClearAllChildren = {
 			description = "Unparents all direct children of this instance",
 		},
-		WaitForChild = {
-			description = "Yields until the named child is parented to this instance",
-			asLuau = true,
-			luauSignature = "(self: Instance, name: string, timeout: number?) -> Instance",
-		},
+		-- WaitForChild = {
+		-- 	description = "Yields until the named child is parented to this instance",
+		-- 	asLuau = true,
+		-- 	luauSignature = "(self: Instance, name: string, timeout: number?) -> Instance",
+		-- },
 		FindFirstChild = {
 			description = "Returns the first direct child that matches the specified name",
 			params = { p("name", t.String), p("recursive", t.Optional(t.Bool)) },
@@ -122,11 +122,11 @@ return c({
 			returns = t.Instance,
 		},
 
-		IsDescendantOf = {
-			description = "Whether this instance is a descendant of the specified ancestor",
-			params = { p("ancestor", t.Instance) },
-			returns = t.Bool,
-		},
+		-- IsDescendantOf = {
+		-- 	description = "Whether this instance is a descendant of the specified ancestor",
+		-- 	params = { p("ancestor", t.Instance) },
+		-- 	returns = t.Bool,
+		-- },
 		GetDescendants = {
 			description = "Returns all descendants below this instance",
 			returns = t.Array(t.Instance),
@@ -147,15 +147,15 @@ return c({
 			returns = t.Instance,
 		},
 
-		IsAncestorOf = {
-			description = "Whether this instance is an ancestor of the specified descendant",
-			params = { p("descendant", t.Instance) },
-			returns = t.Bool,
-		},
-		GetAncestors = {
-			description = "Returns all ancestors above this instance",
-			returns = t.Array(t.Instance),
-		},
+		-- IsAncestorOf = {
+		-- 	description = "Whether this instance is an ancestor of the specified descendant",
+		-- 	params = { p("descendant", t.Instance) },
+		-- 	returns = t.Bool,
+		-- },
+		-- GetAncestors = {
+		-- 	description = "Returns all ancestors above this instance",
+		-- 	returns = t.Array(t.Instance),
+		-- },
 		FindFirstAncestor = {
 			description = "Returns the first ancestor that matches the specified name",
 			params = { p("name", t.String) },

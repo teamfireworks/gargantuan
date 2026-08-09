@@ -1,10 +1,9 @@
 #pragma once
 
-#include "gargantuan/classes/GuiObject.hpp"
+#include "gargantuan/classes/generated/Frame.hpp"
 
 namespace gargantuan {
 	class Frame : public GuiObject {
-	  public:
-		G_INSTANCE_DECL(Frame);
+		I_Frame;
 	};
 }

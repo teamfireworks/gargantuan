@@ -1,22 +1,12 @@
 #include "gargantuan/classes/LuaSourceContainer.hpp"
 #include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
-#include <SDL3/SDL.h>
 #include <cstdlib>
 #include <format>
-#include <lua.h>
 #include <optional>
 #include <string>
 
 namespace gargantuan {
-	G_INSTANCE_ABSTRACT_IMPL(
-		LuaSourceContainer,
-		.Properties = {
-			{"Source", Property::fromMember<&LuaSourceContainer::Source>(true, true).SetSerializable()},
-		}
-	);
-
 	void LuaSourceContainer::CompileBytecode(lua_CompileOptions *options) {
 		if (BytecodeCompileStatus != BytecodeCompileStatus::Uncompiled) return;
 

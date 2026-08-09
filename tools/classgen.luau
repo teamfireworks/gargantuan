@@ -38,9 +38,9 @@ const TARGETS: { [string]: Target } = {
 	},
 	services = {
 		input = "assets/services",
-		headerImport = "gargantuan/classes",
+		headerImport = "gargantuan/services",
 		headerOutput = "include/gargantuan/services/generated",
-		implOutput = "src/classes/generated",
+		implOutput = "src/services/generated",
 	},
 }
 
@@ -77,7 +77,7 @@ const function assembleProperties(state: GenerationState)
 
 		if property.overrideRead or property.overrideWrite then
 			if property.overrideRead then
-				state.publicBody:line(`{property.type.cType} {property.overrideRead}();`)
+				state.publicBody:line(`[[nodiscard]] {property.type.cType} {property.overrideRead}() const;`)
 				state.definitionProperties:line(`.UseRead<&{state.class.name}::{property.overrideRead}>()`)
 			end
 
@@ -90,7 +90,7 @@ const function assembleProperties(state: GenerationState)
 			state.protectedBody:line(`{property.type.cType} {key} = {property.unmodified};`)
 
 			state.publicBody
-				:line(`{property.type.cType} {getIdentifier}() \{`)
+				:line(`[[nodiscard]] {property.type.cType} {getIdentifier}() const \{`)
 				:tab()
 				:line(`return {key};`)
 				:untab()

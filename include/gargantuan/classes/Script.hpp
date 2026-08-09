@@ -1,14 +1,12 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/classes/LuaSourceContainer.hpp"
-#include "gargantuan/reflection/Enums.hpp"
+#include "gargantuan/classes/generated/Script.hpp"
 
 #include <lua.h>
 #include <string>
 
 namespace gargantuan {
-	G_ENUM(RunContext, Client, Server);
+	G_ENUM(RunContext, Client, Server, None);
 
 	enum class ScriptStatus : int {
 		Disabled,
@@ -20,14 +18,9 @@ namespace gargantuan {
 	};
 
 	class Script : public LuaSourceContainer {
-	  public:
-		G_INSTANCE_DECL(Script);
+		I_Script;
 
 		Script();
-
-		Enums::RunContext RunContext = Enums::RunContext::Client;
-		static bool IsEnabled(Instance *self);
-		static void SetEnabled(Instance *self, bool enabled);
 
 		ScriptStatus Status = ScriptStatus::Idle;
 		std::string ErrorMessage = "";

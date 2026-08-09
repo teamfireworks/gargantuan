@@ -116,7 +116,7 @@ namespace gargantuan::InstanceSerialization {
 			std::vector<json> children;
 			children.reserve(instance->Children.size());
 			for (auto &child : instance->Children) {
-				if (instance->Archivable) children.emplace_back(SerializeInstance(child, state));
+				if (instance->GetArchivable()) children.emplace_back(SerializeInstance(child, state));
 			}
 
 			auto *definition = InstanceClassRegistry::GetDefinition(instance.get());
@@ -124,7 +124,7 @@ namespace gargantuan::InstanceSerialization {
 			SerializeProperties(definition, instance, properties);
 
 			nlohmann::ordered_json serialized;
-			serialized["Name"] = instance->Name;
+			serialized["Name"] = instance->GetName();
 			serialized["ClassName"] = definition->ClassName;
 			serialized["Properties"] = properties;
 			serialized["Children"] = children;
@@ -355,7 +355,7 @@ namespace gargantuan::InstanceSerialization {
 
 		LOG_INFO(App, "Registered property count for %s: %zu", className.c_str(), definition->AllProperties.size());
 		auto instance = definition->Constructor();
-		instance->Name = name.get<std::string>();
+		instance->GetName() = name.get<std::string>();
 		for (auto &[key, property] : definition->AllProperties) {
 			LOG_INFO(App, "Trying to deserialize %s of %s", key.data(), state.FormatCurrentPath().data());
 			if (key == "Parent" || !properties.contains(key) || !property->Serializable || !property->Write) continue;
@@ -385,7 +385,7 @@ namespace gargantuan::InstanceSerialization {
 					"Type mismatch on property '{}' in {}, expected {}, got approximately {}",
 					key,
 					state.FormatCurrentPath(),
-					property->GetWriteTypedef(),
+					property->ReflectedTypedef,
 					typeid(deserialized).name()
 				);
 			} catch (const std::exception &e) {

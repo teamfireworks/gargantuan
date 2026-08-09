@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
+#include "gargantuan/classes/generated/LuaSourceContainer.hpp"
 
 #include <SDL3/SDL.h>
 #include <lua.h>
@@ -15,11 +15,9 @@ namespace gargantuan {
 	enum class BytecodeCompileStatus : int { Uncompiled, Success, Error };
 
 	class LuaSourceContainer : public Instance {
-	  public:
-		G_INSTANCE_DECL(LuaSourceContainer);
+		I_LuaSourceContainer;
 
 		std::string ChunkName = GetFullName();
-		std::string Source = "";
 
 		std::vector<char> Bytecode;
 		size_t BytecodeSize;
@@ -49,7 +47,7 @@ namespace gargantuan {
 
 		auto self = std::make_shared<T>();
 		self->ChunkName = std::string(filepath);
-		self->Source = source;
+		self->SetSource(source);
 		return self;
 	};
 }

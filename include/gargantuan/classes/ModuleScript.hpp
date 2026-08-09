@@ -1,13 +1,11 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/classes/LuaSourceContainer.hpp"
+#include "gargantuan/classes/generated/ModuleScript.hpp"
 
 #include <lua.h>
 
 namespace gargantuan {
 	class ModuleScript : public LuaSourceContainer {
-	  public:
-		G_INSTANCE_DECL(ModuleScript);
+		I_ModuleScript;
 	};
 }

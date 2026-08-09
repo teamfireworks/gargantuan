@@ -1,13 +1,10 @@
 #include "gargantuan/services/Workspace.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
-#include "gargantuan/scripting/Userdata.hpp"
+#include "gargantuan/classes/Camera.hpp"
+
+#include <memory>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		Workspace,
-		.Superclass = "WorldRoot",
-		.Properties = {
-			{"CurrentCamera", Property::fromMember<&Workspace::CurrentCamera>(true, true)},
-		}
-	);
+	Workspace::Workspace() {
+		CurrentCamera = std::make_shared<Camera>();
+	}
 }

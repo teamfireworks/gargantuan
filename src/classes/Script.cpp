@@ -1,34 +1,24 @@
 #include "gargantuan/classes/Script.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
 #include "gargantuan/scripting/ScriptEngine.hpp"
+
 #include <lua.h>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		Script,
-		.Superclass = "LuaSourceContainer",
-		.Properties = {
-			{"Enabled", Property::fromReadWrite<bool>(&Script::IsEnabled, &Script::SetEnabled).SetSerializable()},
-			{"RunContext", Property::fromMember<&Script::RunContext>()},
-		},
-	);
-
 	Script::Script() {
 		Destroying->Connect([this](std::monostate _) { this->Cleanup(); });
 	}
 
-	bool Script::IsEnabled(Instance *ptr) {
-		auto self = ptr->Cast<Script>();
-		return self->Status != ScriptStatus::Disabled;
+	bool Script::GetEnabled() {
+		return Status != ScriptStatus::Disabled;
 	}
 
-	void Script::SetEnabled(Instance *ptr, bool enabled) {
-		auto self = ptr->Cast<Script>();
-		if (self->Status == ScriptStatus::Disabled && enabled) {
-			self->Status = ScriptStatus::Idle;
-		} else if (self->Status != ScriptStatus::Disabled && !enabled) {
-			self->Cleanup();
-			self->Status = ScriptStatus::Disabled;
+	void Script::SetEnabled(bool enabled) {
+		GetPropertyChangedSignal("Enabled")->Fire({});
+		if (Status == ScriptStatus::Disabled && enabled) {
+			Status = ScriptStatus::Idle;
+		} else if (Status != ScriptStatus::Disabled && !enabled) {
+			Cleanup();
+			Status = ScriptStatus::Disabled;
 		}
 	}
 

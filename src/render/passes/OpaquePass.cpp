@@ -113,7 +113,7 @@ namespace gargantuan {
 
 				PartUniforms uniforms{
 					.ModelMatrix = part->GetModelMatrix(),
-					.Color = glm::vec4((glm::vec3)part->Color, 1.0f - part->Transparency),
+					.Color = glm::vec4((glm::vec3)part->GetColor(), 1.0f - part->GetTransparency()),
 				};
 				SDL_PushGPUVertexUniformData(context.Commands, 1, &uniforms, sizeof(PartUniforms));
 

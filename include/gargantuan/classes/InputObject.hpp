@@ -1,11 +1,11 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/reflection/Enums.hpp"
+#include "gargantuan/classes/generated/InputObject.hpp"
 
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 #include <magic_enum/magic_enum.hpp>
+
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -255,20 +255,10 @@ namespace gargantuan {
 	extern const std::unordered_map<Enums::ModifierKey, std::unordered_set<Enums::KeyCode>> MODIFIER_TO_KEYCODE;
 
 	class InputObject : public Instance {
-	  public:
-		G_INSTANCE_DECL(InputObject);
+		I_InputObject;
 
-		glm::vec3 Delta = {0.0f, 0.0f, 0.0f};
-		glm::vec3 Position = {0.0f, 0.0f, 0.0f};
-		Enums::KeyCode KeyCode = Enums::KeyCode::None;
-		Enums::UserInputState UserInputState = Enums::UserInputState::None;
-		Enums::UserInputType UserInputType = Enums::UserInputType::None;
-
-		bool IsModifierKeyDown(Enums::ModifierKey modifierKey);
-
-		static std::shared_ptr<InputObject> fromEvent(SDL_Event &event);
+		[[nodiscard]] static std::shared_ptr<InputObject> fromEvent(SDL_Event &event);
 	};
-
 }
 
 template <> struct magic_enum::customize::enum_range<gargantuan::Enums::KeyCode> {

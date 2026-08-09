@@ -8,6 +8,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace gargantuan {
@@ -58,7 +59,7 @@ namespace gargantuan {
 		config->to_parent = [](lua_State *L, void *ctx) -> luarequire_NavigateResult {
 			auto scriptEngine = static_cast<ScriptEngine *>(ctx);
 
-			if (auto parent = scriptEngine->RequireCurrentInstance->Parent) {
+			if (auto parent = scriptEngine->RequireCurrentInstance->ParentPointer) {
 				scriptEngine->RequireCurrentInstance = parent->shared_from_this();
 				return NAVIGATE_SUCCESS;
 			}
@@ -69,7 +70,7 @@ namespace gargantuan {
 		config->to_child = [](lua_State *L, void *ctx, const char *name) -> luarequire_NavigateResult {
 			auto scriptEngine = static_cast<ScriptEngine *>(ctx);
 
-			if (auto child = scriptEngine->RequireCurrentInstance->FindFirstChild(name)) {
+			if (auto child = scriptEngine->RequireCurrentInstance->FindFirstChild(name, std::nullopt)) {
 				scriptEngine->RequireCurrentInstance = child;
 				return NAVIGATE_SUCCESS;
 			}
@@ -80,7 +81,7 @@ namespace gargantuan {
 		config->is_module_present = [](lua_State *L, void *ctx) -> bool {
 			auto scriptEngine = static_cast<ScriptEngine *>(ctx);
 			return scriptEngine->RequireCurrentInstance &&
-				   scriptEngine->RequireCurrentInstance->IsClass<gargantuan::ModuleScript>();
+				   std::static_pointer_cast<gargantuan::ModuleScript>(scriptEngine->RequireCurrentInstance) != nullptr;
 		};
 
 		config->get_chunkname =
@@ -117,15 +118,15 @@ namespace gargantuan {
 			auto scriptEngine = static_cast<ScriptEngine *>(ctx);
 
 			if (!scriptEngine->RequireCurrentInstance) luaL_error(L, "Cannot require nil instance");
-			if (!scriptEngine->RequireCurrentInstance->IsClass<ModuleScript>()) {
+
+			auto module = static_pointer_cast<gargantuan::ModuleScript>(scriptEngine->RequireCurrentInstance);
+			if (!module) {
 				luaL_error(
 					L,
 					"Cannot require %s because it is not a ModuleScript",
 					scriptEngine->RequireCurrentInstance->GetFullName().c_str()
 				);
 			};
-
-			auto module = static_pointer_cast<gargantuan::ModuleScript>(scriptEngine->RequireCurrentInstance);
 
 			module->CompileBytecode(&scriptEngine->CompileOptions);
 			if (module->BytecodeCompileStatus != BytecodeCompileStatus::Success) {

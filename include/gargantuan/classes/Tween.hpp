@@ -1,55 +1,56 @@
-#pragma once
+// #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/datatypes/Color3.hpp"
-#include "gargantuan/datatypes/Signal.hpp"
-#include "gargantuan/datatypes/TweenInfo.hpp"
-#include "gargantuan/datatypes/Vector2.hpp"
-#include "gargantuan/reflection/Enums.hpp"
-#include <ext/vector_float3.hpp>
-#include <lua.h>
-#include <string>
-#include <unordered_map>
-#include <variant>
+// #include "gargantuan/classes/Instance.hpp"
+// #include "gargantuan/datatypes/Color3.hpp"
+// #include "gargantuan/datatypes/Signal.hpp"
+// #include "gargantuan/datatypes/TweenInfo.hpp"
+// #include "gargantuan/datatypes/Vector2.hpp"
+// #include "gargantuan/reflection/Enums.hpp"
 
-namespace gargantuan {
-	G_ENUM(
-		PlaybackState,
+// #include <glm/glm.hpp>
+// #include <lua.h>
+// #include <string>
+// #include <unordered_map>
+// #include <variant>
 
-		Begin,
-		Delayed,
-		Playing,
-		Paused,
-		Completed,
-		Cancelled
-	)
+// namespace gargantuan {
+// 	G_ENUM(
+// 		PlaybackState,
 
-	class Tween : public Instance {
-	  public:
-		G_INSTANCE_DECL(Tween);
+// 		Begin,
+// 		Delayed,
+// 		Playing,
+// 		Paused,
+// 		Completed,
+// 		Cancelled
+// 	)
 
-		std::shared_ptr<Instance> Instance;
-		TweenInfo TweenInfo;
+// 	class Tween : public Instance {
+// 	  public:
+// 		G_INSTANCE_DECL(Tween);
 
-		using TweenableValue = std::variant<float, Color3, Vector2, glm::vec3>;
-		using GoalPropertyMap = std::unordered_map<std::string, TweenableValue>;
-		GoalPropertyMap GoalProperties;
+// 		std::shared_ptr<Instance> Instance;
+// 		TweenInfo TweenInfo;
 
-		Enums::PlaybackState PlaybackState;
+// 		using TweenableValue = std::variant<float, Color3, Vector2, glm::vec3>;
+// 		using GoalPropertyMap = std::unordered_map<std::string, TweenableValue>;
+// 		GoalPropertyMap GoalProperties;
 
-		void Play();
-		void Cancel();
-		void Pause();
+// 		Enums::PlaybackState PlaybackState;
 
-		static int LPlay(lua_State *L, gargantuan::Instance *self);
-		static int LStep(lua_State *L, gargantuan::Instance *self);
+// 		void Play();
+// 		void Cancel();
+// 		void Pause();
 
-		G_SIGNAL(Completed, Enums::PlaybackState)
-	  private:
-		bool IsPlaying;
-		double StartTime;
-		double LerpStartTime;
-		double EndTime;
-		GoalPropertyMap InitialProperties;
-	};
-}
+// 		static int LPlay(lua_State *L, gargantuan::Instance *self);
+// 		static int LStep(lua_State *L, gargantuan::Instance *self);
+
+// 		G_SIGNAL(Completed, Enums::PlaybackState)
+// 	  private:
+// 		bool IsPlaying;
+// 		double StartTime;
+// 		double LerpStartTime;
+// 		double EndTime;
+// 		GoalPropertyMap InitialProperties;
+// 	};
+// }

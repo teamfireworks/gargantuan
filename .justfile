@@ -22,6 +22,7 @@ configure tracy="OFF" build_type="Debug":
 
 # Builds the engine
 build:
+    lute tools/classgen
     cmake --build {{ GARGANTUAN_BUILD_DIRECTORY }} -j={{ num_cpus() }}
 
 # Rebuilds the engine, then runs an example inside assets

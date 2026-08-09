@@ -53,7 +53,7 @@ namespace gargantuan {
 		// {"NumberSequenceKeypoint", OpenLibNumberSequenceKeypoint, NumberSequenceKeypoint::CreateUserdataMetatable},
 		{"Random", OpenLibRandom, Random::CreateUserdataMetatable},
 		// {"RaycastParams", OpenLibRaycastParams},
-		{"Rect", OpenLibRect, Rect::CreateUserdataMetatable},
+		{"Rect", nullptr, Rect::CreateUserdataMetatable},
 		// {"Region3", OpenLibRegion3, Region3::CreateUserdataMetatable},
 		{"UDim", OpenLibUDim, UDim::CreateUserdataMetatable},
 		// {"UDim2", OpenLibUDim2, UDim2::CreateUserdataMetatable},
