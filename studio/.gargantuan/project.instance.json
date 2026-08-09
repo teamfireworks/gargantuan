@@ -15,8 +15,8 @@
 					"Properties": {},
 					"Children": [
 						{
-							"Name": "DirectoryLink",
-							"ClassName": "DirectoryLink",
+							"Name": "FileLink",
+							"ClassName": "FileLink",
 							"Properties": {
 								"Path": {
 									"String": "src"

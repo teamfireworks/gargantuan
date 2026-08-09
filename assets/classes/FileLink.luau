@@ -1,7 +1,7 @@
 const c, t, p = require("@tools/classes").unpack()
 
 return c({
-	name = "DirectoryLink",
+	name = "FileLink",
 	description = "Class that synchronizes a filesystem directory into the DataModel",
 	since = "0.1.0",
 

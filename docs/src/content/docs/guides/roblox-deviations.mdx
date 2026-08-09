@@ -103,7 +103,7 @@ gargantuan --compat-roblox --script=src/Main.luau
     - Tools like Asphalt and Tungsten are redundant as Gargantuan synchronizes
       assets directly from your project via the filesystem.
 
-- Packages are unimplemented. Use `DirectoryLink` to synchronize your packages.
+- Packages are unimplemented. Use `FileLink` to synchronize your packages.
 - `task.cancel` and `coroutine.close` cannot be interspersed with `task` library
   threads and Lua coroutines. This restriction may be lifted by the 0.1 release.
 - `BaseScript`, `LocalScript`, and `Enum.RunContext.Legacy` have been

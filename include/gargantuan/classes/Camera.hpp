@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/classes/generated/Camera.hpp"
 
 #include <SDL3/SDL.h>
@@ -28,9 +27,7 @@ namespace gargantuan {
 		Freecam,
 	);
 
-	class Camera : public Instance {
-		G_DECL_CAMERA;
-
+	class I_Camera {
 		float AccumulatedDeltaX = 0.0f;
 		float AccumulatedDeltaY = 0.0f;
 		float FreecamSpeed = 10.0f;

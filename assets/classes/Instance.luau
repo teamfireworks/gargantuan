@@ -4,6 +4,7 @@ return c({
 	name = "Instance",
 	description = "Abstract class for all instances which can be part of the DataModel",
 	since = "0.1.0",
+	root = true,
 	abstract = true,
 
 	properties = {

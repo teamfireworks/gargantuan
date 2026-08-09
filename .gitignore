@@ -1,9 +1,23 @@
+# Build output
 build
 cmake-build-debug
-.DS_Store
+
+# CMake
 .cache
-.lest
 .fetchcontent-cache
+
+# Lest
+.lest
+
+# Luau Package Manager
 packages/
 .lpm-patch/
-include/gargantuan/classes/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Codegen
+# include/gargantuan/classes/generated/
+# include/gargantuan/services/generated/
+# include/gargantuan/datatypes/generated/

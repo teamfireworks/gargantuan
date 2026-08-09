@@ -1,12 +1,8 @@
-#include "gargantuan/classes/DirectoryLink.hpp"
+#include "gargantuan/classes/FileLink.hpp"
 #include "gargantuan/Log.hpp"
 #include "gargantuan/classes/Folder.hpp"
 #include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/classes/LuaSourceContainer.hpp"
-#include "gargantuan/classes/ModuleScript.hpp"
-#include "gargantuan/classes/Script.hpp"
 #include "gargantuan/filesystem/Paths.hpp"
-#include "gargantuan/reflection/InstanceClassRegistry.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_filesystem.h>
@@ -16,13 +12,7 @@
 #include <string>
 
 namespace gargantuan {
-	G_INSTANCE_IMPL(
-		DirectoryLink,
-		.Description = "Synchronizes a filesystem entry into the data model.",
-		.Properties = {
-			{"Path", Property::fromMember<&DirectoryLink::Path>(true, true).SetSerializable()},
-		}
-	);
+	G_IMPL_FILELINK;
 
 	template <typename T>
 	std::shared_ptr<T> TryCreateScript(
@@ -96,11 +86,11 @@ namespace gargantuan {
 		return nullptr;
 	}
 
-	void DirectoryLink::Synchronize(const std::filesystem::path absolutePath) {
-		if (!Parent || Synchronizing) return;
+	void FileLink::Synchronize(const std::filesystem::path absolutePath) {
+		if (!ParentPointer || Synchronizing) return;
 		Synchronizing = true;
 
-		LOG_INFO(App, "Synchronizing DirectoryLink path: %s", Paths::ToUtf8(absolutePath).c_str());
+		LOG_INFO(App, "Synchronizing FileLink path: %s", Paths::ToUtf8(absolutePath).c_str());
 
 		for (auto &child : OwnedSiblings) {
 			child->Destroy();
@@ -114,7 +104,7 @@ namespace gargantuan {
 			);
 			return;
 		} else if (pathInfo.type != SDL_PATHTYPE_DIRECTORY) {
-			LOG_WARN(App, "DirectoryLinks (for now) can only be used with directories");
+			LOG_WARN(App, "FileLinks (for now) can only be used with directories");
 			return;
 		};
 

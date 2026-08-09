@@ -29,7 +29,7 @@ export type ClassMethod = {
 	read params: { ClassParameter }?,
 	read returns: types.Type?,
 
-	--- Whether to output the method signature int(lua_State* L, Instance* inst)
+	--- Whether to output static int(lua_State* L, Instance* inst)
 	read asLuau: boolean?,
 	read luauSignature: string?,
 }
@@ -39,6 +39,7 @@ export type Class = {
 	read description: string,
 	read since: string,
 
+	read root: boolean?,
 	read abstract: boolean?,
 	read extends: string?,
 	read deprecated: boolean?,
@@ -48,16 +49,10 @@ export type Class = {
 	read methods: { [string]: ClassMethod }?,
 }
 
-const classes = {
-	types = types,
-}
+const classes = {}
 
 function classes.define(x: Class): Class
 	return table.freeze(x)
-end
-
-function classes.type(x: types.Type): types.Type
-	return x
 end
 
 function classes.parameter(name: string, type: types.Type): ClassParameter

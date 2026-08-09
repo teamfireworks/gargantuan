@@ -1,32 +1,42 @@
 export type Type = {
+	read kind: "c" | "class" | "datatype" | "enum" | "optional",
 	read cType: string,
 	read cIncludes: { string }?,
+	read cForwardStatement: string?,
 	read luauType: string,
-
-	read optionalValue: Type?,
 }
 
 const function type(x: Type): Type
 	return x
 end
 
+const function literal<T>(x: T | ""): T
+	return x
+end
+
 const function datatype(typename: string, cType: string?): Type
 	return table.freeze({
+		kind = literal("datatype"),
 		cType = cType or "gargantuan::" .. typename,
 		cIncludes = { `"gargantuan/datatypes/{typename}.hpp"` },
+		cForwardStatement = nil,
 		luauType = typename,
-		optionalValue = nil,
 	})
 end
 
 const types = {
-	Bool = type({ cType = "bool", luauType = "boolean" }),
-	Double = type({ cType = "double", luauType = "number" }),
-	Float = type({ cType = "float", luauType = "number" }),
-	Integer = type({ cType = "int", luauType = "number" }),
-	String = type({ cType = "std::string", cIncludes = { "<string>" }, luauType = "string" }),
-	StringPointer = type({ cType = "const char *", luauType = "string" }),
-	StringView = type({ cType = "std::string_view", cIncludes = { "<string_view>" }, luauType = "string" }),
+	Bool = type({ kind = literal("c"), cType = "bool", luauType = "boolean" }),
+	Double = type({ kind = literal("c"), cType = "double", luauType = "number" }),
+	Float = type({ kind = literal("c"), cType = "float", luauType = "number" }),
+	Integer = type({ kind = literal("c"), cType = "int", luauType = "number" }),
+	String = type({ kind = literal("c"), cType = "std::string", cIncludes = { "<string>" }, luauType = "string" }),
+	StringPointer = type({ kind = literal("c"), cType = "const char *", luauType = "string" }),
+	StringView = type({
+		kind = literal("c"),
+		cType = "std::string_view",
+		cIncludes = { "<string_view>" },
+		luauType = "string",
+	}),
 
 	Axes = datatype("Axes"),
 	CFrame = datatype("CFrame"),
@@ -40,27 +50,34 @@ const types = {
 	Vector2 = datatype("Vector2"),
 
 	Instance = type({
+		kind = "class",
 		cType = "std::shared_ptr<gargantuan::Instance>",
-		-- It's very likely the user has already introduced Instance.hpp
-		-- somewhere, and including it here leads to a recursive import with
-		-- the main Instance class. We omit the Instance include here.
-		cIncludes = { "<memory>" },
+		cIncludes = { "<memory>", '"gargantuan/classes/Instance.hpp"' },
+		cForwardStatement = `class Instance;`,
 		luauType = "Instance",
 	}),
 
 	Signal = type({
+		kind = "datatype",
 		cType = "std::shared_ptr<gargantuan::BaseSignal>",
 		cIncludes = { "<memory>", '"gargantuan/datatypes/Signal.hpp"' },
 		luauType = "Signal<...any>",
 	}),
 
-	Vector3 = type({ cType = "glm::vec3", cIncludes = { "<glm/glm.hpp>" }, luauType = "Vector3" }),
+	Vector3 = type({
+		kind = "datatype",
+		cType = "glm::vec3",
+		cIncludes = { "<glm/glm.hpp>" },
+		luauType = "Vector3",
+	}),
 }
 
 function types.IsA(className: string): Type
 	return {
-		cType = `gargantuan::{className}`,
+		kind = "class",
+		cType = `std::shared_ptr<gargantuan::{className}>`,
 		cIncludes = { `"gargantuan/classes/{className}.hpp"` },
+		cForwardStatement = `class {className};`,
 		luauType = className,
 	}
 end
@@ -68,14 +85,18 @@ end
 function types.EnumItem(enumName: string?): Type
 	if not enumName then
 		return {
+			kind = "enum",
 			cType = "gargantuan::EnumItem",
 			cIncludes = { `"gargantuan/reflection/Enums.hpp"` },
+			cForwardStatement = `class EnumItem;`,
 			luauType = "EnumItem",
 		}
 	else
 		return {
+			kind = "enum",
 			cType = `gargantuan::Enums::{enumName}`,
 			cIncludes = { `"gargantuan/reflection/Enums.hpp"` },
+			cForwardStatement = `namespace Enums \{ enum {enumName}; };`,
 			luauType = `Enum.{enumName}`,
 		}
 	end
@@ -86,6 +107,7 @@ function types.Optional(base: Type): Type
 	table.insert(cIncludes, "<optional>")
 
 	return {
+		kind = "optional",
 		cType = `std::optional<{base.cType}>`,
 		cIncludes = cIncludes,
 		luauType = `{base.luauType}?`,
@@ -98,9 +120,10 @@ function types.Array(base: Type): Type
 	table.insert(cIncludes, "<vector>")
 
 	return {
+		kind = "c",
 		cType = `std::vector<{base.cType}>`,
 		cIncludes = cIncludes,
-		luauType = `\{ {base.luauType} \}`,
+		luauType = `\{ {base.luauType} }`,
 	}
 end
 

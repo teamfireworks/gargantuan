@@ -1,3 +1,7 @@
+-- TODO: This file has like 20 hacks, we should probably implement the types
+-- better. Utrain has a goated suggestions on how to better represent the types,
+-- check Discord #development
+
 const fs = require("@std/fs")
 const path = require("@std/path")
 const process = require("@std/process")
@@ -46,24 +50,24 @@ const function pushIncludes(type: types.Type, includes: { [string]: true })
 	end
 end
 
-const function makeClassDeclarationBody(class: classes.Class, includes: { [string]: true })
-	local protectedBody = { "protected:" }
-	local publicBody = { "public:" }
+const function makeSuperclass(class: classes.Class, includes: { [string]: true })
+	local protectedBody = { "\t  protected:" }
+	local publicBody = { "\t  public:" }
 
 	if class.properties then
 		for key, property in orderedPairs(class.properties) do
 			pushIncludes(property.type, includes)
 			if property.overrideRead or property.overrideWrite then
 				if property.overrideRead then
-					table.insert(publicBody, `{property.type.cType} {property.overrideRead}();`)
+					table.insert(publicBody, `\t\t{property.type.cType} {property.overrideRead}();`)
 				end
 				if property.overrideWrite then
-					table.insert(publicBody, `void {property.overrideWrite}({property.type.cType} value);`)
+					table.insert(publicBody, `\t\tvoid {property.overrideWrite}({property.type.cType} value);`)
 				end
 			else
-				table.insert(protectedBody, `{property.type.cType} {key} = {property.unmodified};`)
-				table.insert(publicBody, `{property.type.cType} Get{key}();`)
-				table.insert(publicBody, `void Set{key}({property.type.cType} value);`)
+				table.insert(protectedBody, `\t\t{property.type.cType} {key} = {property.unmodified};`)
+				table.insert(publicBody, `\t\t{property.type.cType} Get{key}();`)
+				table.insert(publicBody, `\t\tvoid Set{key}({property.type.cType} value);`)
 			end
 		end
 	end
@@ -76,28 +80,23 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 			elseif signal.args and #signal.args > 1 then
 				includes["<tuple>"] = true
 
-				local signalTypedef = "std::tuple<"
+				signalType = "std::tuple<"
 				for index, type in signal.args do
-					signalTypedef ..= type.cType
+					signalType ..= type.cType
 					pushIncludes(type, includes)
 					if index ~= #signal.args then
-						signalTypedef ..= ", "
+						signalType ..= ", "
 					end
 				end
-				signalTypedef ..= ">"
-
-				table.insert(publicBody, `typedef {signalTypedef} {key}Type;`)
-				signalType = `{key}Type`
+				signalType ..= ">"
 			else
 				includes["<variant>"] = true
 				signalType = "std::monostate"
 			end
 
 			includes['"gargantuan/datatypes/Signal.hpp"'] = true
-			table.insert(
-				publicBody,
-				`std::shared_ptr<Signal<{signalType}>> {key} = std::make_shared<Signal<{signalType}>>();`
-			)
+			table.insert(publicBody, `\t\ttypedef Signal<{signalType}> {key}Type;`)
+			table.insert(publicBody, `\t\tstd::shared_ptr<{key}Type> {key} = std::make_shared<{key}Type>();`)
 		end
 	end
 
@@ -105,7 +104,7 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 		for key, method in orderedPairs(class.methods) do
 			if method.asLuau then
 				includes["<lua.h>"] = true
-				table.insert(publicBody, `static int {key}(lua_State* L, Instance* inst);`)
+				table.insert(publicBody, `\t\tstatic int {key}(lua_State* L, Instance* inst);`)
 			else
 				const parameters = {}
 				if method.params then
@@ -115,14 +114,34 @@ const function makeClassDeclarationBody(class: classes.Class, includes: { [strin
 					end
 				end
 				const returnType = method.returns and method.returns.cType or "void"
-				table.insert(publicBody, `{returnType} {key}({table.concat(parameters, ", ")});`)
+				table.insert(publicBody, `\t\t{returnType} {key}({table.concat(parameters, ", ")});`)
 			end
 		end
 	end
 
-	const body = { "public:", "static const InstanceClassDefinition CLASS_DEFINITION;" }
-	tableext.extend(body, protectedBody, publicBody)
+	const baseClass = class.extends or "Instance"
+	includes[`"gargantuan/classes/{baseClass}.hpp"`] = true
+
+	const body = { "namespace gargantuan::BaseInstances {" }
+	if class.name == "Instance" then
+		table.insert(body, `\tclass {class.name} \{`)
+	else
+		table.insert(body, `\tclass {class.name} : public gargantuan::{baseClass} \{`)
+	end
+
+	tableext.extend(body, {
+		"\t  public:",
+		"\t\tstatic const InstanceClassDefinition CLASS_DEFINITION;",
+	}, protectedBody, publicBody)
+	table.insert(body, "\t};")
+	table.insert(body, "};")
 	return body
+end
+
+const function makeClassDeclarationMacro(class: classes.Class)
+	return {
+		`{class.name} : public BaseInstances::{class.name}`,
+	}
 end
 
 const function makeClassImplementationBody(class: classes.Class, includes: { [string]: true })
@@ -228,16 +247,19 @@ end
 
 const function makeClassContents(class: classes.Class)
 	local includes: { [string]: true } = {}
-	local declarationBody = makeClassDeclarationBody(class, includes)
+
+	const superclassBody = makeSuperclass(class, includes)
+	const superclassMacro = makeClassDeclarationMacro(class)
 	const implementationBody = makeClassImplementationBody(class, includes)
 
+	includes[`"gargantuan/classes/{class.name}.hpp"`] = nil
 	local rendered = { "// This file was procedurally @generated by Gargantuan. Do not edit!\n" }
 	for include in orderedPairs(includes) do
 		table.insert(rendered, `#include {include} // IWYU pragma: export`)
 	end
 
-	table.insert(rendered, "")
-	table.insert(rendered, renderMacroBody(`G_DECL_{string.upper(class.name)}`, declarationBody))
+	tableext.extend(rendered, superclassBody)
+	table.insert(rendered, renderMacroBody(`G_DECL_{string.upper(class.name)}`, superclassMacro))
 	table.insert(rendered, renderMacroBody(`G_IMPL_{string.upper(class.name)}`, implementationBody))
 
 	return table.concat(rendered, "\n")

@@ -5,16 +5,13 @@
 
 #pragma once
 
-#include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/classes/generated/DirectoryLink.hpp"
+#include "gargantuan/classes/generated/FileLink.hpp"
 
 #include <filesystem>
 #include <vector>
 
 namespace gargantuan {
-	class DirectoryLink : public Instance {
-		G_DECL_DIRECTORYLINK;
-
+	class I_FileLink {
 		std::vector<std::shared_ptr<Instance>> OwnedSiblings;
 		bool Synchronizing = false;
 
