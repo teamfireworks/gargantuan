@@ -3,5 +3,7 @@
 #include "gargantuan/classes/generated/Folder.hpp"
 
 namespace gargantuan {
-	class I_Folder {};
+	class Folder : public Instance {
+		I_Folder;
+	};
 }

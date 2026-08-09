@@ -13,11 +13,10 @@
 #include <vector>
 
 namespace gargantuan {
-	class Instance : public std::enable_shared_from_this<Instance>,
-					 public Userdata<Instance, std::shared_ptr<Instance>>,
-					 public __CODEGEN__Instance {
-	  public:
-		static const Definition DEFINITION;
+	G_SHARED_USERDATA_DECL(
+		Instance,
+
+		I_Instance;
 
 		virtual ~Instance() = default;
 
@@ -32,39 +31,21 @@ namespace gargantuan {
 		static int LNewIndex(lua_State *L, Instance *instance);
 		static int LNamecall(lua_State *L, Instance *instance);
 
-		template <typename T> [[deprecated("dynamic_cast it urself dummy")]] bool IsClass() const {
-			return dynamic_cast<const T *>(this) != nullptr;
-		}
-		template <typename T> [[deprecated("dynamic_cast it urself dummy")]] T *Cast() const {
-			return dynamic_cast<const T *>(this);
-		}
-		template <typename T> [[deprecated("dynamic_cast it urself dummy")]] T *Cast() {
-			return dynamic_cast<T *>(this);
-		}
-		template <typename T> [[deprecated("dynamic_cast it urself dummy")]] const T *Cast() const {
-			return dynamic_cast<const T *>(this);
-		}
+		template <typename T>
+		[[deprecated("dynamic_cast it urself dummy")]] bool IsClass()
+			const { return dynamic_cast<const T *>(this) != nullptr; } template <typename T>
+			[[deprecated("dynamic_cast it urself dummy")]] T *Cast()
+				const { return dynamic_cast<const T *>(this); } template <typename T>
+				[[deprecated("dynamic_cast it urself dummy")]] T *Cast() {
+					return dynamic_cast<T *>(this);
+				} template <typename T>
+				[[deprecated("dynamic_cast it urself dummy")]] const T *Cast()
+					const { return dynamic_cast<const T *>(this); }
 
 		void CollectDescendants(std::vector<std::shared_ptr<Instance>> &descendants);
 		void FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent);
 		void AssertIsAlive();
-	};
-
-	template <> struct StackValue<std::shared_ptr<Instance>> {
-		typedef Userdata<Instance, std::shared_ptr<Instance>> This;
-		static inline std::string_view ReflectedTypedef() {
-			return StackValue<This>::ReflectedTypedef();
-		}
-		static bool Is(lua_State *L, int idx) {
-			return StackValue<This>::Is(L, idx);
-		}
-		static std::shared_ptr<Instance> From(lua_State *L, int idx) {
-			return StackValue<This>::From(L, idx);
-		}
-		static int Push(lua_State *L, std::shared_ptr<Instance> value) {
-			return StackValue<This>::Push(L, value);
-		}
-	};
+	);
 
 	template <typename Subclass>
 		requires std::is_base_of_v<Instance, Subclass> && (!std::is_same_v<Instance, Subclass>)

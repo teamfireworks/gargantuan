@@ -27,7 +27,9 @@ namespace gargantuan {
 		Freecam,
 	);
 
-	class I_Camera {
+	class Camera : public Instance {
+		I_Camera;
+
 		float AccumulatedDeltaX = 0.0f;
 		float AccumulatedDeltaY = 0.0f;
 		float FreecamSpeed = 10.0f;

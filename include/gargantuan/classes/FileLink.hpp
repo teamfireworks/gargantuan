@@ -11,7 +11,9 @@
 #include <vector>
 
 namespace gargantuan {
-	class I_FileLink {
+	class FileLink : public Instance {
+		I_FileLink;
+
 		std::vector<std::shared_ptr<Instance>> OwnedSiblings;
 		bool Synchronizing = false;
 
