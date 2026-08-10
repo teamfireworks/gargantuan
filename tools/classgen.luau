@@ -319,7 +319,7 @@ const function assembleFile(target: Target, inputFilepath: path.Pathlike)
 	}
 
 	if state.superclass then
-		pushTypeDependencies(state, types.IsA(state.superclass))
+		pushTypeDependencies(state, types.Instance(state.superclass))
 	end
 
 	assembleMethods(state)

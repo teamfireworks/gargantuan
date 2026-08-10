@@ -17,6 +17,7 @@
 #include <glm/glm.hpp>
 #include <lua.h>
 #include <memory>
+#include <optional>
 
 namespace gargantuan {
 	Engine::Engine(std::shared_ptr<gargantuan::DataModel> game, BaseRenderer *renderer)
@@ -26,7 +27,7 @@ namespace gargantuan {
 		  RunService(GetService<gargantuan::RunService>()), ProcessService(GetService<gargantuan::ProcessService>()),
 		  UserInputService(GetService<gargantuan::UserInputService>()) {
 
-		auto descendantAdded = [this](std::shared_ptr<Instance> inst) {
+		DataModel->BindDescendants([this](std::shared_ptr<Instance> inst) {
 			if (auto script = std::dynamic_pointer_cast<gargantuan::Script>(inst)) {
 				this->Script->ScriptQueue.insert(script);
 				inst->Destroying->Once([ScriptEngine = this->Script, script](std::monostate _) {
@@ -47,20 +48,14 @@ namespace gargantuan {
 				);
 				link->Synchronize(absolutePath);
 			}
-		};
+		});
 
-		auto descendantRemoved = [this](std::shared_ptr<Instance> inst) {
+		DataModel->DescendantRemoved->Connect([this](std::shared_ptr<Instance> inst) {
 			if (auto script = std::static_pointer_cast<gargantuan::Script>(inst);
 				script && Script->ScriptQueue.contains(script)) {
 				Script->ScriptQueue.erase(script);
 			}
-		};
-
-		DataModel->DescendantAdded->Connect(descendantAdded);
-		DataModel->DescendantRemoved->Connect(descendantRemoved);
-		for (auto &descendant : DataModel->GetDescendants()) {
-			descendantAdded(descendant);
-		}
+		});
 
 		LOG_INFO(App, "Constructed engine");
 	}
@@ -68,7 +63,7 @@ namespace gargantuan {
 	void Engine::Destroy() {
 		LOG_INFO(App, "Destroying engine");
 		Renderer->Destroy();
-		WorldRoot->KillWorld();
+		WorldRoot->Destroy();
 	}
 
 	float Engine::GetDeltaTime() {
@@ -106,7 +101,7 @@ namespace gargantuan {
 
 					case SDL_EVENT_QUIT:
 						LOG_INFO(App, "Stopping engine");
-						ProcessService->Alive = false;
+						ProcessService->MarkExit(0);
 						return;
 					}
 
@@ -118,7 +113,7 @@ namespace gargantuan {
 			{
 				G_PROFILE("Simulation");
 				RunService->PreSimulation->Fire(deltaTime);
-				WorldRoot->StepPhys(deltaTime);
+				WorldRoot->StepPhysics(deltaTime, std::nullopt);
 				Workspace->GetCurrentCamera()->Step(deltaTime);
 				RunService->PostSimulation->Fire(deltaTime);
 			}

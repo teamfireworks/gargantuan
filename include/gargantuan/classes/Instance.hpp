@@ -14,9 +14,7 @@
 
 namespace gargantuan {
 	G_SHARED_USERDATA_DECL(
-		Instance,
-
-		I_Instance;
+		Instance, I_Instance;
 
 		virtual ~Instance() = default;
 
@@ -31,16 +29,9 @@ namespace gargantuan {
 		static int LNewIndex(lua_State *L, Instance *instance);
 		static int LNamecall(lua_State *L, Instance *instance);
 
-		template <typename T>
-		[[deprecated("dynamic_cast it urself dummy")]] bool IsClass()
-			const { return dynamic_cast<const T *>(this) != nullptr; } template <typename T>
-			[[deprecated("dynamic_cast it urself dummy")]] T *Cast()
-				const { return dynamic_cast<const T *>(this); } template <typename T>
-				[[deprecated("dynamic_cast it urself dummy")]] T *Cast() {
-					return dynamic_cast<T *>(this);
-				} template <typename T>
-				[[deprecated("dynamic_cast it urself dummy")]] const T *Cast()
-					const { return dynamic_cast<const T *>(this); }
+		typedef std::function<void(std::shared_ptr<gargantuan::Instance> instance)> BindCallback;
+		std::function<void()> BindChildren(BindCallback callback);
+		std::function<void()> BindDescendants(BindCallback callback);
 
 		void CollectDescendants(std::vector<std::shared_ptr<Instance>> &descendants);
 		void FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent);

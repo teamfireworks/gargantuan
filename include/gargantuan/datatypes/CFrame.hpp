@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gargantuan/datatypes/Vector3.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 

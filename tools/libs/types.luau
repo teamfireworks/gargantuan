@@ -16,13 +16,12 @@ const function literal<T>(x: T | ""): T
 end
 
 const function datatype(typename: string, cType: string?): Type
-	return table.freeze({
+	return {
 		kind = literal("datatype"),
 		cType = cType or "gargantuan::" .. typename,
 		cIncludes = { `"gargantuan/datatypes/{typename}.hpp"` },
-		cForwardStatement = nil,
 		luauType = typename,
-	})
+	}
 end
 
 const types = {
@@ -49,24 +48,12 @@ const types = {
 	UDim = datatype("UDim"),
 	UDim2 = datatype("UDim2"),
 	Vector2 = datatype("Vector2"),
-
-	Instance = type({
-		kind = "class",
-		cType = "std::shared_ptr<gargantuan::Instance>",
-		cIncludes = { "<memory>", '"gargantuan/classes/Instance.hpp"' },
-		cForwardStatement = `class Instance;`,
-		luauType = "Instance",
-	}),
-
-	Vector3 = type({
-		kind = "datatype",
-		cType = "glm::vec3",
-		cIncludes = { '"gargantuan/datatypes/Vector3.hpp"' },
-		luauType = "Vector3",
-	}),
+	Vector3 = datatype("Vector3", "glm::vec3"),
 }
 
-function types.IsA(className: string): Type
+function types.Instance(className: string?): Type
+	className = className or "Instance"
+
 	return {
 		kind = "class",
 		cType = `std::shared_ptr<gargantuan::{className}>`,
@@ -162,6 +149,68 @@ function types.Array(base: Type): Type
 		cIncludes = cIncludes,
 		luauType = `\{ {base.luauType} }`,
 	}
+end
+
+function types.Function(...: { name: string, type: Type })
+	const cIncludes = { "<functional>" }
+
+	const numParams = select("#", ...)
+	local cParams, luauParams = "", ""
+	if numParams ~= 0 then
+		for index = 1, numParams do
+			const param: { name: string, type: Type } = select(index, ...)
+			cParams ..= param.type.cType .. " " .. param.name
+			luauParams ..= param.name .. ": " .. param.type.luauType
+
+			if param.type.cIncludes then
+				tableext.extend(cIncludes, param.type.cIncludes)
+			end
+
+			if index ~= numParams then
+				cParams ..= ", "
+				luauParams ..= ", "
+			end
+		end
+	end
+
+	return function(...: Type): Type
+		const numReturns = select("#")
+		local cReturns: string, luauReturns: string
+
+		if numReturns == 0 then
+			cReturns, luauReturns = "void", "()"
+		elseif numReturns == 1 then
+			const ret = select(1, ...)
+			cReturns, luauReturns = ret.cType, ret.luauType
+			if ret.cIncludes then
+				tableext.extend(cIncludes, ret.cIncludes)
+			end
+		else
+			table.insert(cIncludes, "<tuple>")
+			cReturns, luauReturns = "std::tuple<", "("
+			for index = 1, numReturns do
+				const ret: Type = select(index, ...)
+				cReturns ..= ret.cType
+				luauReturns ..= ret.luauType
+
+				if ret.cIncludes then
+					tableext.extend(cIncludes, ret.cIncludes)
+				end
+
+				if index ~= numReturns then
+					cReturns ..= ", "
+					luauReturns ..= ", "
+				end
+			end
+		end
+
+		return {
+			kind = "c",
+			cType = `std::function<{cReturns}({cParams})>`,
+			cIncludes = cIncludes,
+			luauType = `({luauParams}) -> {luauReturns}`,
+		}
+	end
 end
 
 return table.freeze(types)

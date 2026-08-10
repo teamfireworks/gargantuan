@@ -1,5 +1,6 @@
 local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
+
+const INTERVAL_SECONDS = 0.1
 
 local baseplate = Instance.new("Part")
 baseplate.Anchored = true
@@ -10,14 +11,13 @@ baseplate.Parent = Workspace
 
 Workspace.CurrentCamera.CFrame = CFrame.new(Vector3.new(0, 15, 60), Vector3.new(0, 15, 0))
 
-RunService.PreSimulation:Connect(function()
+while task.wait(INTERVAL_SECONDS) do
 	local block = Instance.new("Part")
 	block.Anchored = false
 	block.CanCollide = true
 	block.Color = Color3.fromHSV(math.random(), 1, 1)
-	block.CFrame = CFrame.new(0, 20, 0)
-		* CFrame.Angles(math.random() * math.pi, math.random() * math.pi, math.random() * math.pi)
-	block.Position = Vector3.new(0, 25, 0)
+	block.Position = Vector3.new(0, 30, 0)
+	block.Rotation = Vector3.new(math.random(0, 360), math.random(0, 360), math.random(0, 360))
 	block.Size = Vector3.new(1, 1, 1)
 	block.Parent = Workspace
-end)
+end

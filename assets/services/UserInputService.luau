@@ -76,35 +76,35 @@ return c({
 	signals = {
 		DeviceAccelerationChanged = {
 			description = "Fired when the physical acceleration of the device changes",
-			args = { t.IsA("InputObject") },
+			args = { t.Instance("InputObject") },
 		},
 		DeviceGravityChanged = {
 			description = "Fired when the gravity vector of the device changes",
-			args = { t.IsA("InputObject") },
+			args = { t.Instance("InputObject") },
 		},
 		DeviceRotationChanged = {
 			description = "Fired when the device orientation changes",
-			args = { t.IsA("InputObject"), t.CFrame },
+			args = { t.Instance("InputObject"), t.CFrame },
 		},
 		GamepadConnected = {
 			description = "Fired when a gamepad is connected",
-			args = { t.IsA("InputObject") },
+			args = { t.Instance("InputObject") },
 		},
 		GamepadDisconnected = {
 			description = "Fired when a gamepad is disconnected",
-			args = { t.IsA("InputObject") },
+			args = { t.Instance("InputObject") },
 		},
 		InputBegan = {
 			description = "Fired when a user input starts",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		InputChanged = {
 			description = "Fired when an active user input changes state",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		InputEnded = {
 			description = "Fired when a user input ends",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		JumpRequest = {
 			description = "Fired when a jump action is triggered by the user",
@@ -119,11 +119,11 @@ return c({
 		},
 		TouchStarted = {
 			description = "Fired when a touch gesture begins",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		TouchEnded = {
 			description = "Fired when a touch gesture ends",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		TouchDrag = {
 			description = "Fired during a touch dragging gesture",
@@ -135,7 +135,7 @@ return c({
 		},
 		TouchMoved = {
 			description = "Fired when an active touch point moves",
-			args = { t.IsA("InputObject"), t.Bool },
+			args = { t.Instance("InputObject"), t.Bool },
 		},
 		TouchPan = {
 			description = "Fired during a touch panning gesture",
@@ -180,15 +180,15 @@ return c({
 		-- },
 		-- GetDeviceAcceleration = {
 		-- 	description = "Returns an InputObject representing device acceleration",
-		-- 	returns = t.IsA("InputObject"),
+		-- 	returns = t.Instance("InputObject"),
 		-- },
 		-- GetDeviceGravity = {
 		-- 	description = "Returns an InputObject representing the device gravity vector",
-		-- 	returns = t.IsA("InputObject"),
+		-- 	returns = t.Instance("InputObject"),
 		-- },
 		-- GetDeviceRotation = {
 		-- 	description = "Returns the device rotation input object and orientation CFrame",
-		-- 	returns = t.IsA("InputObject"),
+		-- 	returns = t.Instance("InputObject"),
 		-- },
 		-- GetGamepadConnected = {
 		-- 	description = "Returns whether a specific gamepad type is connected",
@@ -198,7 +198,7 @@ return c({
 		-- GetGamepadState = {
 		-- 	description = "Returns a list of input objects representing current gamepad input states",
 		-- 	params = { p("num", t.EnumItem("UserInputType")) },
-		-- 	returns = t.Array(t.IsA("InputObject")),
+		-- 	returns = t.Array(t.Instance("InputObject")),
 		-- },
 		-- GetImageForKeyCode = {
 		-- 	description = "Returns the content asset ID associated with a key code icon",
@@ -207,7 +207,7 @@ return c({
 		-- },
 		GetKeysPressed = {
 			description = "Returns an array of input objects for all currently pressed keyboard keys",
-			returns = t.Array(t.IsA("InputObject")),
+			returns = t.Array(t.Instance("InputObject")),
 		},
 		GetLastInputType = {
 			description = "Returns the type of the last input event received",
@@ -215,7 +215,7 @@ return c({
 		},
 		GetMouseButtonsPressed = {
 			description = "Returns an array of input objects for all currently pressed mouse buttons",
-			returns = t.Array(t.IsA("InputObject")),
+			returns = t.Array(t.Instance("InputObject")),
 		},
 		GetMouseDelta = {
 			description = "Returns the mouse movement delta vector since the last frame",

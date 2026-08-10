@@ -4,6 +4,7 @@ local Workspace = game:GetService("Workspace")
 
 local baseplate = Instance.new("Part")
 baseplate.Name = "Baseplate"
+baseplate.Anchored = true
 baseplate.Color = Color3.fromHSV(0, 0, 0.5)
 baseplate.Position = Vector3.new(0, -10, 0)
 baseplate.Size = Vector3.new(2000, 20, 2000)
@@ -12,6 +13,7 @@ baseplate.Parent = Workspace
 
 local hrp = Instance.new("Part")
 hrp.Name = "HumanoidRootPart"
+hrp.Anchored = true
 hrp.Size = Vector3.new(2, 4, 1)
 hrp.Position = Vector3.new(0, 2, 0)
 hrp.Color = Color3.new(1, 1, 1)

@@ -109,9 +109,15 @@ namespace gargantuan {
 		}
 	};
 
-	template <typename T> struct StackValue<std::vector<T>> {
+	template <typename T>
+		requires IsStackValue<T>
+	struct StackValue<std::vector<T>> {
 		static inline std::string_view ReflectedTypedef() {
 			return std::string("{ ") + StackValue<T>::ReflectedTypedef() + " }";
+		};
+
+		static bool Is(lua_State *L, int idx) {
+			return lua_istable(L, idx);
 		};
 
 		static int Push(lua_State *L, const std::vector<T> &value) {
@@ -124,9 +130,23 @@ namespace gargantuan {
 			}
 			return 1;
 		}
+
+		static std::vector<T> From(lua_State *L, int idx) {
+			std::vector<T> vec;
+			vec.resize(lua_objlen(L, idx));
+
+			for (int iter = 0; (iter = lua_rawiter(L, idx, iter)) != -1;) {
+				if (lua_isnumber(L, idx) && StackValue<T>::Is(L, -1)) vec.push_back(StackValue<T>::From(L, -1));
+				lua_pop(L, 2);
+			}
+
+			return vec;
+		}
 	};
 
-	template <typename T> struct StackValue<std::optional<T>> {
+	template <typename T>
+		requires IsStackValue<T>
+	struct StackValue<std::optional<T>> {
 		static inline std::string ReflectedTypedef() {
 			return std::string(StackValue<T>::ReflectedTypedef()) + "?";
 		}

@@ -1,23 +1,18 @@
-
-#include "gargantuan/scripting/UserdataTag.hpp"
-#include <tuple>
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "gargantuan/datatypes/CFrame.hpp"
+#include "gargantuan/datatypes/Vector3.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
+#include "gargantuan/scripting/UserdataTag.hpp"
 
-#include <glm/ext/quaternion_common.hpp>
-#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <glm/gtx/norm.hpp>
 #include <glm/gtx/orthonormalize.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/trigonometric.hpp>
-
 #include <lua.h>
 #include <lualib.h>
+
+#include <tuple>
 
 namespace gargantuan {
 	G_USERDATA_IMPL(

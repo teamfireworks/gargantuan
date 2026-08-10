@@ -19,7 +19,6 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <stdexcept>
 #include <string>
 
 using namespace gargantuan;
@@ -42,12 +41,8 @@ Engine *ConstructScript(std::string path, BaseRenderer *renderer) {
 		auto game = std::make_shared<DataModel>();
 		auto engine = new Engine(game, renderer);
 
-		LOG_INFO(App, "before constructing ????????");
-
 		auto script = ScriptFromFile<Script>(path.c_str());
 		script->SetParent(engine->Workspace);
-
-		LOG_INFO(App, "????????");
 
 		return engine;
 	} catch (std::exception &e) {
@@ -152,14 +147,18 @@ int main(int argc, char *argv[]) {
 		std::exit(1);
 	}
 
-	SDL_Init(SDL_INIT_VIDEO);
-	std::atexit(SDL_Quit);
-
 	Vector2 viewportSize(720, 540);
 	BaseRenderer *renderer = nullptr;
+
+	std::atexit(SDL_Quit);
+
 	if (program.is_used("--headless")) {
+		SDL_Init(SDL_INIT_EVENTS);
+
 		renderer = new HeadlessRenderer(viewportSize);
 	} else {
+		SDL_Init(SDL_INIT_VIDEO);
+
 		try {
 			renderer = new SDLRenderer(viewportSize);
 		} catch (std::exception &e) {

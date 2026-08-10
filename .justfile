@@ -1,3 +1,6 @@
+# TODO: Move as much of this into tools with Lute, so we can rid Just as a
+# build dependency
+
 GARGANTUAN_BUILD_DIRECTORY := "./build"
 GARGANTUAN_BINARY := "./build/gargantuan"
 

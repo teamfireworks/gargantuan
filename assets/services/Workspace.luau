@@ -8,7 +8,7 @@ return c({
 	properties = {
 		CurrentCamera = {
 			description = "The current camera.",
-			type = t.IsA("Camera"),
+			type = t.Instance("Camera"),
 			unmodified = "nullptr",
 			writeLevel = "Never",
 		},

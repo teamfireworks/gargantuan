@@ -10,8 +10,10 @@ namespace gargantuan {
 	class BasePart : public Instance {
 		I_BasePart;
 
+		glm::vec3 AccumulatedImpulse = {0.0f, 0.0f, 0.0f};
+		virtual void CreateBodyShape(b3BodyId bodyId, b3ShapeDef &bodyShape) = 0;
+
 		glm::mat4 GetModelMatrix();
 		virtual std::unique_ptr<GpuMesh> &GetMesh() const = 0;
-		virtual void CreateBodyShape(b3BodyId bodyId, b3ShapeDef &bodyShape) = 0;
 	};
 } // namespace gargantuan

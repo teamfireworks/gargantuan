@@ -1,5 +1,5 @@
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 type Disk = {
 	part: BasePart,
@@ -13,7 +13,7 @@ local center = Vector3.new(0, 10, 0)
 
 local blackHole = Instance.new("Part")
 blackHole.Size = Vector3.new(8, 8, 8)
-blackHole.Anchored = false
+blackHole.Anchored = true
 blackHole.CanCollide = false
 blackHole.Shape = Enum.PartType.Ball
 -- blackHole.Material = Enum.Material.Neon
@@ -34,7 +34,7 @@ for i = 1, numDisks do
 
 	local disk = Instance.new("Part")
 	disk.Size = Vector3.new(0.5, 0.5, 0.5)
-	disk.Anchored = false
+	disk.Anchored = true
 	disk.CanCollide = false
 	disk.Shape = Enum.PartType.Ball
 	-- disk.Material = Enum.Material.Neon

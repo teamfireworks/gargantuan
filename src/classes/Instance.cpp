@@ -1,6 +1,5 @@
 #include "gargantuan/classes/Instance.hpp"
 #include "gargantuan/InstanceProperty.hpp"
-#include "gargantuan/Log.hpp"
 #include "gargantuan/datatypes/Signal.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
 #include "gargantuan/scripting/UserdataTag.hpp"
@@ -58,7 +57,7 @@ namespace gargantuan {
 
 	void Instance::FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent) {
 		AncestryChanged->Fire({child, parent});
-		// GetPropertyChangedSignal("Parent")->Fire({});
+		GetPropertyChangedSignal("Parent")->Fire({});
 		for (auto &descendant : Children) {
 			descendant->FireAncestryChanged(child, parent);
 		}
@@ -97,10 +96,6 @@ namespace gargantuan {
 
 		ParentPointer = newParent.get();
 
-		// LOG_DEBUG(App, "Updating parent for %s", GetFullName().c_str());
-
-		//  vvv this block is causing some bullshit ???
-		// im gonna look at spookexes branch he fixed this somehow wait
 		if (newParent != nullptr) {
 			newParent->Children.push_back(self);
 			newParent->ChildAdded->Fire(self);
@@ -113,7 +108,6 @@ namespace gargantuan {
 		}
 
 		FireAncestryChanged(self, newParent);
-		// LOG_DEBUG(App, "Successfully set parent");
 	}
 
 	void Instance::ClearAllChildren() {
@@ -121,6 +115,24 @@ namespace gargantuan {
 		for (auto &child : children) {
 			child->Destroy();
 		}
+	}
+
+	std::function<void()> Instance::BindChildren(std::function<void(std::shared_ptr<Instance> inst)> callback) {
+		for (auto &child : Children) {
+			callback(child);
+		}
+
+		auto conn = ChildAdded->Connect(callback);
+		return [conn]() { conn->Disconnect(); };
+	}
+
+	std::function<void()> Instance::BindDescendants(std::function<void(std::shared_ptr<Instance> inst)> callback) {
+		for (auto &child : GetDescendants()) {
+			callback(child);
+		}
+
+		auto conn = DescendantAdded->Connect(callback);
+		return [conn]() { conn->Disconnect(); };
 	}
 
 	bool Instance::IsPropertyModified(std::string propertyName) {

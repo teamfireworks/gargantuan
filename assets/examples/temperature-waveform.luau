@@ -1,5 +1,5 @@
-local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 const GRID_SIZE = 20
 const BLOCK_SIZE = 2
@@ -24,6 +24,7 @@ for x = 1, GRID_SIZE do
 	blocks[x] = {}
 	for z = 1, GRID_SIZE do
 		local p = Instance.new("Part")
+		p.Anchored = true
 		p.CFrame = CFrame.new((x - (GRID_SIZE + 1) / 2) * BLOCK_SIZE, Y_OFFSET, (z - (GRID_SIZE + 1) / 2) * BLOCK_SIZE)
 		p.Size = Vector3.new(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
 		p.Parent = Workspace

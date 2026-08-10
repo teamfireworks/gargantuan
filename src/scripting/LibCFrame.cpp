@@ -1,3 +1,6 @@
+// NOTE: Need StackValue<glm::vec3> implementation
+#include "gargantuan/datatypes/Vector3.hpp" // IWYU pragma: keep
+
 #include "gargantuan/datatypes/CFrame.hpp"
 #include "gargantuan/scripting/ScriptEngine.hpp"
 #include "gargantuan/scripting/StackValue.hpp"

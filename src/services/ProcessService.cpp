@@ -5,7 +5,7 @@
 #include <lualib.h>
 
 namespace gargantuan {
-	void ProcessService::CExitAsync(int exitCode) {
+	void ProcessService::MarkExit(int exitCode) {
 		Alive = false;
 		ExitCode = exitCode;
 	}
@@ -13,7 +13,7 @@ namespace gargantuan {
 	int ProcessService::ExitAsync(lua_State *L, Instance *self) {
 		auto processService = dynamic_cast<ProcessService *>(self);
 		int exitCode = luaL_checknumber(L, 2);
-		if (processService->Alive) processService->CExitAsync(exitCode);
+		if (processService->Alive) processService->MarkExit(exitCode);
 		return lua_yield(L, 0);
 	}
 

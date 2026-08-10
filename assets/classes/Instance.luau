@@ -31,7 +31,7 @@ return c({
 		},
 		Parent = {
 			description = "Hierarchical parent of the instance, instances are unparented on destruction",
-			type = t.Optional(t.Instance),
+			type = t.Optional(t.Instance()),
 			unmodified = "std::nullopt",
 			overrideRead = "GetParent",
 			overrideWrite = "SetParent",
@@ -41,23 +41,23 @@ return c({
 	signals = {
 		AncestryChanged = {
 			description = "Fired after the Parent property of this or ancestor instances is changed",
-			args = { t.Instance, t.Instance },
+			args = { t.Instance(), t.Instance() },
 		},
 		ChildAdded = {
 			description = "Fired after an instance is parented to this instance",
-			args = { t.Instance },
+			args = { t.Instance() },
 		},
 		ChildRemoved = {
 			description = "Fired after an instance is unparented from this instance",
-			args = { t.Instance },
+			args = { t.Instance() },
 		},
 		DescendantAdded = {
 			description = "Fired after a descendant instance is added to this instance",
-			args = { t.Instance },
+			args = { t.Instance() },
 		},
 		DescendantRemoved = {
 			description = "Fired after a descendant instance is removed from this instance",
-			args = { t.Instance },
+			args = { t.Instance() },
 		},
 		Destroying = {
 			description = "Fired once when the instance is destroyed",
@@ -96,7 +96,7 @@ return c({
 
 		GetChildren = {
 			description = "Returns all direct children of this instance",
-			returns = t.Array(t.Instance),
+			returns = t.Array(t.Instance()),
 		},
 		ClearAllChildren = {
 			description = "Unparents all direct children of this instance",
@@ -109,67 +109,77 @@ return c({
 		FindFirstChild = {
 			description = "Returns the first direct child that matches the specified name",
 			params = { p("name", t.String), p("recursive", t.Optional(t.Bool)) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstChildOfClass = {
 			description = "Returns the first direct child that exactly matches the specified class",
 			params = { p("className", t.String), p("recursive", t.Optional(t.Bool)) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstChildWhichIsA = {
 			description = "Returns the first direct child that derives from the specified class",
 			params = { p("className", t.String), p("recursive", t.Optional(t.Bool)) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
+		-- BindChildren = {
+		-- 	description = "Calls the specified callback on existing and future direct children. Returns a disconnector.",
+		-- 	params = { p("callback", t.Function(p("instance", t.Instance()))()) },
+		-- 	returns = t.Function()(),
+		-- },
 
 		-- IsDescendantOf = {
 		-- 	description = "Whether this instance is a descendant of the specified ancestor",
-		-- 	params = { p("ancestor", t.Instance) },
+		-- 	params = { p("ancestor", t.Instance()) },
 		-- 	returns = t.Bool,
 		-- },
 		GetDescendants = {
 			description = "Returns all descendants below this instance",
-			returns = t.Array(t.Instance),
+			returns = t.Array(t.Instance()),
 		},
 		FindFirstDescendant = {
 			description = "Returns the first descendant that matches the specified name",
 			params = { p("name", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstDescendantOfClass = {
 			description = "Returns the first descendant that exactly matches the specified class",
 			params = { p("className", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstDescendantWhichIsA = {
 			description = "Returns the first descendant that derives from the specified class",
 			params = { p("className", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
+		-- BindDescendants = {
+		-- 	description = "Calls the specified callback on existing and future descendants. Returns a disconnector.",
+		-- 	params = { p("callback", t.Function(p("instance", t.Instance()))()) },
+		-- 	returns = t.Function()(),
+		-- },
 
 		-- IsAncestorOf = {
 		-- 	description = "Whether this instance is an ancestor of the specified descendant",
-		-- 	params = { p("descendant", t.Instance) },
+		-- 	params = { p("descendant", t.Instance()) },
 		-- 	returns = t.Bool,
 		-- },
 		-- GetAncestors = {
 		-- 	description = "Returns all ancestors above this instance",
-		-- 	returns = t.Array(t.Instance),
+		-- 	returns = t.Array(t.Instance()),
 		-- },
 		FindFirstAncestor = {
 			description = "Returns the first ancestor that matches the specified name",
 			params = { p("name", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstAncestorOfClass = {
 			description = "Returns the first ancestor that exactly matches the specified class",
 			params = { p("className", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 		FindFirstAncestorWhichIsA = {
 			description = "Returns the first ancestor that derives from the specified class",
 			params = { p("className", t.String) },
-			returns = t.Instance,
+			returns = t.Instance(),
 		},
 	},
 })

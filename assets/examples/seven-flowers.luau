@@ -18,6 +18,7 @@ local flowerParts = {}
 
 local baseplate = Instance.new("Part")
 baseplate.Name = "Baseplate"
+baseplate.Anchored = true
 baseplate.Color = Color3.fromHSV(0, 0, 0.5)
 baseplate.Position = Vector3.new(0, -20, 0)
 baseplate.Size = Vector3.new(2000, 20, 2000)
@@ -26,6 +27,7 @@ baseplate.Parent = Workspace
 
 for index, flowerColor in FLOWERS do
 	local flowerSoul = Instance.new("Part")
+	flowerSoul.Anchored = true
 	flowerSoul.Color = flowerColor
 	flowerSoul.CastShadow = true
 	flowerSoul.Size = Vector3.new(2, 2, 2)

@@ -9,6 +9,6 @@ namespace gargantuan {
 		bool Alive = false;
 		int ExitCode = 0;
 
-		void CExitAsync(int exitCode);
+		void MarkExit(int exitCode);
 	};
 }
