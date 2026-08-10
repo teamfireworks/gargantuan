@@ -1,3 +1,4 @@
+local tableext = require("@std/tableext")
 export type Type = {
 	read kind: "c" | "class" | "datatype" | "enum" | "optional",
 	read cType: string,
@@ -57,13 +58,6 @@ const types = {
 		luauType = "Instance",
 	}),
 
-	Signal = type({
-		kind = "datatype",
-		cType = "std::shared_ptr<gargantuan::BaseSignal>",
-		cIncludes = { "<memory>", '"gargantuan/datatypes/Signal.hpp"' },
-		luauType = "Signal<...any>",
-	}),
-
 	Vector3 = type({
 		kind = "datatype",
 		cType = "glm::vec3",
@@ -80,6 +74,49 @@ function types.IsA(className: string): Type
 		cForwardStatement = `class {className};`,
 		luauType = className,
 	}
+end
+
+function types.Signal(...: Type): Type
+	const numArgs = select("#", ...)
+	if numArgs == 0 then
+		return {
+			kind = "datatype",
+			cType = "std::shared_ptr<gargantuan::Signal<std::monostate>>",
+			cIncludes = { "<variant>", "<memory>", '"gargantuan/datatypes/Signal.hpp"' },
+			luauType = "Signal<>",
+		}
+	elseif numArgs == 1 then
+		const type: Type = select(1, ...)
+		const cIncludes = { "<memory>", '"gargantuan/datatypes/Signal.hpp"' }
+		if type.cIncludes then
+			tableext.extend(cIncludes, type.cIncludes)
+		end
+
+		return {
+			kind = "datatype",
+			cType = `std::shared_ptr<gargantuan::Signal<{type.cType}>>`,
+			cIncludes = { "<memory>", '"gargantuan/datatypes/Signal.hpp"' },
+			luauType = `Signal<{type.luauType}>`,
+		}
+	else
+		const cIncludes = { "<tuple>", "<memory>", '"gargantuan/datatypes/Signal.hpp"' }
+		const cArgs, luauArgs = table.create(numArgs), table.create(numArgs)
+		for index = 1, numArgs do
+			const type: Type = select(index, ...)
+			if type.cIncludes then
+				tableext.extend(cIncludes, type.cIncludes)
+			end
+			cArgs[index] = type.cType
+			luauArgs[index] = type.luauType
+		end
+
+		return {
+			kind = "datatype",
+			cType = `std::shared_ptr<Signal<std::tuple<{table.concat(cArgs, ", ")}>>>`,
+			cIncludes = cIncludes,
+			luauType = `Signal<{table.concat(luauArgs, ", ")}>`,
+		}
+	end
 end
 
 function types.EnumItem(enumName: string?): Type

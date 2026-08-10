@@ -40,6 +40,12 @@ namespace gargantuan {
 		return nullptr;
 	}
 
+	FileLink::FileLink() {
+		GetPropertyChangedSignal("Path")->Connect([this](std::monostate _) {
+			LOG_DEBUG(App, "Source -> %s", this->GetPath().c_str());
+		});
+	}
+
 	std::shared_ptr<Instance> InstanceFromPath(const std::filesystem::path absolutePath) {
 		SDL_PathInfo pathInfo;
 		if (!SDL_GetPathInfo(Paths::ToUtf8(absolutePath).c_str(), &pathInfo)) {

@@ -1,46 +1,46 @@
 {
-  "disable_ai": true,
-  "format_on_save": "on",
-  "project_panel": {
-    "auto_fold_dirs": true,
-  },
-  "languages": {
-    "Luau": {
-      "formatter": {
-        "external": {
-          "command": "stylua",
-          "arguments": ["-"],
-        },
-      },
-    },
-  },
-  "lsp": {
-    "json-language-server": {
-      "settings": {
-        "json": {
-          "schemas": [
-            {
-              "fileMatch": ["*.project.json"],
-              "url": "https://raw.githubusercontent.com/rojo-rbx/vscode-rojo/refs/heads/master/schemas/project.template.schema.json",
-            },
-          ],
-        },
-      },
-    },
-    "luau-lsp": {
-      "settings": {
-        "roblox": {
-          // ts the same api SMH
-          "enabled": true,
-          "security_level": "plugin",
-          "download_api_documentation": true,
-          "download_definitions": true,
-        },
-        "fflags": {
-          "enable_new_solver": true,
-          "sync": true,
-        },
-      },
-    },
-  },
+	"disable_ai": true,
+	"format_on_save": "on",
+	"project_panel": {
+		"auto_fold_dirs": true,
+	},
+	"languages": {
+		"Luau": {
+			"formatter": {
+				"external": {
+					"command": "stylua",
+					"arguments": ["-"],
+				},
+			},
+		},
+	},
+	"lsp": {
+		"json-language-server": {
+			"settings": {
+				"json": {
+					"schemas": [
+						{
+							"fileMatch": ["*.project.json"],
+							"url": "https://raw.githubusercontent.com/rojo-rbx/vscode-rojo/refs/heads/master/schemas/project.template.schema.json",
+						},
+					],
+				},
+			},
+		},
+		"luau-lsp": {
+			"settings": {
+				"roblox": {
+					// ts the same api SMH
+					"enabled": true,
+					"security_level": "plugin",
+					"download_api_documentation": true,
+					"download_definitions": true,
+				},
+				"fflags": {
+					"enable_new_solver": true,
+					"sync": true,
+				},
+			},
+		},
+	},
 }

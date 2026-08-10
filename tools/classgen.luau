@@ -117,47 +117,22 @@ const function assembleSignals(state: GenerationState)
 		return
 	end
 
-	pushTypeDependencies(state, types.Signal)
-
 	for key, signal in orderedPairs(state.class.signals) do
-		local cType: string, luauGenericType: string
+		const signalType = if signal.args then types.Signal(table.unpack(signal.args)) else types.Signal()
+		pushTypeDependencies(state, signalType)
 
-		const numArgs = signal.args and #signal.args or 0
-		if not signal.args or numArgs == 0 then
-			state.includes["<variant>"] = true
-			cType = "std::monostate"
-			luauGenericType = "()"
-		elseif numArgs == 1 then
-			const arg = signal.args[1]
-			pushTypeDependencies(state, arg)
-			cType = arg.cType
-			luauGenericType = arg.luauType
-		else
-			state.includes["<tuple>"] = true
-			cType = "std::tuple<"
-			luauGenericType = ""
-			for index, arg in signal.args do
-				pushTypeDependencies(state, arg)
-				cType ..= arg.cType
-				luauGenericType ..= arg.luauType
-				if index ~= numArgs then
-					cType ..= ", "
-					luauGenericType ..= ", "
-				end
-			end
-			cType ..= ">"
-		end
+		const innerType = string.match(signalType.cType, "std::shared_ptr<(.+)>")
 
 		const typedefIdentifier = `{key}Signal`
 		state.publicBody
-			:line(`typedef gargantuan::Signal<{cType}> {typedefIdentifier};`)
+			:line(`typedef {innerType} {typedefIdentifier};`)
 			:line(`std::shared_ptr<{typedefIdentifier}> {key} = std::make_shared<{typedefIdentifier}>();`)
 
 		const keyString = string.format("%q", key)
 		state.definitionProperties
 			:line(`InstanceProperty({keyString})`)
 			:tab()
-			:line(`.SetReflectedTypedef({string.format("%q", `Signal<{luauGenericType}>`)})`)
+			:line(`.SetReflectedTypedef({string.format("%q", signalType.luauType)})`)
 			:line(`.SetSignal()`)
 			:line(`.UseRead<&{state.class.name}::{key}>()`)
 			:line(`.IntoPair(),`)

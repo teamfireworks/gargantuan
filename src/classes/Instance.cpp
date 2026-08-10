@@ -58,7 +58,7 @@ namespace gargantuan {
 
 	void Instance::FireAncestryChanged(std::shared_ptr<Instance> child, std::shared_ptr<Instance> parent) {
 		AncestryChanged->Fire({child, parent});
-		GetPropertyChangedSignal("Parent")->Fire({});
+		// GetPropertyChangedSignal("Parent")->Fire({});
 		for (auto &descendant : Children) {
 			descendant->FireAncestryChanged(child, parent);
 		}
@@ -70,7 +70,10 @@ namespace gargantuan {
 
 	void Instance::SetParent(std::optional<std::shared_ptr<Instance>> value) {
 		AssertIsAlive();
+
 		std::shared_ptr<Instance> newParent = value.has_value() ? value.value() : nullptr;
+		if (ParentPointer == newParent.get()) return;
+
 		std::shared_ptr<Instance> self = shared_from_this();
 
 		// This whole subtree leaves the old ancestry and joins the new one, so
@@ -94,6 +97,10 @@ namespace gargantuan {
 
 		ParentPointer = newParent.get();
 
+		// LOG_DEBUG(App, "Updating parent for %s", GetFullName().c_str());
+
+		//  vvv this block is causing some bullshit ???
+		// im gonna look at spookexes branch he fixed this somehow wait
 		if (newParent != nullptr) {
 			newParent->Children.push_back(self);
 			newParent->ChildAdded->Fire(self);
@@ -106,6 +113,7 @@ namespace gargantuan {
 		}
 
 		FireAncestryChanged(self, newParent);
+		// LOG_DEBUG(App, "Successfully set parent");
 	}
 
 	void Instance::ClearAllChildren() {
@@ -128,10 +136,9 @@ namespace gargantuan {
 		// return property->Read(this) != property->Unmodified;
 	};
 
-	std::shared_ptr<BaseSignal> Instance::GetPropertyChangedSignal(std::string propertyName) {
+	std::shared_ptr<Signal<std::monostate>> Instance::GetPropertyChangedSignal(std::string propertyName) {
 		if (PropertyChangedSignals.contains(propertyName)) return PropertyChangedSignals[propertyName];
 
-		LOG_DEBUG(App, "Finding %s", propertyName.c_str());
 		auto property = FindProperty(propertyName);
 
 		if (!property) throw std::runtime_error("Property does not exist");
@@ -156,7 +163,7 @@ namespace gargantuan {
 		property->Write(this, property->Unmodified);
 	};
 
-	const InstanceProperty *Instance::FindProperty(std::string_view name) {
+	const InstanceProperty *Instance::FindProperty(std::string name) {
 		const InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(this);
 		if (!definition) return nullptr;
 
@@ -164,7 +171,7 @@ namespace gargantuan {
 		return it != definition->AllProperties.end() ? it->second : nullptr;
 	}
 
-	const Instance::Self::Method *Instance::FindMethod(std::string_view name) {
+	const Instance::Self::Method *Instance::FindMethod(std::string name) {
 		const InstanceClassDefinition *definition = InstanceClassRegistry::GetDefinition(this);
 		if (!definition) return nullptr;
 

@@ -14,14 +14,14 @@ namespace gargantuan {
 	struct InstanceClassDefinition {
 		std::string ClassName = "Instance";
 		std::shared_ptr<Instance> (*Constructor)();
-		std::string_view Description = "(No description provided.)";
+		std::string Description = "(No description provided.)";
 		std::optional<std::string> Superclass = "Instance";
-		std::unordered_map<std::string_view, InstanceProperty> Properties{};
-		std::unordered_map<std::string_view, UserdataMethod<Instance>> Methods{};
+		std::unordered_map<std::string, InstanceProperty> Properties{};
+		std::unordered_map<std::string, UserdataMethod<Instance>> Methods{};
 
 		bool Flattened = false;
-		std::unordered_set<std::string_view> InheritedClasses{};
-		std::unordered_map<std::string_view, const InstanceProperty *> AllProperties{};
-		std::unordered_map<std::string_view, const UserdataMethod<Instance> *> AllMethods{};
+		std::unordered_set<std::string> InheritedClasses{};
+		std::unordered_map<std::string, const InstanceProperty *> AllProperties{};
+		std::unordered_map<std::string, const UserdataMethod<Instance> *> AllMethods{};
 	};
 }

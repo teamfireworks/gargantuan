@@ -29,8 +29,7 @@ namespace gargantuan {
 		World = worldId;
 
 		auto checkChildAdded = [this](std::shared_ptr<Instance> instance) {
-			if (instance->IsA("BasePart")) {
-				std::shared_ptr<BasePart> part = std::static_pointer_cast<BasePart>(instance);
+			if (auto part = std::dynamic_pointer_cast<BasePart>(instance)) {
 				this->Parts.push_back(part);
 
 				b3BodyDef partBodyDef = b3DefaultBodyDef();
@@ -119,8 +118,7 @@ namespace gargantuan {
 		};
 
 		auto checkChildRemoved = [this](std::shared_ptr<Instance> instance) {
-			if (instance->IsA("BasePart")) {
-				std::shared_ptr<BasePart> part = std::static_pointer_cast<BasePart>(instance);
+			if (auto part = std::static_pointer_cast<BasePart>(instance)) {
 				erase(Parts, part);
 				b3DestroyBody(this->PartBodies[part.get()]);
 				this->PartBodies.erase(part.get());

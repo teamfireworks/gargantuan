@@ -27,19 +27,20 @@ namespace gargantuan {
 		  UserInputService(GetService<gargantuan::UserInputService>()) {
 
 		auto descendantAdded = [this](std::shared_ptr<Instance> inst) {
-			if (auto script = std::static_pointer_cast<gargantuan::Script>(inst)) {
+			if (auto script = std::dynamic_pointer_cast<gargantuan::Script>(inst)) {
 				this->Script->ScriptQueue.insert(script);
 				inst->Destroying->Once([ScriptEngine = this->Script, script](std::monostate _) {
 					if (ScriptEngine->ScriptQueue.contains(script)) ScriptEngine->ScriptQueue.erase(script);
 				});
 			}
 
-			if (auto link = std::static_pointer_cast<gargantuan::FileLink>(inst)) {
+			if (auto link = std::dynamic_pointer_cast<gargantuan::FileLink>(inst)) {
 				auto relativePath = link->GetPath();
 				auto absolutePath = std::filesystem::absolute(this->DataModel->Root / relativePath);
 				LOG_INFO(
 					App,
-					"Got file link: %s %s %s",
+					"Got file link: %s, %s %s %s",
+					inst->GetClassName().c_str(),
 					inst->GetFullName().c_str(),
 					Paths::ToUtf8(absolutePath).c_str(),
 					relativePath.c_str()

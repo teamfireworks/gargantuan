@@ -1,9 +1,9 @@
 #include "gargantuan/reflection/InstanceClassRegistry.hpp"
 #include "gargantuan/classes/Instance.hpp"
 
-#include <SDL3/SDL_log.h>
+#include <SDL3/SDL.h>
+
 #include <cstddef>
-#include <string_view>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -119,7 +119,7 @@ namespace gargantuan::InstanceClassRegistry {
 		return def;
 	}
 
-	InstanceClassDefinition *GetDefinitionByName(std::string_view name) {
+	InstanceClassDefinition *GetDefinitionByName(std::string name) {
 		EnsureNameIndex();
 		auto &nameMap = GetNameToTypeMap();
 		auto it = nameMap.find(std::string(name));
@@ -128,9 +128,9 @@ namespace gargantuan::InstanceClassRegistry {
 		return GetDefinitionByType(it->second);
 	}
 
-	std::vector<std::string_view> GetClassNames() {
+	std::vector<std::string> GetClassNames() {
 		auto &map = GetDefinitionsMap();
-		std::vector<std::string_view> result;
+		std::vector<std::string> result;
 		result.reserve(map.size());
 		for (auto &definition : map) {
 			result.emplace_back(definition.second.ClassName);

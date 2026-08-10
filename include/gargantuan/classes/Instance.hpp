@@ -25,8 +25,8 @@ namespace gargantuan {
 		Instance *ParentPointer = nullptr;
 		InstanceClassDefinition *CachedDefinition = nullptr;
 
-		const InstanceProperty *FindProperty(std::string_view name);
-		const Self::Method *FindMethod(std::string_view name);
+		const InstanceProperty *FindProperty(std::string name);
+		const Self::Method *FindMethod(std::string name);
 		static int LIndex(lua_State *L, Instance *instance);
 		static int LNewIndex(lua_State *L, Instance *instance);
 		static int LNamecall(lua_State *L, Instance *instance);

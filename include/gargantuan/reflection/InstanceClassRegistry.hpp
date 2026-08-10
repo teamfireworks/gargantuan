@@ -2,7 +2,6 @@
 
 #include "gargantuan/InstanceClassDefinition.hpp"
 
-#include <string_view>
 #include <typeindex>
 #include <vector>
 
@@ -24,6 +23,6 @@ namespace gargantuan::InstanceClassRegistry {
 	}
 
 	InstanceClassDefinition *GetDefinition(Instance *instance);
-	InstanceClassDefinition *GetDefinitionByName(std::string_view name);
-	std::vector<std::string_view> GetClassNames();
+	InstanceClassDefinition *GetDefinitionByName(std::string name);
+	std::vector<std::string> GetClassNames();
 }

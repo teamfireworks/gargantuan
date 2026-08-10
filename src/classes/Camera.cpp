@@ -4,11 +4,11 @@
 #include <glm/glm.hpp>
 
 namespace gargantuan {
-	float Camera::GetAspectRatio() {
+	float Camera::GetAspectRatio() const {
 		return ViewportSize.GetY() > 0.0f ? ViewportSize.GetX() / ViewportSize.GetY() : 1.0f;
 	}
 
-	float Camera::GetHorizontalFieldOfView() {
+	float Camera::GetHorizontalFieldOfView() const {
 		return glm::degrees(2 * glm::atan(GetAspectRatio() * glm::tan(glm::radians(FieldOfView) / 2)));
 	}
 
@@ -17,7 +17,7 @@ namespace gargantuan {
 		GetPropertyChangedSignal("HorizontalFieldOfView")->Fire({});
 	}
 
-	float Camera::GetDiagonalFieldOfView() {
+	float Camera::GetDiagonalFieldOfView() const {
 		return glm::degrees(
 			2 * glm::atan(glm::sqrt(1 + glm::pow(GetAspectRatio(), 2)) * glm::tan(glm::radians(FieldOfView) / 2))
 		);

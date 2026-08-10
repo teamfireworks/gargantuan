@@ -4,7 +4,6 @@
 #include "gargantuan/scripting/StackValue.hpp"
 #include <functional>
 #include <string>
-#include <string_view>
 #include <utility>
 
 namespace gargantuan {
@@ -120,7 +119,10 @@ namespace gargantuan {
 		}
 
 		std::pair<std::string, InstanceProperty> IntoPair() & {
-			return {Name, *this};
+			std::string propName = std::move(Name);
+			InstanceProperty prop = std::move(*this);
+			prop.Name = propName;
+			return {propName, std::move(prop)};
 		}
 
 		template <auto Pointer> InstanceProperty &UseRead() {

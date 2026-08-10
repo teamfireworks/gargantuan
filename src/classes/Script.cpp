@@ -8,7 +8,7 @@ namespace gargantuan {
 		Destroying->Connect([this](std::monostate _) { this->Cleanup(); });
 	}
 
-	bool Script::GetEnabled() {
+	bool Script::GetEnabled() const {
 		return Status != ScriptStatus::Disabled;
 	}
 

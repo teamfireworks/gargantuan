@@ -20,5 +20,7 @@ namespace gargantuan {
 		// TODO: This syncs on engine start up. We should implement file
 		// watching. Also use the Filesystem classes
 		void Synchronize(const std::filesystem::path absolutePath);
+
+		FileLink();
 	};
 }

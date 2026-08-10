@@ -91,7 +91,7 @@ return c({
 		GetPropertyChangedSignal = {
 			description = "Returns a signal that is fired when the specified property is changed",
 			params = { p("propertyName", t.String) },
-			returns = t.Signal,
+			returns = t.Signal(),
 		},
 
 		GetChildren = {

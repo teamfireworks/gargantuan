@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 using namespace gargantuan;
@@ -41,8 +42,12 @@ Engine *ConstructScript(std::string path, BaseRenderer *renderer) {
 		auto game = std::make_shared<DataModel>();
 		auto engine = new Engine(game, renderer);
 
+		LOG_INFO(App, "before constructing ????????");
+
 		auto script = ScriptFromFile<Script>(path.c_str());
 		script->SetParent(engine->Workspace);
+
+		LOG_INFO(App, "????????");
 
 		return engine;
 	} catch (std::exception &e) {
