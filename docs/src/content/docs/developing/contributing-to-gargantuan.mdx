@@ -17,6 +17,17 @@ again.
 - Likewise, do not use AI to generate documentation, models, artwork, etc. AI
   usage must be constrained to only code.
 
+### Codebase Overview
+
+Gargantuan comprises multiple components:
+
+- `classes` and `services`, which implement instance classes with the `Instance` base class.
+- `datatypes`, which implement the runtime types including the `Instance`.
+- `scripting`, which provides the runtime alongside `Userdata` and the global libraries in Luau.
+- `reflection`, which provides registries for instance classes and enums.
+- `render`, which implements the `Renderer` and related classes.
+- Other components are self-explanatory.
+
 ### Issues
 
 - Search existing issues before opening a new bug report or feature request.
@@ -31,11 +42,39 @@ again.
 - If an issue you want to work on is stale, mention an active maintainer and
   show your intent to contribute. Please don't waste time on features that will
   not be implemented into Gargantuan.
-- To make code review and CI easier, please keep changes minimal and focuses.
+- To make code review and CI easier, please keep changes minimal and focused.
   You may break up large changes into multiple pull requests. [Please don't be
-  like Spook.](https://github.com/teamfireworks/gargantuan/pull/9).
+  like Spook.](https://github.com/teamfireworks/gargantuan/pull/9)
 
-## Pull requests
+## Code Style & Conventions
+
+- [Follow conventional commits.](https://www.conventionalcommits.org/en/v1.0.0/)
+- [Don't write comments. Code should be self-documenting, and Gargantuan already has API documentation.](https://www.youtube.com/watch?v=Bf7vDBBOBUA&t=332s)
+- Proofread surrounding code before submitting.
+- Naming conventions:
+  - `camelCase` for local variables and parameters.
+  - `LOUD_SNAKE_CASE` for constants.
+  - `PascalCase` for everything else.
+
+## Implementation Guides
+
+### Implementing New Data Types
+
+1. Add a header file and implement a class using the `G_USERDATA_DECL` macros.
+2. Add a source file and define the userdata with the `G_USERDATA_IMPL` macro.
+3. Implement your data type.
+4. Open `ScriptEngine`'s header file to add a matching `OpenLib` static function.
+5. Implement a `Lib` and the matching `OpenLib` function for your data type.
+6. Write unit tests & polish!
+
+### Implementing New Instances
+
+1. Add a header file and implement a class that extends the `Instance` class; include `G_INSTANCE_DECL` in the instance's body.
+2. Add a source file and define the instance with the `G_INSTANCE_IMPL` macro.
+3. Implement your instance with whatever modules you need.
+4. Write unit tests & polish!
+
+## Pull Requests
 
 Before opening a pull request, make sure that:
 
