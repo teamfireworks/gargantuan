@@ -35,13 +35,33 @@ Verify that Vulkan can detect your GPU correctly:
 vulkaninfo --summary
 ```
 #### Dependencies
-Install dependencies with the following command(s):
+Install dependencies for your Linux distribution with the following command(s):
 <Tabs>
-  	<TabItem label="Arch Linux">
+	<TabItem label="Arch Linux">
 		```
-		sudo pacman -Syu --needed base-devel clang cmake ninja ccache shaderc just git curl freetype2 libxcursor libxi libxrandr libxss libxtst
+		sudo pacman -Syu --needed base-devel cmake ninja ccache shaderc just git curl unzip freetype2 libx11 libxext libxcursor libxi libxfixes libxrandr libxss libxtst
 		```
-  	</TabItem>
+	</TabItem>
+	<TabItem label="Ubuntu">
+		```
+		sudo apt install build-essential cmake ninja-build ccache glslc just git curl unzip libfreetype-dev libx11-dev libxext-dev libxcursor-dev libxi-dev libxfixes-dev libxrandr-dev libxss-dev libxtst-dev
+		```
+	</TabItem>
+	<TabItem label="Debian">
+		```
+		sudo apt install build-essential cmake ninja-build ccache glslc just git curl unzip libfreetype-dev libx11-dev libxext-dev libxcursor-dev libxi-dev libxfixes-dev libxrandr-dev libxss-dev libxtst-dev
+		```
+	</TabItem>
+	<TabItem label="Fedora">
+		```
+		sudo dnf install gcc gcc-c++ cmake ninja-build ccache glslc just git curl unzip freetype-devel libX11-devel libXext-devel libXcursor-devel libXi-devel libXfixes-devel libXrandr-devel libXScrnSaver-devel libXtst-devel zlib-ng-compat-static libpng-static
+		```
+	</TabItem>
+	<TabItem label="openSUSE Tumbleweed">
+		```
+		sudo zypper install --no-recommends gcc gcc-c++ cmake ninja ccache shaderc just git curl unzip freetype2-devel libX11-devel libXext-devel libXcursor-devel libXi-devel libXfixes-devel libXrandr-devel libXss-devel libXtst-devel
+		```
+	</TabItem>
 </Tabs>
 #### Rokit
 Once you have installed dependencies, install [Rokit](https://github.com/rojo-rbx/rokit) via the automated installer script with `curl`:
