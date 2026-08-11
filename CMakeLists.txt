@@ -202,4 +202,11 @@ if(WIN32)
 			"$<TARGET_FILE_DIR:gargantuan>"
 		COMMENT "Copying SDL3.dll next to gargantuan.exe"
 	)
+
+	add_custom_command(TARGET gargantuan POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory_if_newer 
+			"${CMAKE_CURRENT_BINARY_DIR}/shaders"
+			"$<TARGET_FILE_DIR:gargantuan>/shaders"
+		COMMENT "Copying shaders next to gargantuan.exe"
+	)
 endif()
