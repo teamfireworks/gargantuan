@@ -57,6 +57,10 @@ export default defineConfig({
 							label: "Additional Copyright Notices",
 							slug: "meta/additional-copyright-notices",
 						},
+						{
+							label: "LLM Policy",
+							slug: "meta/llm-policy",
+						},
 					],
 				},
 			],
