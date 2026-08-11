@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Gargantuan is a C++23 game engine with a Luau-facing API. The user may override these defaults, except for the documentation-related ones.
+Gargantuan is a C++23 game engine scriptable from Luau. The user may override these defaults, except for the documentation-related ones.
 
 ## Design defaults
 
