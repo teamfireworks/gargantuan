@@ -54,7 +54,3 @@ Match your verification to the change:
 Format touched C++ with `clang-format -i` and Luau with `stylua`, following `.clang-format` and `stylua.toml`.
 
 If a command fails, read the first actionable error and don't run the same underlying operation again through another wrapper, job count, or direct CMake/Ninja command. If the failure is unrelated, switch immediately to the narrowest unaffected check you can run, then report the blocker instead of trying to fix it.
-
-## Final response
-
-Keep your final response terse and evidence-first: state the outcome, the files you changed, the exact verification you ran and its result, then any blockers, uncertainty, or things you deliberately left untouched. Skip describing routine exploration and only report what you found or changed, not how you looked for it.
