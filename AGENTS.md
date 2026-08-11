@@ -22,6 +22,7 @@ Gargantuan is a C++23 game engine scriptable from Luau. The user may override th
 ## Repository orientation
 
 - Use the "Contribute to Gargantuan" developer article in the docs as the starting point for components, conventions, and contribution workflows. Find it by title instead of guessing its path. Once you've read it, only inspect the code directly relevant to the task; don't map out the whole codebase beforehand.
+- Treat the vendored Luau source and headers as the source of truth for supported syntax and C API behavior. Gargantuan embeds Luau, not stock Lua 5.1, so do not assume APIs or semantics from other Lua versions. Use the official [Luau syntax](https://luau.org/syntax/) and [C API](https://luau.org/api/) documentation as supplementary references.
 - Reflected classes and services are schema-generated, so never edit the generated output directly. Change the schema instead, or the handwritten behavior alongside it. To regenerate, run `just build` rather than invoking the generator directly.
 - Generated output may not exist yet in a fresh checkout or worktree. Don't search for generated examples or treat missing generated files as a problem; use the schemas and handwritten code as the source of truth, then let the normal build or generation command create the output.
 
