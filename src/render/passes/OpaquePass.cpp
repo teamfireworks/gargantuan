@@ -35,7 +35,7 @@ namespace gargantuan {
 
 	class OpaquePass final : public RenderPass {
 	  public:
-		static constexpr std::string LABEL = "Opaque";
+		static constexpr std::string_view LABEL = "Opaque";
 
 		struct alignas(16) WorldUniforms {
 			glm::mat4 ViewMatrix;

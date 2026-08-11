@@ -12,7 +12,7 @@ namespace gargantuan {
 
 	class GuiPass final : public RenderPass {
 	  public:
-		static constexpr std::string LABEL = "Gui";
+		static constexpr std::string_view LABEL = "Gui";
 
 		FileShader Shader{
 			.VertexFilepath = GetShaderPath("gui.vert"),
