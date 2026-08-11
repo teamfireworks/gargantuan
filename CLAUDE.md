@@ -1,1 +1,1 @@
-docs/src/content/docs/meta/agents.mdx
+AGENTS.md
