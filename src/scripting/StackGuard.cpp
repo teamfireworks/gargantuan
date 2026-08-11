@@ -10,9 +10,9 @@ namespace gargantuan {
 #ifdef NDEBUG
 	StackGuard::StackGuard(lua_State *_, std::source_location _loc) {}
 	StackGuard::~StackGuard() {}
-	StackGuard &StackGuard::Reserve(int _) {}
-	StackGuard &StackGuard::Unreserve(int _) {}
-	StackGuard &StackGuard::Expect(int _) {}
+	StackGuard &StackGuard::Reserve(int _) { return *this; }
+	StackGuard &StackGuard::Unreserve(int _) { return *this; }
+	StackGuard &StackGuard::Expect(int _) { return *this; }
 #else
 	StackGuard::StackGuard(lua_State *L, std::source_location loc) : Source(loc), L(L), ExpectedSize(lua_gettop(L)) {}
 	StackGuard::~StackGuard() {
