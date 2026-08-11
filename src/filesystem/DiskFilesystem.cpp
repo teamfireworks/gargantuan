@@ -78,7 +78,7 @@ namespace gargantuan {
 
 	FileMetadata DiskFilesystem::Metadata(const std::filesystem::path &path) const {
 		SDL_PathInfo info;
-		if (!SDL_GetPathInfo(path.c_str(), &info)) throw std::runtime_error(SDL_GetError());
+		if (!SDL_GetPathInfo(path.string().c_str(), &info)) throw std::runtime_error(SDL_GetError());
 		return {
 			.Type = MapSDLPathType(info.type),
 			.Size = static_cast<unsigned int>(info.size),
@@ -90,7 +90,7 @@ namespace gargantuan {
 	}
 
 	std::unique_ptr<FileHandle> DiskFilesystem::Open(const std::filesystem::path &path, const FileOpen &mode) {
-		auto stream = SDL_IOFromFile(path.c_str(), MapFileOpen(mode));
+		auto stream = SDL_IOFromFile(path.string().c_str(), MapFileOpen(mode));
 		if (!stream) throw SDL_GetError();
 		return std::make_unique<DiskFileHandle>(stream);
 	};
@@ -107,7 +107,7 @@ namespace gargantuan {
 		std::vector<DirectoryEntry> entries;
 		for (const auto &entry : std::filesystem::directory_iterator(path)) {
 			entries.push_back({
-				.Name = entry.path().filename(),
+				.Name = std::move(entry.path().filename().string()),
 				.Path = entry.path(),
 				.Type = MapDirectoryEntryType(entry),
 			});
@@ -118,7 +118,7 @@ namespace gargantuan {
 	void CollectDescendants(std::vector<DirectoryEntry> &entries, const std::filesystem::path &path) {
 		for (const auto &entry : std::filesystem::directory_iterator(path)) {
 			entries.push_back({
-				.Name = entry.path().filename(),
+				.Name = std::move(entry.path().filename().string()),
 				.Path = entry.path(),
 				.Type = MapDirectoryEntryType(entry),
 			});
@@ -137,7 +137,7 @@ namespace gargantuan {
 		if (!std::filesystem::exists(source)) throw std::runtime_error("Source does not exist");
 		if (std::filesystem::exists(destination)) throw std::runtime_error("Cannot copy to existing destination");
 		if (std::filesystem::is_regular_file(source)) {
-			SDL_CopyFile(source.c_str(), destination.c_str());
+			SDL_CopyFile(source.string().c_str(), destination.string().c_str());
 		}
 	};
 };
