@@ -57,10 +57,6 @@ export default defineConfig({
 							label: "Additional Copyright Notices",
 							slug: "meta/additional-copyright-notices",
 						},
-						{
-							label: "For AI Agents",
-							slug: "meta/agents",
-						},
 					],
 				},
 			],
