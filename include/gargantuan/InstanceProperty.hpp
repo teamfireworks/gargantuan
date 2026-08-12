@@ -7,6 +7,12 @@
 #include <utility>
 
 namespace gargantuan {
+	#ifdef __NDEBUG__
+		#define DEBUG_ENUM_ENTRY Debug = 0
+	#else
+		#define DEBUG_ENUM_ENTRY Debug
+	#endif
+
 	G_ENUM(
 		Permission,
 
@@ -25,15 +31,13 @@ namespace gargantuan {
 		// Minimum of Gargantuan itself
 		Engine,
 
-#ifdef __NDEBUG__
-		Debug = 0,
-#else
-		Debug,
-#endif
+		DEBUG_ENUM_ENTRY,
 
 		// This feature should never be used
 		Never = 7
 	);
+
+	#undef DEBUG_ENUM_ENTRY
 
 	class Instance;
 
