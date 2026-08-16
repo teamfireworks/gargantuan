@@ -82,9 +82,13 @@ namespace gargantuan {
 		SourcePaths[sourceKey] = realVariantPath;
 	}
 
-	const FontAtlas *FontProvider::Get(
-		const std::string &name, const Enums::FontWeight &weight, const Enums::FontStyle &style, uint32_t pointSize
-	) {
+	const FontAtlas *FontProvider::
+		Get( // is this supposed to be GetAtlas instead of Get
+			const std::string &name,
+			const Enums::FontWeight &weight,
+			const Enums::FontStyle &style,
+			uint32_t pointSize
+		) {
 		AtlasKey atlasKey{name, weight, style, pointSize};
 		auto variant = Atlases.find(atlasKey);
 		if (variant != Atlases.end()) return &variant->second;
