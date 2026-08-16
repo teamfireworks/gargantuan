@@ -3,6 +3,14 @@
 #include "gargantuan/classes/generated/HingeConstraint.hpp"
 
 namespace gargantuan {
+	G_ENUM( // hi fire did i do the enum correctly
+		ActuatorType,
+
+		None,
+		Motor,
+		Servo,
+	)
+
 	class HingeConstraint : public Constraint {
 		I_HingeConstraint;
 
