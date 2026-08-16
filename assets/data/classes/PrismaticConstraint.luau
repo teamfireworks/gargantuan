@@ -17,9 +17,10 @@ return c({
 		},
 		CurrentPosition = {
 			description = "Read only property that contains the current position of the constriant.",
-			type = t.Float, --i think but idk how the types.luau works cuz i'm new to it
-			unmodified = "0", --idk what this means
-			serializable = false, --how do i make it read only
+			type = t.Float,
+			unmodified = "0",
+			serializable = false,
+			writeLevel = "Never",
 		},
 		--limits stuff
 		LimitsEnabled = {
