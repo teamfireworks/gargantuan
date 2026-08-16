@@ -82,6 +82,10 @@ set(SDL_DISABLE_PCH ON CACHE BOOL "" FORCE)
 set(SDL_RENDER ON CACHE BOOL "" FORCE)
 set(SDL_SHARED ON CACHE BOOL "" FORCE)
 set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_INSTALL OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_BUILD_STANDALONE OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_USE_VCPKG OFF CACHE BOOL "" FORCE)
+set(MSDF_ATLAS_USE_SKIA OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE) #was giving me compile issues (don't wnna install nasm for no reason)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
@@ -94,6 +98,7 @@ add_subdirectory(vendor/luau SYSTEM)
 add_subdirectory(vendor/sdl SYSTEM)
 add_subdirectory(vendor/sdl_image SYSTEM)
 add_subdirectory(vendor/sdl_ttf SYSTEM)
+add_subdirectory(vendor/msdf-atlas-gen SYSTEM)
 
 ################################################################################
 # Tracy
@@ -193,6 +198,7 @@ target_link_libraries(gargantuan
 		Luau.Require
 		Luau.Config
 		Tracy::TracyClient
+		msdf-atlas-gen
 )
 
 if(WIN32)
