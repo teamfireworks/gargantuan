@@ -43,7 +43,7 @@ namespace gargantuan {
 
 		static std::expected<FontAtlas, std::string> fromFileHandle(
 			SDL_GPUDevice *gpu,
-			const std::unique_ptr<FileHandle> handle,
+			const std::unique_ptr<FileHandle> &handle,
 			const msdf_atlas::Charset &charset = msdf_atlas::Charset::ASCII
 		);
 

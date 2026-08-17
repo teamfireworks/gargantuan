@@ -1,6 +1,8 @@
 #pragma once
 
+#include "gargantuan/assets/FontProvider.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
+#include "gargantuan/filesystem/BaseFilesystem.hpp"
 #include "gargantuan/render/RenderPass.hpp"
 
 #include <SDL3/SDL.h>
@@ -42,12 +44,14 @@ namespace gargantuan {
 
 	class SDLRenderer final : public BaseRenderer {
 	  public:
-		SDLRenderer(Vector2 &viewportSize);
+		SDLRenderer(Vector2 &viewportSize, BaseFilesystem *filesystem);
 
 		int Width, Height = 0;
 		SDL_Window *Window = nullptr;
 		SDL_GPUDevice *Gpu = nullptr;
 		SDL_GPUTextureFormat SwapchainFormat;
+
+		FontProvider *Font;
 
 		SDL_GPUTexture *DepthTexture = nullptr;
 		SDL_GPUTexture *ShadowMapTexture = nullptr;

@@ -5,15 +5,24 @@
 #include "gargantuan/render/Renderer.hpp"
 
 #include <SDL3/SDL.h>
+#include <cstdint>
 #include <memory>
+#include <vector>
 
 namespace gargantuan {
 	class GuiPass final : public RenderPass {
 	  public:
 		static constexpr const char *LABEL = "Gui";
 
-		struct alignas(16) GuiUniforms {
+		struct alignas(16) Uniforms {
 			glm::vec2 ViewportSize;
+		};
+
+		struct TextureBatch {
+			GuiTextureType Type = GuiTextureType::Color;
+			SDL_GPUTexture *Texture = nullptr;
+			uint32_t IndexOffset;
+			uint32_t IndexCount = 0;
 		};
 
 		FileShader Shader{
@@ -23,6 +32,10 @@ namespace gargantuan {
 			.FragmentUniformBufferCount = 0,
 		};
 
+		std::vector<GuiVertex> Vertices;
+		std::vector<uint32_t> Indices;
+		std::vector<TextureBatch> Batches;
+
 		GuiPass(SDL_GPUDevice *gpu, SDL_GPUTextureFormat swapchainFormat) {
 			Shader.Init(gpu);
 
@@ -30,10 +43,10 @@ namespace gargantuan {
 			info.vertex_shader = Shader.VertexShader;
 			info.fragment_shader = Shader.FragmentShader;
 
-			info.vertex_input_state.vertex_attributes = UIVertex::Attributes->data();
-			info.vertex_input_state.num_vertex_attributes = static_cast<Uint32>(UIVertex::Attributes->size());
-			info.vertex_input_state.vertex_buffer_descriptions = UIVertex::BufferDescriptions->data();
-			info.vertex_input_state.num_vertex_buffers = static_cast<Uint32>(UIVertex::BufferDescriptions->size());
+			info.vertex_input_state.vertex_attributes = GuiVertex::Attributes->data();
+			info.vertex_input_state.num_vertex_attributes = static_cast<Uint32>(GuiVertex::Attributes->size());
+			info.vertex_input_state.vertex_buffer_descriptions = GuiVertex::BufferDescriptions->data();
+			info.vertex_input_state.num_vertex_buffers = static_cast<Uint32>(GuiVertex::BufferDescriptions->size());
 
 			info.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
 			info.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
@@ -64,17 +77,14 @@ namespace gargantuan {
 		};
 
 		SDL_GPURenderPass *Draw(SDL_GPUDevice *gpu, FrameContext &context) override {
-			std::vector<UIVertex> vertices;
-			std::vector<uint32_t> indices;
-
 			for (auto &layer : context.Layers) {
-				PushChildGuiObjects(layer, vertices, indices);
+				CollectGuiObjects(layer, Vertices, Indices);
 			}
 
-			if (vertices.empty()) return nullptr;
+			if (Batches.empty()) return nullptr;
 
 			SDL_GPUBuffer *vertexBuffer, *indexBuffer;
-			UploadBuffers(gpu, context, vertices, indices, vertexBuffer, indexBuffer);
+			UploadBuffers(gpu, context, vertexBuffer, indexBuffer);
 
 			SDL_GPUColorTargetInfo colorTarget = {
 				.texture = context.SwapchainTexture,
@@ -85,13 +95,13 @@ namespace gargantuan {
 			SDL_GPURenderPass *pass = SDL_BeginGPURenderPass(context.Commands, &colorTarget, 1, nullptr);
 			SDL_BindGPUGraphicsPipeline(pass, Pipeline);
 
-			GuiUniforms uniforms{
+			Uniforms uniforms{
 				.ViewportSize = {
 					static_cast<float>(context.Width),
 					static_cast<float>(context.Height),
 				}
 			};
-			SDL_PushGPUVertexUniformData(context.Commands, 0, &uniforms, sizeof(GuiUniforms));
+			SDL_PushGPUVertexUniformData(context.Commands, 0, &uniforms, sizeof(Uniforms));
 
 			SDL_GPUBufferBinding vertexBinding{.buffer = vertexBuffer, .offset = 0};
 			SDL_BindGPUVertexBuffers(pass, 0, &vertexBinding, 1);
@@ -99,107 +109,88 @@ namespace gargantuan {
 			SDL_GPUBufferBinding indexBinding{.buffer = indexBuffer, .offset = 0};
 			SDL_BindGPUIndexBuffer(pass, &indexBinding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
-			SDL_DrawGPUIndexedPrimitives(pass, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+			for (auto &batch : Batches) {
+				if (batch.Texture) {
+					SDL_GPUTextureSamplerBinding samplerBinding{};
+					SDL_BindGPUFragmentSamplers(pass, 0, &samplerBinding, 1);
+				}
+				SDL_DrawGPUIndexedPrimitives(pass, batch.IndexCount, 1, batch.IndexOffset, 0, 0);
+			}
 
 			SDL_ReleaseGPUBuffer(gpu, vertexBuffer);
 			SDL_ReleaseGPUBuffer(gpu, indexBuffer);
+
+			Vertices.clear();
+			Indices.clear();
+			Batches.clear();
 
 			return pass;
 		};
 
 	  private:
-		void PushChildGuiObjects(
-			std::shared_ptr<Instance> parent, std::vector<UIVertex> &vertices, std::vector<uint32_t> &indices
+		void CollectGuiObjects(
+			std::shared_ptr<Instance> parent, std::vector<GuiVertex> &vertices, std::vector<uint32_t> &indices
 		) {
 			for (auto &child : parent->GetChildren()) {
-				if (auto childGui = std::dynamic_pointer_cast<GuiObject>(child)) {
-					PushGuiObject(childGui, vertices, indices);
-				}
+				auto guiObject = std::dynamic_pointer_cast<GuiObject>(child);
+				if (!guiObject) continue;
+
+				auto colorBatch = GetTextureBatch(nullptr, GuiTextureType::Color);
+				PushSolidQuad(guiObject, colorBatch);
 			}
 		}
 
-		void PushGuiObject(
-			std::shared_ptr<GuiObject> object, std::vector<UIVertex> &vertices, std::vector<uint32_t> &indices
-		) {
-			if (!object->GetVisible()) return;
+		TextureBatch *GetTextureBatch(SDL_GPUTexture *texture, GuiTextureType type) {
+			if (!Batches.empty()) {
+				auto &current = Batches.back();
+				if (current.Type == type && current.Texture == texture) {
+					return &current;
+				}
+			}
 
+			Batches.push_back({
+				.Type = type,
+				.Texture = texture,
+				.IndexOffset = static_cast<uint32_t>(Indices.size()),
+				.IndexCount = 0,
+			});
+
+			return &Batches.back();
+		}
+
+		void PushSolidQuad(GuiObject::Pointer object, TextureBatch *batch) {
 			Rect bounds = object->CalculateAbsoluteBounds();
-			uint32_t baseIndex = static_cast<uint32_t>(vertices.size());
+			uint32_t baseIndex = static_cast<uint32_t>(Vertices.size());
 
 			glm::vec2 min = bounds.Min, max = bounds.Max;
 			glm::vec2 size = bounds.GetSize();
-			glm::vec4 background = {
+			glm::vec4 color = {
 				(glm::vec3)object->GetBackgroundColor3(),
 				1.0f - object->GetBackgroundTransparency(),
 			};
 			float rotation = object->GetRotation();
-			int textureIndex = UI_SOLID_COLOR_INDEX;
 
-			vertices.push_back(
-				UIVertex{
-					.AbsolutePosition = min,
-					.AbsoluteSize = size,
-					.UV = {0.0f, 0.0f},
-					.Background = background,
-					.Rotation = rotation,
-					.TextureIndex = textureIndex,
-				}
-			);
+			Vertices.push_back({min, size, {0.0f, 0.0f}, color, rotation, batch->Type});
+			Vertices.push_back({{max.x, min.y}, size, {1.0f, 0.0f}, color, rotation, batch->Type});
+			Vertices.push_back({{min.x, max.y}, size, {0.0f, 1.0f}, color, rotation, batch->Type});
+			Vertices.push_back({max, size, {1.0f, 1.0f}, color, rotation, batch->Type});
 
-			vertices.push_back(
-				UIVertex{
-					.AbsolutePosition = {max.x, min.y},
-					.AbsoluteSize = size,
-					.UV = {1.0f, 0.0f},
-					.Background = background,
-					.Rotation = rotation,
-					.TextureIndex = textureIndex,
-				}
-			);
+			Indices.push_back(baseIndex + 0);
+			Indices.push_back(baseIndex + 2);
+			Indices.push_back(baseIndex + 1);
 
-			vertices.push_back(
-				UIVertex{
-					.AbsolutePosition = {min.x, max.y},
-					.AbsoluteSize = size,
-					.UV = {0.0f, 1.0f},
-					.Background = background,
-					.Rotation = rotation,
-					.TextureIndex = textureIndex,
-				}
-			);
+			Indices.push_back(baseIndex + 1);
+			Indices.push_back(baseIndex + 2);
+			Indices.push_back(baseIndex + 3);
 
-			vertices.push_back(
-				UIVertex{
-					.AbsolutePosition = max,
-					.AbsoluteSize = size,
-					.UV = {1.0f, 1.0f},
-					.Background = background,
-					.Rotation = rotation,
-					.TextureIndex = textureIndex,
-				}
-			);
-
-			indices.push_back(baseIndex + 0);
-			indices.push_back(baseIndex + 2);
-			indices.push_back(baseIndex + 1);
-
-			indices.push_back(baseIndex + 1);
-			indices.push_back(baseIndex + 2);
-			indices.push_back(baseIndex + 3);
-
-			PushChildGuiObjects(object, vertices, indices);
+			batch->IndexCount += 6;
 		}
 
 		void UploadBuffers(
-			SDL_GPUDevice *gpu,
-			FrameContext &context,
-			std::vector<UIVertex> &vertices,
-			std::vector<uint32_t> &indices,
-			SDL_GPUBuffer *&vertexBuffer,
-			SDL_GPUBuffer *&indexBuffer
+			SDL_GPUDevice *gpu, FrameContext &context, SDL_GPUBuffer *&vertexBuffer, SDL_GPUBuffer *&indexBuffer
 		) {
-			uint32_t vertexBufferSize = static_cast<uint32_t>(vertices.size() * sizeof(UIVertex));
-			uint32_t indexBufferSize = static_cast<uint32_t>(indices.size() * sizeof(uint32_t));
+			uint32_t vertexBufferSize = static_cast<uint32_t>(Vertices.size() * sizeof(GuiVertex));
+			uint32_t indexBufferSize = static_cast<uint32_t>(Indices.size() * sizeof(uint32_t));
 
 			SDL_GPUBufferCreateInfo vertexBufferInfo{.usage = SDL_GPU_BUFFERUSAGE_VERTEX, .size = vertexBufferSize};
 			SDL_GPUBufferCreateInfo indexBufferInfo{.usage = SDL_GPU_BUFFERUSAGE_INDEX, .size = indexBufferSize};
@@ -213,8 +204,8 @@ namespace gargantuan {
 			SDL_GPUTransferBuffer *transferBuffer = SDL_CreateGPUTransferBuffer(gpu, &tBufferInfo);
 
 			uint8_t *mapped = static_cast<uint8_t *>(SDL_MapGPUTransferBuffer(gpu, transferBuffer, false));
-			std::memcpy(mapped, vertices.data(), vertexBufferSize);
-			std::memcpy(mapped + vertexBufferSize, indices.data(), indexBufferSize);
+			std::memcpy(mapped, Vertices.data(), vertexBufferSize);
+			std::memcpy(mapped + vertexBufferSize, Indices.data(), indexBufferSize);
 			SDL_UnmapGPUTransferBuffer(gpu, transferBuffer);
 
 			SDL_GPUCopyPass *copyPass = SDL_BeginGPUCopyPass(context.Commands);

@@ -4,6 +4,7 @@
 #include "gargantuan/classes/DataModel.hpp"
 #include "gargantuan/classes/Script.hpp"
 #include "gargantuan/datatypes/Vector2.hpp"
+#include "gargantuan/filesystem/BaseFilesystem.hpp"
 #include "gargantuan/filesystem/DiskFilesystem.hpp"
 #include "gargantuan/filesystem/Project.hpp"
 #include "gargantuan/render/Renderer.hpp"
@@ -22,38 +23,37 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <tuple>
 
 using namespace gargantuan;
+using ConstructResult = std::tuple<DataModel::Pointer, BaseFilesystem *>;
 
-Engine *ConstructProject(std::string path, BaseRenderer *renderer) {
+ConstructResult ConstructProject(std::string path) {
 	auto root = std::filesystem::path(path);
 	try {
 		auto fs = new DiskFilesystem(root);
 		auto project = Project::fromExisting(fs);
 		auto game = project.DeserializeGame();
-		return new Engine(game, renderer);
+		return ConstructResult(game, fs);
 	} catch (std::exception &e) {
 		LOG_CRITICAL(App, "%s", e.what());
 		std::exit(1);
 	}
 }
 
-Engine *ConstructScript(std::string path, BaseRenderer *renderer) {
+ConstructResult ConstructScript(std::string path) {
 	try {
 		auto game = std::make_shared<DataModel>();
-		auto engine = new Engine(game, renderer);
-
 		auto script = ScriptFromFile<Script>(path.c_str());
-		script->SetParent(engine->Workspace);
-
-		return engine;
+		script->SetParent(game);
+		return ConstructResult(game, nullptr);
 	} catch (std::exception &e) {
 		LOG_CRITICAL(App, "%s", e.what());
 		std::exit(1);
 	}
 }
 
-Engine *ConstructInstance(std::string path, BaseRenderer *renderer) {
+ConstructResult ConstructInstance(std::string path) {
 	SDL_PathInfo pathInfo;
 	if (!SDL_GetPathInfo(path.c_str(), &pathInfo)) {
 		LOG_CRITICAL(App, "Failed to get path info for %s: %s", path.c_str(), SDL_GetError());
@@ -100,7 +100,7 @@ Engine *ConstructInstance(std::string path, BaseRenderer *renderer) {
 		instance->SetParent(game->GetService("Workspace"));
 	}
 
-	return new Engine(game, renderer);
+	return {game, nullptr};
 }
 
 int main(int argc, char *argv[]) {
@@ -155,6 +155,10 @@ int main(int argc, char *argv[]) {
 
 	std::atexit(SDL_Quit);
 
+	auto [game, filesystem] = hasProject  ? ConstructProject(program.get<std::string>("--project"))
+							  : hasScript ? ConstructScript(program.get<std::string>("--script"))
+										  : ConstructInstance(program.get<std::string>("--instance"));
+
 	if (program.is_used("--headless")) {
 		SDL_Init(SDL_INIT_EVENTS);
 
@@ -162,20 +166,18 @@ int main(int argc, char *argv[]) {
 	} else {
 		SDL_Init(SDL_INIT_VIDEO);
 
+		TTF_Init();
+		std::atexit(TTF_Quit);
+
 		try {
-			renderer = new SDLRenderer(viewportSize);
+			renderer = new SDLRenderer(viewportSize, filesystem);
 		} catch (std::exception &e) {
 			LOG_CRITICAL(App, "Failed to construct SDL3 renderer: %s", e.what());
 			std::exit(1);
 		}
 	}
 
-	TTF_Init();
-	std::atexit(TTF_Quit);
-
-	auto engine = hasProject  ? ConstructProject(program.get<std::string>("--project"), renderer)
-				  : hasScript ? ConstructScript(program.get<std::string>("--script"), renderer)
-							  : ConstructInstance(program.get<std::string>("--instance"), renderer);
+	Engine *engine = new Engine(game, renderer);
 
 	LOG_INFO(App, "Starting engine loop");
 	engine->ProcessService->Alive = true;

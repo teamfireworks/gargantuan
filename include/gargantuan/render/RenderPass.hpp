@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gargantuan/assets/FontProvider.hpp"
 #include "gargantuan/classes/Camera.hpp"
 #include "gargantuan/classes/LayerCollector.hpp"
 #include "gargantuan/classes/WorldRoot.hpp"
@@ -22,6 +23,7 @@ namespace gargantuan {
 
 	struct FrameContext : DrawContext {
 		SDL_GPUCommandBuffer *Commands;
+		FontProvider *Font;
 
 		SDL_GPUTexture *SwapchainTexture;
 		SDL_GPUTexture *DepthTexture;

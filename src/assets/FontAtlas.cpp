@@ -7,6 +7,7 @@
 #include <ext/import-font.h>
 #include <msdf-atlas-gen/FontGeometry.h>
 #include <msdf-atlas-gen/GlyphGeometry.h>
+#include <msdf-atlas-gen/glyph-generators.h>
 #include <vector>
 
 namespace gargantuan {
@@ -84,8 +85,8 @@ namespace gargantuan {
 
 		msdf_atlas::ImmediateAtlasGenerator<
 			float,
-			3,
-			msdf_atlas::msdfGenerator,
+			4,
+			msdf_atlas::mtsdfGenerator,
 			msdf_atlas::BitmapAtlasStorage<msdf_atlas::byte, 4>>
 			generator(width, height);
 
@@ -186,7 +187,7 @@ namespace gargantuan {
 	};
 
 	std::expected<FontAtlas, std::string> FontAtlas::fromFileHandle(
-		SDL_GPUDevice *gpu, const std::unique_ptr<FileHandle> handle, const msdf_atlas::Charset &charset
+		SDL_GPUDevice *gpu, const std::unique_ptr<FileHandle> &handle, const msdf_atlas::Charset &charset
 	) {
 		std::vector<uint8_t> fontBuffer;
 		auto fontBytes = handle->Size();
