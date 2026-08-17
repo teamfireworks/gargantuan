@@ -30,44 +30,44 @@ namespace gargantuan {
 		},
 	};
 
-	std::array<SDL_GPUVertexBufferDescription, 1> UIVertex::BufferDescriptions[]{
+	std::array<SDL_GPUVertexBufferDescription, 1> GuiVertex::BufferDescriptions[]{
 		SDL_GPUVertexBufferDescription{
 			.slot = 0,
-			.pitch = sizeof(UIVertex),
+			.pitch = sizeof(GuiVertex),
 			.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
 		},
 	};
 
-	std::array<SDL_GPUVertexAttribute, 5> UIVertex::Attributes[]{
+	std::array<SDL_GPUVertexAttribute, 5> GuiVertex::Attributes[]{
 		SDL_GPUVertexAttribute{
 			.location = 0,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
-			.offset = offsetof(UIVertex, AbsolutePosition),
+			.offset = offsetof(GuiVertex, AbsolutePosition),
 		},
 		SDL_GPUVertexAttribute{
 			.location = 1,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
-			.offset = offsetof(UIVertex, AbsoluteSize),
+			.offset = offsetof(GuiVertex, AbsoluteSize),
 		},
 		SDL_GPUVertexAttribute{
 			.location = 2,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
-			.offset = offsetof(UIVertex, UV),
+			.offset = offsetof(GuiVertex, UV),
 		},
 		SDL_GPUVertexAttribute{
 			.location = 3,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
-			.offset = offsetof(UIVertex, Background),
+			.offset = offsetof(GuiVertex, Background),
 		},
 		SDL_GPUVertexAttribute{
 			.location = 4,
 			.buffer_slot = 0,
 			.format = SDL_GPU_VERTEXELEMENTFORMAT_INT,
-			.offset = offsetof(UIVertex, TextureIndex),
+			.offset = offsetof(GuiVertex, TextureIndex),
 		},
 	};
 } // namespace gargantuan

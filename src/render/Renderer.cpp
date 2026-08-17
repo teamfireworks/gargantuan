@@ -2,6 +2,9 @@
 
 #include "gargantuan/render/Renderer.hpp"
 #include "gargantuan/Log.hpp"
+#include "gargantuan/assets/FontProvider.hpp"
+#include "gargantuan/filesystem/BaseFilesystem.hpp"
+#include "gargantuan/filesystem/Paths.hpp"
 #include "gargantuan/render/MeshProvider.hpp"
 #include "gargantuan/render/RenderPass.hpp"
 #include "gargantuan/render/RenderPrimitives.hpp"
@@ -31,7 +34,7 @@ namespace gargantuan {
 		CreateGuiPass,
 	};
 
-	SDLRenderer::SDLRenderer(Vector2 &viewportSize) : BaseRenderer(viewportSize) {
+	SDLRenderer::SDLRenderer(Vector2 &viewportSize, BaseFilesystem *filesystem) : BaseRenderer(viewportSize) {
 		Gpu = SDL_CreateGPUDevice(SHADER_FORMATS, true, nullptr);
 		if (!Gpu) throw std::runtime_error(std::format("Failed to create GPU device: {}", SDL_GetError()));
 
@@ -43,6 +46,9 @@ namespace gargantuan {
 		}
 
 		SwapchainFormat = SDL_GetGPUSwapchainTextureFormat(Gpu, Window);
+
+		Font = new FontProvider(Gpu, filesystem);
+		Font->RegisterManifest(Paths::GetExecutableDirectory() / "fonts/TitilliumWeb.font.json");
 
 		SDL_GPUTextureCreateInfo shadowMapInfo{
 			.type = SDL_GPU_TEXTURETYPE_2D,
@@ -123,6 +129,7 @@ namespace gargantuan {
 		frameContext.Camera = drawContext.Camera;
 		frameContext.Layers = drawContext.Layers;
 
+		frameContext.Font = Font;
 		frameContext.DepthTexture = DepthTexture;
 		frameContext.ShadowMapTexture = ShadowMapTexture;
 		frameContext.ShadowSampler = ShadowSampler;

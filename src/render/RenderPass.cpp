@@ -11,4 +11,4 @@ namespace gargantuan {
 
 		Shader.Destroy(gpu);
 	}
-} // namespace gargantuan
+}
