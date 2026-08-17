@@ -56,6 +56,6 @@ namespace gargantuan {
 		msdfgen::FontMetrics Metrics;
 
 		std::unordered_map<msdfgen::unicode_t, FontGlyph> Glyphs;
-		const FontGlyph *GetGlyph(const msdfgen::unicode_t codepoint);
+		const FontGlyph *GetGlyph(const msdfgen::unicode_t codepoint) const;
 	};
 }

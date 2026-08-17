@@ -1,28 +1,20 @@
 const CoreGui = game:GetService("CoreGui")
-local Workspace = game:GetService("Workspace")
 
 CoreGui.Name = "CoreGui"
 
-const half = Instance.new("Frame")
-half.BackgroundColor3 = Color3.new(1, 0, 0)
-half.Size = UDim2.fromScale(0.5, 1)
-half.Name = "Frame"
-half.BackgroundTransparency = 0.5
+const dialog = Instance.new("Frame")
+dialog.BackgroundColor3 = Color3.new(1, 1, 1)
+dialog.Size = UDim2.fromScale(1, 0.5)
+dialog.Name = "Dialog"
+dialog.BackgroundTransparency = 0
 
-const centered = Instance.new("Frame")
-centered.AnchorPoint = Vector2.new(0.5, 0.5)
-centered.BackgroundColor3 = Color3.new(0, 1, 0)
-centered.Size = UDim2.fromOffset(128, 128)
-centered.Position = UDim2.fromScale(0.5, 0.5)
-centered.Name = "Centered"
+const text = Instance.new("TextLabel")
+text.Text = "Kris, when I cast Snowgrave..."
+text.Size = UDim2.fromScale(1, 1)
+text.Name = "Text"
+text.BackgroundTransparency = 1
 
 const screen = Instance.new("ScreenGui")
-centered.Parent = half
-half.Parent = screen
+text.Parent = dialog
+dialog.Parent = screen
 screen.Parent = CoreGui
-centered.Name = "Screen"
-
-print("Camera viewport size =", Workspace.CurrentCamera.ViewportSize)
-print("Screen absolute size =", screen.AbsoluteSize)
-print("Half absolute size =", half.AbsoluteSize)
-print("Centered absolute size =", centered.AbsoluteSize)

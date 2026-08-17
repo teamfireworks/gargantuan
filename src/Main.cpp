@@ -6,6 +6,7 @@
 #include "gargantuan/datatypes/Vector2.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
 #include "gargantuan/filesystem/DiskFilesystem.hpp"
+#include "gargantuan/filesystem/Paths.hpp"
 #include "gargantuan/filesystem/Project.hpp"
 #include "gargantuan/render/Renderer.hpp"
 
@@ -46,7 +47,8 @@ ConstructResult ConstructScript(std::string path) {
 		auto game = std::make_shared<DataModel>();
 		auto script = ScriptFromFile<Script>(path.c_str());
 		script->SetParent(game);
-		return ConstructResult(game, nullptr);
+		// todo: lazy
+		return ConstructResult(game, new DiskFilesystem(Paths::GetExecutableDirectory().parent_path()));
 	} catch (std::exception &e) {
 		LOG_CRITICAL(App, "%s", e.what());
 		std::exit(1);

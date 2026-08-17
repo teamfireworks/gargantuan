@@ -197,7 +197,7 @@ namespace gargantuan {
 		return fromFontBuffer(gpu, fontBuffer, fontBytes, charset);
 	};
 
-	const FontGlyph *FontAtlas::GetGlyph(const msdfgen::unicode_t codepoint) {
-		return Glyphs.contains(codepoint) ? &Glyphs[codepoint] : nullptr;
+	const FontGlyph *FontAtlas::GetGlyph(const msdfgen::unicode_t codepoint) const {
+		return Glyphs.contains(codepoint) ? &Glyphs.at(codepoint) : nullptr;
 	};
 }

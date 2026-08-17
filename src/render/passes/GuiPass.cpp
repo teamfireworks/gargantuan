@@ -1,6 +1,7 @@
+#include "gargantuan/assets/FontAtlas.hpp"
 #include "gargantuan/classes/GuiObject.hpp"
 #include "gargantuan/classes/Instance.hpp"
-#include "gargantuan/render/RenderPass.hpp"
+#include "gargantuan/classes/TextLabel.hpp"
 #include "gargantuan/render/RenderPrimitives.hpp"
 #include "gargantuan/render/Renderer.hpp"
 
@@ -36,7 +37,10 @@ namespace gargantuan {
 		std::vector<uint32_t> Indices;
 		std::vector<TextureBatch> Batches;
 
-		GuiPass(SDL_GPUDevice *gpu, SDL_GPUTextureFormat swapchainFormat) {
+		SDL_GPUDevice *Gpu;
+		SDL_GPUSampler *Sampler = nullptr;
+
+		GuiPass(SDL_GPUDevice *gpu, SDL_GPUTextureFormat swapchainFormat) : Gpu(gpu) {
 			Shader.Init(gpu);
 
 			SDL_GPUGraphicsPipelineCreateInfo info{};
@@ -74,11 +78,32 @@ namespace gargantuan {
 			info.target_info.has_depth_stencil_target = false;
 
 			Pipeline = SDL_CreateGPUGraphicsPipeline(gpu, &info);
+
+			SDL_GPUSamplerCreateInfo samplerInfo{
+				.min_filter = SDL_GPU_FILTER_LINEAR,
+				.mag_filter = SDL_GPU_FILTER_LINEAR,
+				.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
+
+				.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+				.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+				.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+			};
+
+			Sampler = SDL_CreateGPUSampler(gpu, &samplerInfo);
 		};
+
+		~GuiPass() {
+			if (Gpu && Sampler) {
+				SDL_ReleaseGPUSampler(Gpu, Sampler);
+				Sampler = nullptr;
+			}
+
+			Gpu = nullptr;
+		}
 
 		SDL_GPURenderPass *Draw(SDL_GPUDevice *gpu, FrameContext &context) override {
 			for (auto &layer : context.Layers) {
-				CollectGuiObjects(layer, Vertices, Indices);
+				CollectGuiObjects(context, layer);
 			}
 
 			if (Batches.empty()) return nullptr;
@@ -111,7 +136,10 @@ namespace gargantuan {
 
 			for (auto &batch : Batches) {
 				if (batch.Texture) {
-					SDL_GPUTextureSamplerBinding samplerBinding{};
+					SDL_GPUTextureSamplerBinding samplerBinding{
+						.texture = batch.Texture,
+						.sampler = batch.Type == GuiTextureType::Font ? Sampler : nullptr,
+					};
 					SDL_BindGPUFragmentSamplers(pass, 0, &samplerBinding, 1);
 				}
 				SDL_DrawGPUIndexedPrimitives(pass, batch.IndexCount, 1, batch.IndexOffset, 0, 0);
@@ -128,15 +156,27 @@ namespace gargantuan {
 		};
 
 	  private:
-		void CollectGuiObjects(
-			std::shared_ptr<Instance> parent, std::vector<GuiVertex> &vertices, std::vector<uint32_t> &indices
-		) {
+		void CollectGuiObjects(FrameContext &context, std::shared_ptr<Instance> parent) {
 			for (auto &child : parent->GetChildren()) {
 				auto guiObject = std::dynamic_pointer_cast<GuiObject>(child);
-				if (!guiObject) continue;
+				if (!guiObject || !guiObject->GetVisible()) continue;
 
-				auto colorBatch = GetTextureBatch(nullptr, GuiTextureType::Color);
-				PushSolidQuad(guiObject, colorBatch);
+				if (auto textLabel = std::dynamic_pointer_cast<TextLabel>(child)) {
+					auto font = textLabel->GetFontFace();
+
+					auto expectedAtlas = context.Font->GetAtlas(font.Family, font.Weight, font.Style);
+					if (!expectedAtlas.has_value()) continue;
+
+					auto fontAtlas = expectedAtlas.value();
+					auto batch = GetTextureBatch(fontAtlas->Texture, GuiTextureType::Font);
+					batch->IndexCount += PushBackground(guiObject, GuiTextureType::Color);
+					batch->IndexCount += PushText(textLabel, fontAtlas);
+				} else {
+					auto batch = GetTextureBatch(nullptr, GuiTextureType::Color);
+					batch->IndexCount += PushBackground(guiObject, GuiTextureType::Color);
+				}
+
+				CollectGuiObjects(context, child);
 			}
 		}
 
@@ -158,7 +198,7 @@ namespace gargantuan {
 			return &Batches.back();
 		}
 
-		void PushSolidQuad(GuiObject::Pointer object, TextureBatch *batch) {
+		uint32_t PushBackground(GuiObject::Pointer object, GuiTextureType textureType) {
 			Rect bounds = object->CalculateAbsoluteBounds();
 			uint32_t baseIndex = static_cast<uint32_t>(Vertices.size());
 
@@ -170,10 +210,10 @@ namespace gargantuan {
 			};
 			float rotation = object->GetRotation();
 
-			Vertices.push_back({min, size, {0.0f, 0.0f}, color, rotation, batch->Type});
-			Vertices.push_back({{max.x, min.y}, size, {1.0f, 0.0f}, color, rotation, batch->Type});
-			Vertices.push_back({{min.x, max.y}, size, {0.0f, 1.0f}, color, rotation, batch->Type});
-			Vertices.push_back({max, size, {1.0f, 1.0f}, color, rotation, batch->Type});
+			Vertices.push_back({min, size, {0.0f, 0.0f}, color, rotation, textureType});
+			Vertices.push_back({{max.x, min.y}, size, {1.0f, 0.0f}, color, rotation, textureType});
+			Vertices.push_back({{min.x, max.y}, size, {0.0f, 1.0f}, color, rotation, textureType});
+			Vertices.push_back({max, size, {1.0f, 1.0f}, color, rotation, textureType});
 
 			Indices.push_back(baseIndex + 0);
 			Indices.push_back(baseIndex + 2);
@@ -183,7 +223,82 @@ namespace gargantuan {
 			Indices.push_back(baseIndex + 2);
 			Indices.push_back(baseIndex + 3);
 
-			batch->IndexCount += 6;
+			return 6;
+		}
+
+		uint32_t PushText(TextLabel::Pointer object, const FontAtlas *fontAtlas) {
+			Rect bounds = object->CalculateAbsoluteBounds();
+			float scale = object->GetTextSize() / object->GetLineHeight();
+			uint32_t indexCount = 0;
+
+			glm::vec2 cursor = bounds.Min + glm::vec2(0.0f, fontAtlas->Metrics.ascenderY * scale);
+			glm::vec4 textColor = {(glm::vec3)object->GetTextColor3(), 1.0f - object->GetTextTransparency()};
+
+			for (auto c : object->GetText()) {
+				auto glyph = fontAtlas->GetGlyph(c);
+				if (!glyph) continue;
+
+				auto minX = glyph->PlaneBounds.Min.GetX(), minY = glyph->PlaneBounds.Min.GetY();
+				auto maxX = glyph->PlaneBounds.Max.GetX(), maxY = glyph->PlaneBounds.Max.GetY();
+
+				glm::vec2 minPos = cursor + glm::vec2(minX, -maxY) * scale;
+				glm::vec2 maxPos = cursor + glm::vec2(maxX, -minY) * scale;
+				glm::vec2 quadSize = maxPos - minPos;
+
+				uint32_t baseIndex = static_cast<uint32_t>(Vertices.size());
+
+				minX = glyph->AtlasBounds.Min.GetX(), minY = glyph->AtlasBounds.Min.GetY();
+				maxX = glyph->AtlasBounds.Max.GetX(), maxY = glyph->AtlasBounds.Max.GetY();
+
+				Vertices.push_back({
+					minPos,
+					quadSize,
+					glyph->AtlasBounds.Min,
+					textColor,
+					0.0f,
+					GuiTextureType::Font,
+				});
+
+				Vertices.push_back({
+					{maxPos.x, minPos.y},
+					quadSize,
+					{maxX, maxY},
+					textColor,
+					0.0f,
+					GuiTextureType::Font,
+				});
+
+				Vertices.push_back({
+					{minPos.x, maxPos.y},
+					quadSize,
+					{minX, maxY},
+					textColor,
+					0.0f,
+					GuiTextureType::Font,
+				});
+
+				Vertices.push_back({
+					maxPos,
+					quadSize,
+					glyph->AtlasBounds.Max,
+					textColor,
+					0.0f,
+					GuiTextureType::Font,
+				});
+
+				Indices.push_back(baseIndex + 0);
+				Indices.push_back(baseIndex + 2);
+				Indices.push_back(baseIndex + 1);
+
+				Indices.push_back(baseIndex + 1);
+				Indices.push_back(baseIndex + 2);
+				Indices.push_back(baseIndex + 3);
+
+				indexCount += 6;
+				cursor.x += glyph->Advance * scale;
+			}
+
+			return indexCount;
 		}
 
 		void UploadBuffers(

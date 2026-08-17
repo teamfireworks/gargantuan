@@ -4,6 +4,7 @@
 #include "gargantuan/Log.hpp"
 #include "gargantuan/assets/FontProvider.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
+#include "gargantuan/filesystem/Paths.hpp"
 #include "gargantuan/render/MeshProvider.hpp"
 #include "gargantuan/render/RenderPass.hpp"
 #include "gargantuan/render/RenderPrimitives.hpp"
@@ -47,6 +48,7 @@ namespace gargantuan {
 		SwapchainFormat = SDL_GetGPUSwapchainTextureFormat(Gpu, Window);
 
 		Font = new FontProvider(Gpu, filesystem);
+		Font->RegisterManifest(Paths::GetExecutableDirectory() / "fonts/TitilliumWeb.font.json");
 
 		SDL_GPUTextureCreateInfo shadowMapInfo{
 			.type = SDL_GPU_TEXTURETYPE_2D,

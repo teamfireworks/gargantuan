@@ -43,7 +43,7 @@ namespace gargantuan {
 
 	class FontProvider {
 	  public:
-		FontProvider(SDL_GPUDevice *gpu, BaseFilesystem *filesystem);
+		FontProvider(SDL_GPUDevice *gpu, BaseFilesystem *filesystem) : Gpu(gpu), Filesystem(filesystem) {};
 		~FontProvider();
 
 		void RegisterManifest(const std::filesystem::path &path);
