@@ -37,7 +37,7 @@ Sparked your interest? [Read the documentation.](https://gargantuan.teamfirework
 ## Development
 
 Gargantuan is maintained by [godmothersfire](https://github.com/godmothersfire)
-who representes [Team Fireworks](https://github.com/teamfireworks).
+who represents [Team Fireworks](https://github.com/teamfireworks).
 
 Gargantuan is a project by and for the collective Roblox community. Gargantuan
 welcomes your contribution and support, even if it's just messing around with
