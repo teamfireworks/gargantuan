@@ -3,7 +3,7 @@
 #include "gargantuan/classes/generated/HingeConstraint.hpp"
 
 namespace gargantuan {
-	G_ENUM( // hi fire did i do the enum correctly
+	G_ENUM(
 		ActuatorType,
 
 		None,

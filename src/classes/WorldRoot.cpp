@@ -65,6 +65,7 @@ namespace gargantuan {
 
 		b3JointId joint = it->CreateJoint(&World, body0, body1);
 		ConstraintJoints[it.get()] = joint;
+		it->LeJoint = &joint;
 		return joint;
 	}
 
@@ -102,8 +103,9 @@ namespace gargantuan {
 				erase(Parts, it);
 				b3DestroyBody(this->PartBodies[it.get()]);
 				this->PartBodies.erase(it.get());
-			} else if (auto it = std::static_pointer_cast<Constraint>(instance);
-					   it && ConstraintJoints.contains(it.get())) {
+			} else if (
+				auto it = std::static_pointer_cast<Constraint>(instance); it && ConstraintJoints.contains(it.get())
+			) {
 				b3DestroyJoint(this->ConstraintJoints[it.get()], true);
 				this->ConstraintJoints.erase(it.get());
 			}
@@ -133,6 +135,10 @@ namespace gargantuan {
 				if (auto body = PartBodies[part]; part->AccumulatedImpulse.value > ZERO_VEC3) {
 					b3Body_ApplyLinearImpulseToCenter(body, AsB3Vec3(part->AccumulatedImpulse), true);
 					part->AccumulatedImpulse = {};
+				}
+				if (auto body = PartBodies[part]; part->AccumulatedAngularImpulse.value > ZERO_VEC3) {
+					b3Body_ApplyAngularImpulse(body, AsB3Vec3(part->AccumulatedAngularImpulse), true);
+					part->AccumulatedAngularImpulse = {};
 				}
 			}
 

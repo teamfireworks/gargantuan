@@ -39,6 +39,5 @@ hinge.AngularVelocity = math.pi --1 full rotation every 2 seconds
 hinge.Parent = Workspace
 
 UserInputService.JumpRequest:Connect(function()
-	--part1:ApplyImpulse(Vector3.new(5,0,0))
-	--can't apply angular impulse yet, otherwise thats what i would use to test.
+	part1:ApplyAngularImpulse(Vector3.new(5,0,0)) -- idk if this works yet
 end)
