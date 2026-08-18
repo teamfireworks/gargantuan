@@ -11,6 +11,7 @@ namespace gargantuan {
 		I_BasePart;
 
 		glm::vec3 AccumulatedImpulse = {0.0f, 0.0f, 0.0f};
+		glm::vec3 AccumulatedAngularImpulse = {0.0f, 0.0f, 0.0f};
 		virtual void CreateBodyShape(b3BodyId bodyId, b3ShapeDef &bodyShape) = 0;
 
 		glm::mat4 GetModelMatrix();

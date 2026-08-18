@@ -6,7 +6,7 @@ local process = require("@std/process")
 const parsed = args.parse("doctor", "checks for dependencies required to compile the engine")
 	:simple(args.flag("--fix", "try to fix these issues"))
 
-const hasHomebrew = process.run({ program = "brew", args = { "--version" } }).ok
+const hasHomebrew = process.run({ program = "brew", args = { "--version" } }).ok --TODO: make this work on windows
 
 const function tryInstall(package: string)
 	if not parsed.flags.fix then
