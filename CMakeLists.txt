@@ -69,6 +69,8 @@ if(
 				"  https://gargantuan.teamfireworks.org/developing/build-system")
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
 add_subdirectory(extern)
 
 # Libraries
