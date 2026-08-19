@@ -25,7 +25,7 @@ do
 	table.insert(cmakeArguments, `-DCMAKE_BUILD_TYPE={parsed:get("--type")}`)
 	table.insert(cmakeArguments, `-DGARGANTUAN_TRACY_TOOLS={parsed.flags.tracy and "ON" or "OFF"}`)
 
-	if not parsed.args["no-ccache"] then
+	if not parsed.flags["--no-ccache"] then
 		table.insert(cmakeArguments, "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
 	end
 

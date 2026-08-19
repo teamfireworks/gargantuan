@@ -41,6 +41,34 @@ if(GARGANTUAN_VERSION_SUFFIX)
 endif()
 message("${GARGANTUAN_VERSION_FULL}")
 
+if(
+	NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/msdf_atlas_gen/CMakeLists.txt"
+	# OR NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/msdf_atlas_gen/msdfgen/CMakeLists.txt"
+)
+	message(FATAL_ERROR
+				"Your Gargantuan repository looks incomplete. Please read the following "
+				"instructions carefully:"
+				"\n"
+				"1) If you have downloaded Aseprite source using the "
+				"\"Code > Download ZIP\" button from GitHub, you will not be able to "
+				"compile Gargantuan. You need to get the code with other methods (continue "
+				"reading)."
+				"\n"
+				"2) You can correctly clone the GitHub repository with the "
+				"\"--recursive\" argument:"
+				"\n"
+				"  git clone --recursive https://github.com/teamfireworks/gargantuan.git"
+				"\n"
+				"3) If you have already cloned the repository and see this message, "
+				"you still need to initialize submodules running the following command:"
+				"\n"
+				"  git submodule update --init --recursive"
+				"\n"
+				"More information in the documentation:"
+				"\n"
+				"  https://gargantuan.teamfireworks.org/developing/build-system")
+endif()
+
 add_subdirectory(extern)
 
 # Libraries

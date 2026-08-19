@@ -19,12 +19,12 @@ do
 		end
 	end
 
-	if not parsed.flags["no-classgen"] then
-		const classgenResult = process.run({ program = "seal", args = { "scripts/classgen.luau" }, stdio = "Inherit" })
-		if not classgenResult.ok then
-			error("Failed to generate instance classes")
-		end
-	end
+	-- if not parsed.flags["no-classgen"] then
+	-- 	const classgenResult = process.run({ program = "seal", args = { "scripts/classgen.luau" }, stdio = "Inherit" })
+	-- 	if not classgenResult.ok then
+	-- 		error("Failed to generate instance classes")
+	-- 	end
+	-- end
 
 	const jobs = tonumber(parsed:get("jobs")) or countCpus()
 	const cmakeResult = process.run({
