@@ -5,7 +5,7 @@
 
 file(GLOB_RECURSE GARGANTUAN_RUNNER_SOURCES CONFIGURE_DEPENDS "*.cpp" "*.hpp")
 
-add_executable(gargantuan_runner STATIC ${GARGANTUAN_RUNNER_SOURCES})
+add_executable(gargantuan_runner ${GARGANTUAN_RUNNER_SOURCES})
 
 target_include_directories(gargantuan_runner PUBLIC "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(gargantuan_runner PRIVATE gargantuan::core)
+target_link_libraries(gargantuan_runner PRIVATE gargantuan::core gargantuan::datatypes gargantuan::instances)

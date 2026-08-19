@@ -1,4 +1,7 @@
 {
-	"languageMode": "nonstrict",
-	"lint": { "UnknownType": false }
+	"languageMode": "strict",
+	"lint": { "UnknownType": false, "LocalUnused": false },
+	"aliases": {
+		"tools": "./libs"
+	}
 }

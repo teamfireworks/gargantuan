@@ -1,6 +1,6 @@
 local args = require("@std/args")
-local configuration = require("@scripts/configuration")
-local countCpus = require("@scripts/utils/countCpus")
+local configuration = require("@tools/configuration")
+local countCpus = require("@tools/utils/countCpus")
 local fs = require("@std/fs")
 local process = require("@std/process")
 

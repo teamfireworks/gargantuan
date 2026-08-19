@@ -1,4 +1,4 @@
-local append = require("@scripts/utils/append")
+local append = require("@tools/utils/append")
 
 export type Type = {
 	read kind: "c" | "class" | "datatype" | "enum" | "optional",
@@ -50,6 +50,15 @@ const types = {
 	UDim2 = datatype("UDim2"),
 	Vector2 = datatype("Vector2"),
 	Vector3 = datatype("Vector3", "glm::vec3"),
+
+	glm = {
+		vec2 = type({
+			kind = literal("c"),
+			cType = "glm::vec2",
+			cIncludes = { "<glm/glm.hpp>" },
+			luauType = "unknown",
+		}),
+	},
 }
 
 function types.Instance(className: string?): Type

@@ -1,6 +1,6 @@
 const args = require("@std/args")
 const process = require("@std/process")
-local configuration = require("@scripts/configuration")
+local configuration = require("@tools/configuration")
 
 const parsed = args.parse("configure", "prepares the build directory"):simple(
 	args.named("--type", "build type to use, either 'Debug' or 'Release'"):default("Debug"),
