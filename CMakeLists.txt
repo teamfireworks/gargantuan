@@ -75,8 +75,8 @@ add_subdirectory(extern)
 
 # Libraries
 add_subdirectory(src/gargantuan_core)
+add_subdirectory(src/gargantuan_datamodel)
 add_subdirectory(src/gargantuan_datatypes)
-add_subdirectory(src/gargantuan_instances)
 add_subdirectory(src/gargantuan_renderer)
 add_subdirectory(src/gargantuan_runtime)
 

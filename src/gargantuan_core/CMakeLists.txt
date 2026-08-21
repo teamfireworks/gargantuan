@@ -15,11 +15,11 @@ target_link_libraries(gargantuan_core
 		flecs_static
 		# glaze::glaze
 		# glm
-		# Luau.CodeGen
-		# Luau.Compiler
-		# Luau.Config
-		# Luau.Require
-		# Luau.VM
+		Luau.CodeGen
+		Luau.Compiler
+		Luau.Config
+		Luau.Require
+		Luau.VM
 		# SDL3::SDL3
 		# SDL3_image-static
 		# SDL3_ttf-static
