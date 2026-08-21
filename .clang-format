@@ -1,63 +1,11 @@
-# yaml-language-server: $schema=https://json.schemastore.org/clang-format-21.x.json
----
 BasedOnStyle: LLVM
-Language: Cpp
 
-IndentWidth: 4
-TabWidth: 4
-UseTab: Always
-ColumnLimit: 120
-
-NamespaceIndentation: All
-
-BinPackArguments: false
-BinPackParameters: OnePerLine
-ExperimentalAutoDetectBinPacking: false
-
-AlignAfterOpenBracket: BlockIndent
-Cpp11BracedListStyle: true
-
-AllowShortBlocksOnASingleLine: Empty
-AllowShortFunctionsOnASingleLine: Empty
-AllowShortIfStatementsOnASingleLine: WithoutElse
-AllowShortLoopsOnASingleLine: false
-
-BreakBeforeBraces: Custom
-BreakBeforeConceptDeclarations: Never
-BraceWrapping:
-    AfterClass: false
-    AfterControlStatement: Never
-    AfterEnum: false
-    AfterFunction: false
-    AfterNamespace: false
-    AfterStruct: false
-    AfterUnion: false
-    BeforeElse: false
-    BeforeLambdaBody: false
-    BeforeWhile: false
-    AfterObjCDeclaration: false
-    SplitEmptyFunction: false
-    SplitEmptyRecord: false
-
-BreakConstructorInitializers: BeforeColon
-ConstructorInitializerIndentWidth: 4
-
-PointerAlignment: Right
-
-SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
-SpacesInSquareBrackets: false
-SpacesInAngles: Never
-SpacesInContainerLiterals: false
-
-AlignConsecutiveAssignments:
-    Enabled: false
-AlignConsecutiveDeclarations:
-    Enabled: false
-
-FixNamespaceComments: false
-
-PenaltyBreakAssignment: 100
-
-Macros:
-    - G_USERDATA_IMPL(name, ...) = const classType::Definition classType::DEFINITION = {__VA_ARGS__}
+SortIncludes: CaseInsensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+    - Regex: '^["](gargantuan)/.*'
+      Priority: 1
+    - Regex: "^[<](box3d/|flecs/|glaze/|Luau/|lua/|magic_enum/|msdf_atlas_gen/|SDL3/|Tracy/).*"
+      Priority: 2
+    - Regex: "^<[^/]*>"
+      Priority: 3
