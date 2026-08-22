@@ -6,6 +6,6 @@
 		"extra": "./.seal/typedefs/extra",
 		"interop": "./.seal/typedefs/interop",
 		"lest": "./.lest/core",
-		"scripts": "./scripts/libs"
+		"tools": "./tools/libs"
 	}
 }

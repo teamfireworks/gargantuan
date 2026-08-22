@@ -1,0 +1,8 @@
+{
+	"languageMode": "strict",
+	"lint": { "UnknownType": false, "LocalUnused": false },
+	"aliases": {
+		"tools": "./libs",
+		"extra": "../.seal/extra"
+	}
+}
