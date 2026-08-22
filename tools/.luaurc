@@ -2,6 +2,7 @@
 	"languageMode": "strict",
 	"lint": { "UnknownType": false, "LocalUnused": false },
 	"aliases": {
-		"tools": "./libs"
+		"tools": "./libs",
+		"extra": "../.seal/extra"
 	}
 }

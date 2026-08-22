@@ -1,12 +1,12 @@
 local args = require("@std/args")
 local configuration = require("@tools/configuration")
-local countCpus = require("@tools/utils/countCpus")
 local fs = require("@std/fs")
 local process = require("@std/process")
+local thread = require("@std/thread")
 
 const parsed = args.parse("build", "compiles the engine"):simple(
 	args.named("--jobs", "number of jobs passed to CMake, defaults to the number of CPUs on this system"):aliases("-j"),
-	args.flag("--no-classgen", "skip recompilation of instance classes")
+	args.flag("--no-declgen", "skip regenerating files in tools/decls")
 )
 
 do
@@ -26,7 +26,7 @@ do
 	-- 	end
 	-- end
 
-	const jobs = tonumber(parsed:get("jobs")) or countCpus()
+	const jobs = tonumber(parsed:get("jobs")) or thread.parallelism()
 	const cmakeResult = process.run({
 		program = "cmake",
 		args = { "--build", configuration.buildDirectory, "-j", tostring(jobs) },

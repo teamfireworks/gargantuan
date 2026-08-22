@@ -1,10 +1,10 @@
-const typesLib = require("@tools/types")
+const ctypes = require("@tools/ctypes")
 
-export type ThreadLevel = "None" | "Plugin" | "LocalUser" | "EngineScript" | "Engine" | "Debug" | "Never"
+export type ThreadLevel = "None" | "Plugin" | "LocalUser" | "CoreScript" | "Core" | "Debug" | "Never"
 
 export type Parameter = {
 	read name: string,
-	read type: typesLib.Type,
+	read type: ctypes.CType,
 
 	[string]: never,
 }
@@ -12,17 +12,18 @@ export type Parameter = {
 export type Overload = {
 	read name: string,
 	read description: string,
-	read returns: typesLib.Type,
+	read returns: ctypes.CType,
 	read threadLevel: ThreadLevel?,
 
 	[string]: never,
 }
 
 export type Property = {
+	read robloxName: string?,
 	read description: string,
 	read since: string?,
 
-	read type: typesLib.Type,
+	read type: ctypes.CType,
 	read unmodified: string,
 
 	read readLevel: ThreadLevel?,
@@ -38,17 +39,19 @@ export type Property = {
 }
 
 export type Signal = {
+	read robloxName: string?,
 	read description: string,
 	read since: string?,
 
 	read parameters: { Parameter },
-	read restParameter: { type: typesLib.Type, description: string }?,
+	read restParameter: { type: ctypes.CType, description: string }?,
 	read threadLevel: ThreadLevel?,
 
 	[string]: never,
 }
 
 export type Method = {
+	read robloxName: string?,
 	read description: string,
 	read since: string?,
 
@@ -58,12 +61,12 @@ export type Method = {
 		--- Whether to mark as a `const` method.
 		read constant: boolean?,
 		read parameters: { Parameter }?,
-		read returns: typesLib.Type?,
+		read returns: ctypes.CType?,
 		[string]: never,
 	}?,
 
 	--- Automatically generate a matching Luau implementation using overloads
-	read withOverloads: { [typesLib.Type | { typesLib.Type }]: Overload }?,
+	read withOverloads: { [ctypes.CType | { ctypes.CType }]: Overload }?,
 
 	--- Manually define a static int(lua_State*)
 	read withManual: { read luauSignature: string, [string]: never }?,
@@ -72,10 +75,11 @@ export type Method = {
 }
 
 export type StaticProperty = {
+	read robloxName: string?,
 	read description: string,
 	read since: string?,
 
-	read type: typesLib.Type,
+	read type: ctypes.CType,
 	read value: string,
 
 	[string]: never,
@@ -126,7 +130,7 @@ const function kindConstructor<T, K>(kind: K | ""): (x: T) -> WithKind<K, T>
 end
 
 const declare = {
-	types = typesLib,
+	types = ctypes,
 
 	property = kindConstructor<<Property>>("property"),
 	static = kindConstructor<<StaticProperty>>("static"),
@@ -137,7 +141,7 @@ const declare = {
 	datatype = kindConstructor<<Datatype>>("datatype"),
 }
 
-function declare.parameter(name: string, type: typesLib.Type): Parameter
+function declare.parameter(name: string, type: ctypes.CType): Parameter
 	return { name = name, type = type }
 end
 

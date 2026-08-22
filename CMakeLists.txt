@@ -74,12 +74,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 add_subdirectory(extern)
 
 # Libraries
-add_subdirectory(src/gargantuan_core)
-add_subdirectory(src/gargantuan_datamodel)
-add_subdirectory(src/gargantuan_datatypes)
-add_subdirectory(src/gargantuan_renderer)
-add_subdirectory(src/gargantuan_runtime)
+add_subdirectory(src/core)
+add_subdirectory(src/datamodel)
+add_subdirectory(src/datatypes)
+add_subdirectory(src/renderer)
+add_subdirectory(src/runtime)
 
 # Executables
-add_subdirectory(src/gargantuan_editor)
-add_subdirectory(src/gargantuan_runner)
+add_subdirectory(src/editor)
+add_subdirectory(src/runner)
