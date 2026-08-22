@@ -19,6 +19,8 @@
 
 </div>
 
+# Important: All development work is prioritized into [the ECS rewrite](https://github.com/teamfireworks/gargantuan/pull/43)
+
 ## About Gargantuan
 
 Gargantuan is an 3D game engine, scriptable using Luau, independently developed
