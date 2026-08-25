@@ -3,15 +3,7 @@
 #include "gargantuan/classes/generated/PrismaticConstraint.hpp"
 
 namespace gargantuan {
-	G_ENUM( // hi fire did i do the enum correctly
-		ActuatorType,
-
-		None,
-		Motor,
-		Servo,
-	)
-
-	class PrismaticConstraint : public Constraint {
+	class PrismaticConstraint : public SlidingBallConstraint {
 		I_PrismaticConstraint;
 
 		PrismaticConstraint();
