@@ -1,36 +1,33 @@
-[submodule "vendor/luau"]
-	path = vendor/luau
-	url = https://github.com/luau-lang/luau.git
-[submodule "vendor/sdl"]
-	path = vendor/sdl
-	url = https://github.com/libsdl-org/SDL.git
-[submodule "vendor/glm"]
-	path = vendor/glm
-	url = https://github.com/g-truc/glm.git
-[submodule "vendor/box3d"]
-	path = vendor/box3d
-	url = https://github.com/erincatto/box3d.git
-[submodule "vendor/magicenum"]
-	path = vendor/magicenum
-	url = https://github.com/Neargye/magic_enum.git
-[submodule "vendor/json"]
-	path = vendor/json
-	url = https://github.com/nlohmann/json.git
-[submodule "vendor/tracy"]
-	path = vendor/tracy
-	url = https://github.com/wolfpld/tracy.git
-[submodule "vendor/argparse"]
-	path = vendor/argparse
-	url = https://github.com/p-ranav/argparse.git
-[submodule "vendor/sdl_ttf"]
-	path = vendor/sdl_ttf
-	url = https://github.com/libsdl-org/SDL_ttf.git
-[submodule "vendor/sdl_image"]
-	path = vendor/sdl_image
-	url = https://github.com/libsdl-org/SDL_image.git
-[submodule "vendor/glaze"]
-	path = vendor/glaze
+[submodule "extern/glaze"]
+	path = extern/glaze
 	url = https://github.com/stephenberry/glaze.git
-[submodule "vendor/SDL_FontCache"]
-	path = vendor/SDL_FontCache
-	url = https://github.com/grimfang4/SDL_FontCache.git
+[submodule "extern/SDL3"]
+	path = extern/SDL3
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "extern/SDL3_image"]
+	path = extern/SDL3_image
+	url = https://github.com/libsdl-org/SDL_image.git
+[submodule "extern/Luau"]
+	path = extern/Luau
+	url = https://github.com/luau-lang/luau.git
+[submodule "extern/box3d"]
+	path = extern/box3d
+	url = https://github.com/erincatto/box3d.git
+[submodule "extern/Tracy"]
+	path = extern/Tracy
+	url = https://github.com/wolfpld/tracy.git
+[submodule "extern/magic_enum"]
+	path = extern/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
+[submodule "extern/glm"]
+	path = extern/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "extern/SDL3_ttf"]
+	path = extern/SDL3_ttf
+	url = https://github.com/libsdl-org/SDL_ttf.git
+[submodule "extern/msdf_atlas_gen"]
+	path = extern/msdf_atlas_gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen.git
+[submodule "extern/flecs"]
+	path = extern/flecs
+	url = https://github.com/SanderMertens/flecs.git

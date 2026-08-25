@@ -1,4 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/clangd.json
+If:
+    PathMatch: .*/.cpp
+
 CompileFlags:
     Add: [-std=c++23, -Iinclude, -I.]
     CompilationDatabase: "build"
