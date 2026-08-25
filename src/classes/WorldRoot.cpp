@@ -12,7 +12,6 @@
 #include <box3d/id.h>
 #include <box3d/math_functions.h>
 #include <box3d/types.h>
-#include <cstddef>
 #include <memory>
 #include <optional>
 #include <unordered_map>

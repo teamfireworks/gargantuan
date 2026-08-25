@@ -19,7 +19,6 @@ return c({
 			serializable = false,
 			writeLevel = "Never",
 		},
-		--limits stuff
 		LimitsEnabled = {
 			description = "Sets wheter the HingeConstraint will limit the range of rotation.",
 			type = t.Bool,
@@ -38,7 +37,6 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--servo stuff
 		TargetAngle = {
 			description = "The target angle a HingeConstraint will attempt to rotate to if its ActuatorType is set to Servo. Measured in radians.", --TODO: radian -> degree and vice versa conversion (because roblox measures these in degrees)
 			type = t.Float,
@@ -57,7 +55,6 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--motor stuff
 		AngularVelocity = {
 			description = "The angular velocity a HingeConstraint with ActuatorType set to Motor will attempt to achieve. Measured in radians/second.",
 			type = t.Float,

@@ -38,7 +38,6 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--limits stuff
 		LimitsEnabled = {
 			description = "Sets wheter the RodConstraint will limit the angles of rod and respective attachments.",
 			type = t.Bool,

@@ -19,7 +19,6 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--limits stuff
 		LimitsEnabled = {
 			description = "Sets whether the BallSocketConstraint sets a limit on rotation based on UpperAngle.",
 			type = t.Bool,

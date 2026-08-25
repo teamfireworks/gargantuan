@@ -15,12 +15,11 @@ return c({
 			writeLevel = "Never",
 		},
 		Length = {
-			description = "The target distance. Measured in units(?)",
+			description = "The target distance. Measured in units.",
 			type = t.Float,
 			unmodified = "0",
 			serializable = true,
 		},
-		--limits stuff
 		LimitsEnabled = {
 			description = "Sets wheter the RodConstraint will limit the angles of rod and respective attachments.",
 			type = t.Bool,

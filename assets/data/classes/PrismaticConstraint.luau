@@ -7,9 +7,6 @@ return c({
 	since = "0.1.0",
 
 	properties = {
-		--ok so idk if anyone is gonna read this but i'll also put this as a github comment
-		--prismaticconstraints have a different base instance called SlidingBallConstraint (these are also used by CylindricalConstraints)
-		--should i implement this as well or keep it as Constraint for simplicity?
 		ActuatorType = {
 			description = "Sets whether the rotation of the PrismaticConstraint is actuated and, if so, what kind of actuation it uses.",
 			type = t.EnumItem("ActuatorType"),
@@ -22,7 +19,6 @@ return c({
 			serializable = false,
 			writeLevel = "Never",
 		},
-		--limits stuff
 		LimitsEnabled = {
 			description = "Sets wheter the PrismaticConstraint will limit the range of rotation.",
 			type = t.Bool,
@@ -41,7 +37,6 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--servo stuff
 		TargetPosition = {
 			description = "The PrismaticConstraint's attempted target position when ActuatorType is set to Servo.",
 			type = t.Float,
@@ -49,7 +44,7 @@ return c({
 			serializable = true,
 		},
 		Speed = {
-			description = "The desired speed a PrismaticConstraint with ActuatorType set to Servo will attempt to maintain while moving towards its TargetPosition. Measured in _____ per second.",
+			description = "The desired speed a PrismaticConstraint with ActuatorType set to Servo will attempt to maintain while moving towards its TargetPosition. Measured in units per second.",
 			type = t.Float,
 			unmodified = "0",
 			serializable = true,
@@ -60,9 +55,8 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--motor stuff
 		Velocity = {
-			description = "The PrismaticConstraint's attempted velocity when ActuatorType is set to Motor. Measured in _____ per second.", --do we wanna call them studs??
+			description = "The PrismaticConstraint's attempted velocity when ActuatorType is set to Motor. Measured in units per second.",
 			type = t.Float,
 			unmodified = "0",
 			serializable = true,
