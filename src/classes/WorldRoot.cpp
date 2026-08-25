@@ -57,16 +57,34 @@ namespace gargantuan {
 	}
 
 	b3JointId WorldRoot::CreateConstraintJoint(std::shared_ptr<Constraint> it) {
+		if (!it->GetActive()) return b3_nullJointId;
+
 		auto [part0, part1] = it->GetActiveParts();
-		if (!part0 && !part1) return b3_nullJointId;
+		if (!part0 || !part1) return b3_nullJointId;
 
 		b3BodyId body0 = PartBodies.contains(part0.get()) ? PartBodies[part0.get()] : CreatePartBody(part0);
 		b3BodyId body1 = PartBodies.contains(part1.get()) ? PartBodies[part1.get()] : CreatePartBody(part1);
 
 		b3JointId joint = it->CreateJoint(&World, body0, body1);
 		ConstraintJoints[it.get()] = joint;
-		it->LeJoint = &joint;
+		it->LeJoint = joint;
+
+		it->UpdateJoint();
 		return joint;
+	}
+
+	void WorldRoot::DestroyConstraintJoint(Constraint *it) {
+		auto found = ConstraintJoints.find(it);
+		if (found == ConstraintJoints.end()) return;
+
+		b3DestroyJoint(found->second, true);
+		ConstraintJoints.erase(found);
+		it->LeJoint = b3_nullJointId;
+	}
+
+	void WorldRoot::RebuildConstraintJoint(std::shared_ptr<Constraint> it) {
+		DestroyConstraintJoint(it.get());
+		CreateConstraintJoint(it);
 	}
 
 	WorldRoot::WorldRoot() {
@@ -77,8 +95,10 @@ namespace gargantuan {
 		World = b3CreateWorld(&worldDefinition);
 
 		Destroying->Once([this](std::monostate _) {
-			for (auto &[_, joint] : ConstraintJoints) {
+			for (auto &[constraint, joint] : ConstraintJoints) {
 				b3DestroyJoint(joint, false);
+				constraint->LeJoint = b3_nullJointId;
+				constraint->RequestRebuild = nullptr;
 			};
 			ConstraintJoints.clear();
 
@@ -94,20 +114,23 @@ namespace gargantuan {
 			if (auto it = std::dynamic_pointer_cast<BasePart>(instance)) {
 				CreatePartBody(it);
 			} else if (auto it = std::dynamic_pointer_cast<Constraint>(instance)) {
+				std::weak_ptr<Constraint> weak = it;
+				it->RequestRebuild = [this, weak]() {
+					if (auto constraint = weak.lock()) RebuildConstraintJoint(constraint);
+				};
+
 				CreateConstraintJoint(it);
 			}
 		});
 
 		DescendantRemoved->Connect([this](std::shared_ptr<Instance> instance) {
-			if (auto it = std::static_pointer_cast<BasePart>(instance); it && PartBodies.contains(it.get())) {
+			if (auto it = std::dynamic_pointer_cast<BasePart>(instance); it && PartBodies.contains(it.get())) {
 				erase(Parts, it);
 				b3DestroyBody(this->PartBodies[it.get()]);
 				this->PartBodies.erase(it.get());
-			} else if (
-				auto it = std::static_pointer_cast<Constraint>(instance); it && ConstraintJoints.contains(it.get())
-			) {
-				b3DestroyJoint(this->ConstraintJoints[it.get()], true);
-				this->ConstraintJoints.erase(it.get());
+			} else if (auto it = std::dynamic_pointer_cast<Constraint>(instance)) {
+				DestroyConstraintJoint(it.get());
+				it->RequestRebuild = nullptr;
 			}
 		});
 	};
