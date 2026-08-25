@@ -1,10 +1,10 @@
-const ctypes = require("@tools/ctypes")
+const cTypes = require("./cTypes")
 
 export type ThreadLevel = "None" | "Plugin" | "LocalUser" | "CoreScript" | "Core" | "Debug" | "Never"
 
 export type Parameter = {
 	read name: string,
-	read type: ctypes.CType,
+	read type: cTypes.CType,
 
 	[string]: never,
 }
@@ -12,7 +12,7 @@ export type Parameter = {
 export type Overload = {
 	read name: string,
 	read description: string,
-	read returns: { ctypes.CType }?,
+	read returns: { cTypes.CType }?,
 	read threadLevel: ThreadLevel?,
 
 	[string]: never,
@@ -23,7 +23,7 @@ export type Property = {
 	read description: string,
 	read since: string?,
 
-	read type: ctypes.CType,
+	read type: cTypes.CType,
 	read unmodified: string,
 
 	read readLevel: ThreadLevel?,
@@ -44,7 +44,7 @@ export type Signal = {
 	read since: string?,
 
 	read parameters: { Parameter },
-	read restParameter: { type: ctypes.CType, description: string }?,
+	read restParameter: { type: cTypes.CType, description: string }?,
 	read threadLevel: ThreadLevel?,
 
 	[string]: never,
@@ -61,12 +61,12 @@ export type Method = {
 		--- Whether to mark as a `const` method.
 		read constant: boolean?,
 		read parameters: { Parameter }?,
-		read returns: { ctypes.CType }?,
+		read returns: { cTypes.CType }?,
 		[string]: never,
 	}?,
 
 	--- Automatically generate a matching Luau implementation using overloads
-	read withOverloads: { [ctypes.CType | { ctypes.CType }]: Overload }?,
+	read withOverloads: { [cTypes.CType | { cTypes.CType }]: Overload }?,
 
 	--- Manually define a static int(lua_State*)
 	read withManual: { read luauSignature: string, [string]: never }?,
@@ -79,7 +79,7 @@ export type StaticProperty = {
 	read description: string,
 	read since: string?,
 
-	read type: ctypes.CType,
+	read type: cTypes.CType,
 	read value: string,
 
 	[string]: never,
@@ -130,7 +130,7 @@ const function kindConstructor<T, K>(kind: K | ""): (x: T) -> WithKind<K, T>
 end
 
 const declare = {
-	types = ctypes,
+	types = cTypes,
 
 	property = kindConstructor<<Property>>("property"),
 	static = kindConstructor<<StaticProperty>>("static"),
@@ -141,7 +141,7 @@ const declare = {
 	datatype = kindConstructor<<Datatype>>("datatype"),
 }
 
-function declare.parameter(name: string, type: ctypes.CType): Parameter
+function declare.parameter(name: string, type: cTypes.CType): Parameter
 	return { name = name, type = type }
 end
 

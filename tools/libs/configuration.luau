@@ -4,18 +4,18 @@ return {
 	buildDirectory = "build",
 	binaryBasename = "gargantuan",
 
-	classgenTargets = {
-		classes = {
-			input = "assets/data/classes",
-			headerImport = "gargantuan/classes",
-			headerOutput = "include/gargantuan/classes/generated",
-			implOutput = "src/classes/generated",
+	declgen = {
+		datamodel = {
+			inputDir = "tools/decls/datamodel",
+			codegenScript = "tools/libs/codegen/generateInstanceClass",
+			macroOutputDir = "src/datamodel/generated",
+			registerOutput = "src/registration/RegisterDatamodel.cpp",
 		},
-		services = {
-			input = "assets/data/services",
-			headerImport = "gargantuan/services",
-			headerOutput = "include/gargantuan/services/generated",
-			implOutput = "src/services/generated",
+		datatypes = {
+			inputDir = "tools/decls/datatypes",
+			codegenScript = "tools/libs/codegen/generateDataType",
+			macroOutputDir = "src/datatypes/generated",
+			registerOutput = "src/registration/RegisterDatatypes.cpp",
 		},
 	},
 }

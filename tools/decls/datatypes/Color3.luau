@@ -24,6 +24,15 @@ return d.datatype({
 			unmodified = "0.0f",
 			withMember = {},
 		}),
+
+		__add = d.method({
+			description = "Adds two Color3s",
+			withMember = {
+				constant = true,
+				parameters = { p("other", t.Color3:ConstRef()) },
+				returns = { t.Color3 },
+			},
+		}),
 	},
 
 	library = {
@@ -35,7 +44,7 @@ return d.datatype({
 					p("green", t.Float:Optional()),
 					p("blue", t.Float:Optional()),
 				},
-				returns = t.Color3,
+				returns = { t.Color3 },
 			},
 		}),
 
@@ -43,7 +52,7 @@ return d.datatype({
 			description = "Constructs a new Color3 using red, green, and blue components from 1 to 255.",
 			withMember = {
 				parameters = { p("red", t.Float), p("green", t.Float), p("blue", t.Float) },
-				returns = t.Color3,
+				returns = { t.Color3 },
 			},
 		}),
 
@@ -51,7 +60,7 @@ return d.datatype({
 			description = "Constructs a new Color3 using hue, saturation, and value components from 0 to 1.",
 			withMember = {
 				parameters = { p("hue", t.Float), p("saturation", t.Float), p("value", t.Float) },
-				returns = t.Color3,
+				returns = { t.Color3 },
 			},
 		}),
 	},

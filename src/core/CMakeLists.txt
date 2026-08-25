@@ -14,7 +14,7 @@ target_link_libraries(gargantuan_core
 		# box3d::box3d
 		flecs_static
 		# glaze::glaze
-		# glm
+		glm
 		Luau.CodeGen
 		Luau.Compiler
 		Luau.Config
