@@ -38,7 +38,7 @@ return c({
 			serializable = true,
 		},
 		TargetAngle = {
-			description = "The target angle a HingeConstraint will attempt to rotate to if its ActuatorType is set to Servo. Measured in radians.", --TODO: radian -> degree and vice versa conversion (because roblox measures these in degrees)
+			description = "The target angle a HingeConstraint will attempt to rotate to if its ActuatorType is set to Servo. Measured in degrees.",
 			type = t.Float,
 			unmodified = "0",
 			serializable = true,
