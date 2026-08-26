@@ -1,6 +1,8 @@
 #include "gargantuan/classes/HingeConstraint.hpp"
 #include <box3d/box3d.h>
+#include <box3d/math_functions.h>
 #include <box3d/types.h>
+#include <trigonometric.hpp>
 
 namespace gargantuan {
 	HingeConstraint::HingeConstraint() {
@@ -43,7 +45,7 @@ namespace gargantuan {
 		bool isServo = this->ActuatorType == Enums::ActuatorType::Servo;
 		b3RevoluteJoint_EnableSpring(LeJoint, isServo);
 		if (isServo) {
-			b3RevoluteJoint_SetTargetAngle(LeJoint, this->TargetAngle);
+			b3RevoluteJoint_SetTargetAngle(LeJoint, B3_DEG_TO_RAD * this->TargetAngle);
 		}
 	}
 }
