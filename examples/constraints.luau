@@ -1,11 +1,7 @@
--- this is supposed to be the master example
--- number keys go to different constraints
--- eg press 1 to run the weldconstraint test etc etc
--- will flesh out and make a better selector later
 local uis = game:GetService("UserInputService")
 local w = game:GetService("Workspace")
 
-local connection: RBXScriptConnection --this is for interacting with the scene through jumprequest
+local connection: RBXScriptConnection
 
 local function makeBaseplate()
 	local baseplate = Instance.new("Part")
@@ -19,14 +15,14 @@ end
 local function weldConstraintScene()
 	local part0 = Instance.new("Part")
 	part0.Anchored = false
-	part0.Color = Color3.fromRGB(150, 0, 0) --red
+	part0.Color = Color3.fromRGB(150, 0, 0)
 	part0.Position = Vector3.new(-5, 0, 0)
 	part0.Size = Vector3.new(2, 2, 2)
 	part0.Parent = w
 
 	local part1 = Instance.new("Part")
 	part1.Anchored = false
-	part1.Color = Color3.fromRGB(0, 0, 150) --blue
+	part1.Color = Color3.fromRGB(0, 0, 150)
 	part1.Position = Vector3.new(2, 1, 0)
 	part1.Size = Vector3.new(2, 2, 2)
 	part1.Parent = w
@@ -45,7 +41,7 @@ end
 local function prismaticConstraintScene()
 	local part0 = Instance.new("Part")
 	part0.Anchored = true
-	part0.Color = Color3.fromRGB(150, 0, 0) --red
+	part0.Color = Color3.fromRGB(150, 0, 0)
 	part0.Position = Vector3.new(-5, 0, 0)
 	part0.Size = Vector3.new(2, 2, 2)
 	part0.Parent = w
@@ -55,8 +51,8 @@ local function prismaticConstraintScene()
 
 	local part1 = Instance.new("Part")
 	part1.Anchored = false
-	part1.Color = Color3.fromRGB(0, 0, 150) --bloo
-	part1.Position = Vector3.new(2, 1, 0) --they start at different y positions, so the prismatic constraint should align them
+	part1.Color = Color3.fromRGB(0, 0, 150)
+	part1.Position = Vector3.new(2, 1, 0)
 	part1.Size = Vector3.new(2, 2, 2)
 	part1.Parent = w
 
@@ -75,14 +71,13 @@ local function prismaticConstraintScene()
 
 	connection = uis.JumpRequest:Connect(function()
 		part1:ApplyImpulse(Vector3.new(5, 0, 0))
-		--should move away from part0 then get pulled back
 	end)
 end
 
 local function hingeConstraintScene()
 	local part0 = Instance.new("Part")
 	part0.Anchored = true
-	part0.Color = Color3.fromRGB(150, 0, 0) --red
+	part0.Color = Color3.fromRGB(150, 0, 0)
 	part0.Position = Vector3.new(-5, 0, 0)
 	part0.Size = Vector3.new(2, 2, 2)
 	part0.Parent = w
@@ -93,7 +88,7 @@ local function hingeConstraintScene()
 
 	local part1 = Instance.new("Part")
 	part1.Anchored = false
-	part1.Color = Color3.fromRGB(0, 0, 150) --bloo
+	part1.Color = Color3.fromRGB(0, 0, 150)
 	part1.Position = Vector3.new(-5, 2, 0)
 	part1.Size = Vector3.new(10, 2, 2)
 	part1.Parent = w
@@ -107,11 +102,11 @@ local function hingeConstraintScene()
 	hinge.Attachment1 = a1
 	hinge.Enabled = true
 	hinge.ActuatorType = Enum.ActuatorType.Motor
-	hinge.AngularVelocity = math.pi --1 full rotation every 2 seconds
+	hinge.AngularVelocity = math.pi
 	hinge.Parent = w
 
 	connection = uis.JumpRequest:Connect(function()
-		part1:ApplyAngularImpulse(Vector3.new(5, 0, 0)) -- idk if this works yet
+		part1:ApplyAngularImpulse(Vector3.new(5, 0, 0))
 	end)
 end
 

@@ -28,7 +28,6 @@ namespace gargantuan {
 		b3DistanceJoint_EnableSpring(LeJoint, true);
 		b3DistanceJoint_SetLength(LeJoint, this->FreeLength);
 		b3DistanceJoint_SetSpringDampingRatio(LeJoint, this->Damping);
-		// tweak these two incase they look bad
 		b3DistanceJoint_SetSpringForceRange(LeJoint, this->Stiffness, this->Stiffness);
 
 		b3DistanceJoint_EnableLimit(LeJoint, this->LimitsEnabled);

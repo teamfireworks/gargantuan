@@ -73,6 +73,5 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
-		--TODO: add the others
 	},
 })

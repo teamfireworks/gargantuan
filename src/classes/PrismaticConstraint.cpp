@@ -34,8 +34,6 @@ namespace gargantuan {
 		if (isMotor) {
 			b3PrismaticJoint_SetMaxMotorForce(LeJoint, this->MotorMaxForce);
 			b3PrismaticJoint_SetMotorSpeed(LeJoint, this->Velocity);
-			// couldn't find a way to put in MotorMaxSpeed easily so thats a TODO
-			// same with the Speed
 		}
 
 		bool isServo = this->ActuatorType == Enums::ActuatorType::Servo;

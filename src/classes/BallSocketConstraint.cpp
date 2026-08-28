@@ -18,7 +18,6 @@ namespace gargantuan {
 		jointDefinition.base.bodyIdA = body0;
 		jointDefinition.base.bodyIdB = body1;
 		jointDefinition.base.collideConnected = true;
-		// for restitution values experiment with the spring cuz idk how it works yet
 		return b3CreateSphericalJoint(*world, &jointDefinition);
 	}
 

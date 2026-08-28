@@ -15,8 +15,6 @@ namespace gargantuan {
 		jointDefinition.base.bodyIdA = body0;
 		jointDefinition.base.bodyIdB = body1;
 		jointDefinition.base.collideConnected = true;
-		// tbh this would probably be better as a spring joint
-		// probably just combine with a spherical joint
 		return b3CreateDistanceJoint(*world, &jointDefinition);
 	}
 
@@ -25,6 +23,6 @@ namespace gargantuan {
 
 		b3DistanceJoint_SetLength(LeJoint, this->Length);
 		b3DistanceJoint_EnableLimit(LeJoint, this->LimitsEnabled);
-		b3DistanceJoint_SetLengthRange(LeJoint, this->Length, this->Length); // fix limits (angle wise)
+		b3DistanceJoint_SetLengthRange(LeJoint, this->Length, this->Length);
 	}
 }

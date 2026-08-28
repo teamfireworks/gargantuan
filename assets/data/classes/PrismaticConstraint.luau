@@ -5,5 +5,4 @@ return c({
 	extends = "SlidingBallConstraint",
 	description = "	Constraint its attachments to slide along one axis but not rotate. ",
 	since = "0.1.0",
-	-- it inherits all properties from SlidingBallConstraint
 })
