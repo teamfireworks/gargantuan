@@ -83,8 +83,8 @@ const function assembleProperties(state: GenerationState)
 				:newline()
 				:line(`void {setIdentifier}({property.type.cType} value) \{`)
 				:tab()
-				:line(`GetPropertyChangedSignal({keyString})->Fire(\{});`)
 				:line(`{key} = value;`)
+				:line(`GetPropertyChangedSignal({keyString})->Fire(\{});`)
 				:untab()
 				:line(`}`)
 				:newline()
@@ -282,7 +282,8 @@ end
 
 const function assembleFile(target: Target, declarationContents: fs.FileEntry)
 	const classContents = fs.readfile(declarationContents.path)
-	const classResult = luau.eval(classContents, { stdlib = "Seal", name = declarationContents.path })
+	const classResult =
+		luau.eval(classContents, { stdlib = "Seal", name = path.absolutize(declarationContents.path) }) -- the path.absolutize is more windows bs
 	if typeof(classResult) == "error" then
 		print(tostring(classResult))
 		return

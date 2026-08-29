@@ -28,5 +28,7 @@ namespace gargantuan {
 	  private:
 		b3BodyId CreatePartBody(std::shared_ptr<BasePart> it);
 		b3JointId CreateConstraintJoint(std::shared_ptr<Constraint> it);
+		void DestroyConstraintJoint(Constraint *it);
+		void RebuildConstraintJoint(std::shared_ptr<Constraint> it);
 	};
 }

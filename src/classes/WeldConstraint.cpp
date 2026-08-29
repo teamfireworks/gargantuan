@@ -9,7 +9,7 @@ namespace gargantuan {
 		if (!part0->FindFirstAncestorWhichIsA("WorldRoot")) return {nullptr, nullptr};
 
 		if (!Part1.has_value()) return {nullptr, nullptr};
-		auto part1 = Part0.value();
+		auto part1 = Part1.value();
 		if (!part1->FindFirstAncestorWhichIsA("WorldRoot")) return {nullptr, nullptr};
 
 		return {part0, part1};

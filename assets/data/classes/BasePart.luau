@@ -87,5 +87,9 @@ return c({
 			description = "Applies an impulse onto this instance.",
 			params = { p("impulse", t.Vector3) },
 		},
+		ApplyAngularImpulse = {
+			description = "Applies an angular impulse onto this instance.",
+			params = { p("impulse", t.Vector3) },
+		},
 	},
 })
