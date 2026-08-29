@@ -31,3 +31,6 @@
 [submodule "extern/flecs"]
 	path = extern/flecs
 	url = https://github.com/SanderMertens/flecs.git
+[submodule ".lute/batteries"]
+	path = .lute/batteries
+	url = https://github.com/rniraclefire/lute-batteries.git

@@ -1,4 +1,4 @@
-<div align="center">
+x<div align="center">
 
 <img src="./assets/github/banner.png" alt="Gargantuan" width="656px" />
 <br/>
@@ -63,6 +63,9 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 ## Legal Notice
+
+Luau is a trademark of Roblox Corporation.
+Luduvo is a trademark of Luduvo Corporation.
 
 Gargantuan is an independent open-source game engine created and maintained by
 godmothersfire, who represents Team Fireworks.

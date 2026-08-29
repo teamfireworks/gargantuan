@@ -1,5 +1,6 @@
 #include "datatypes/gg_Color3.hpp"
 
+#include <cstdint>
 #include <lua.h>
 
 // this would be codegen but i needa rough out the output code
