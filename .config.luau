@@ -17,21 +17,16 @@ return {
 		rootDir = true,
 		buildDir = "build",
 
-		codegen = {
-			workerPath = "@codegen/libs/worker",
-			targets = {
-				datatypes = {
-					workerMethod = "generateDatatype",
-					schemaDir = "codegen/datatypes",
-					outputDir = "src/datatypes/generated",
-					registryPath = "src/datatypes/generated/gg_RegisterDatatypes.cpp",
-				},
-				instances = {
-					workerMethod = "generateInstanceClass",
-					schemaDir = "codegen/instances",
-					outputDir = "src/instances/generated",
-					registryPath = "src/instances/generated/gg_RegisterInstances.cpp",
-				},
+		codegenTargets = {
+			datatypes = {
+				schemaDir = "codegen/datatypes",
+				outputDir = "src/datatypes/generated",
+				registryPath = "src/datatypes/generated/gg_RegisterDatatypes.cpp",
+			},
+			instances = {
+				schemaDir = "codegen/instances",
+				outputDir = "src/instances/generated",
+				registryPath = "src/instances/generated/gg_RegisterInstances.cpp",
 			},
 		},
 	},

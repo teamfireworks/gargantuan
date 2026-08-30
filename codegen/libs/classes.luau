@@ -92,7 +92,7 @@ export type ClassProperty = {
 		ReadParallel: SecurityCapabilities?,
 		Write: SecurityCapabilities?,
 		WriteParallel: SecurityCapabilities?,
-	}?,
+	},
 	--- Output a class member with default reads and writes
 	ImplementMember: boolean?,
 	--- Output header methods to implement reads and writes
@@ -102,7 +102,7 @@ export type ClassProperty = {
 	}?,
 	--- Output static int(lua_State *)
 	ImplementManual: {
-		CanThrow: boolean?,
+		NoThrow: boolean?,
 	}?,
 }
 
@@ -124,7 +124,7 @@ export type ClassMethod = {
 		Permits: {
 			Call: SecurityCapabilities?,
 			CallParallel: SecurityCapabilities?,
-		}?,
+		},
 	}?,
 	--- Output header methods alongside a default Luau implementation
 	ImplementOverloaded: {
@@ -132,8 +132,13 @@ export type ClassMethod = {
 	}?,
 	--- Output static int(lua_State *)
 	ImplementManual: {
-		CanThrow: boolean?,
+		NoThrow: boolean?,
 		CanYield: boolean?,
+
+		Permits: {
+			Call: SecurityCapabilities?,
+			CallParallel: SecurityCapabilities?,
+		},
 	}?,
 }
 
@@ -161,7 +166,7 @@ export type ClassConstant = {
 
 export type function WithKind(target: type, kind: type)
 	const result = types.copy(target)
-	result:setproperty(types.singleton("kind"), kind)
+	result:setproperty(types.singleton("Kind"), kind)
 	return result
 end
 
@@ -172,9 +177,35 @@ export type ClassMember =
 	| WithKind<ClassSignal, "ClassSignal">
 	| WithKind<ClassConstant, "ClassConstant">
 
+export type Members = { [string]: ClassMember }
+export type Schema<T, K> = {
+	Kind: K,
+	Prelude: T,
+	Members: Members,
+}
+
+export type InstanceClass = {
+	Name: string,
+	Owner: string?,
+	Abstract: boolean?,
+	Serializable: boolean?,
+	Description: string,
+	Since: vector,
+}
+
+export type InstanceClassSchema = Schema<InstanceClass, "InstanceClass">
+
+export type Datatype = {
+	Name: string,
+	Description: string,
+	Since: vector,
+}
+
+export type DatatypeSchema = Schema<Datatype, "Datatype">
+
 const function createKindedConstructor<T, K>(kind: K | "")
 	return function(x: T): WithKind<T, K>
-		(x :: any).kind = kind
+		(x :: any).Kind = kind
 		return x
 	end
 end

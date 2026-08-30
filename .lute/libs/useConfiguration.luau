@@ -11,7 +11,6 @@ export type LuauConfiguration = {
 }
 
 export type GargantuanCodegenTarget = {
-	read workerMethod: string,
 	read schemaDir: string,
 	read outputDir: string,
 	read registryPath: string,
@@ -20,11 +19,9 @@ export type GargantuanCodegenTarget = {
 export type GargantuanConfiguration = {
 	read rootDir: boolean?,
 	read buildDir: string,
-	read codegen: {
-		read workerPath: string,
-		read targets: {
-			[string]: GargantuanCodegenTarget,
-		},
+	read codegenTargets: {
+		read datatypes: GargantuanCodegenTarget,
+		read instances: GargantuanCodegenTarget,
 	},
 }
 

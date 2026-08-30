@@ -12,13 +12,13 @@ types.__index = types
 export type Type = setmetatable<{
 	CType: string,
 	CIncludes: { string }?,
-	CForwardStatement: string?,
+	CForwardDeclaration: string?,
 	LuauType: string,
 }, typeof(types)>
 
 const function collectTypes(len: number, ...: Type)
 	const cTypes, luauTypes, cIncludes: { string } = table.create<<string>>(len), table.create<<string>>(len), {}
-	local cForwardStatement: string? = nil
+	local CForwardDeclaration: string? = nil
 
 	for index = 1, select("#", ...) do
 		const value: Type = select(index, ...)
@@ -29,22 +29,22 @@ const function collectTypes(len: number, ...: Type)
 			tableext.extend(cIncludes, value.CIncludes)
 		end
 
-		if value.CForwardStatement then
-			if cForwardStatement == nil then
-				cForwardStatement = ""
+		if value.CForwardDeclaration then
+			if CForwardDeclaration == nil then
+				CForwardDeclaration = ""
 			end
-			value.CForwardStatement ..= value.CForwardStatement .. "\n"
+			value.CForwardDeclaration ..= value.CForwardDeclaration .. "\n"
 		end
 	end
 
-	return cTypes, cIncludes, cForwardStatement, luauTypes
+	return cTypes, cIncludes, CForwardDeclaration, luauTypes
 end
 
-const function newtype(cType: string, cIncludes: { string }?, cForwardStatement: string?, luauType: string): Type
+const function newtype(cType: string, cIncludes: { string }?, CForwardDeclaration: string?, luauType: string): Type
 	return setmetatable({
 		CType = cType,
 		CIncludes = cIncludes,
-		CForwardStatement = cForwardStatement,
+		CForwardDeclaration = CForwardDeclaration,
 		LuauType = luauType,
 	}, types)
 end
@@ -52,7 +52,9 @@ end
 const function datatype(name: string, cType: string?): Type
 	return newtype(
 		cType or `gg_{name}`,
-		{ `"datatypes/gg_{name}.hpp"` } :: { string }?,
+		{
+			-- `"datatypes/gg_{name}.hpp"`
+		} :: { string }?,
 		`struct gg_{name}` :: string?,
 		`gg_{name}`
 	)
@@ -85,7 +87,7 @@ function types.Extend(
 	self: Type,
 	cType: string?,
 	cIncludes: { string }?,
-	cForwardStatement: string?,
+	CForwardDeclaration: string?,
 	luauType: string?
 ): Type
 	return setmetatable({
@@ -93,7 +95,7 @@ function types.Extend(
 		CIncludes = if cIncludes and self.CIncludes
 			then tableext.extend(cIncludes, self.CIncludes)
 			else self.CIncludes or cIncludes or {} :: { string }?,
-		CForwardStatement = cForwardStatement or self.CForwardStatement,
+		CForwardDeclaration = CForwardDeclaration or self.CForwardDeclaration,
 		LuauType = luauType or self.LuauType,
 	}, types)
 end
@@ -114,12 +116,12 @@ function types.Tuple(...: Type): Type
 		return ... :: Type
 	end
 
-	const cTypes, cIncludes, cForwardStatement, luauTypes = collectTypes(len, ...)
+	const cTypes, cIncludes, CForwardDeclaration, luauTypes = collectTypes(len, ...)
 	table.insert(cIncludes, "<tuple>")
 	return newtype(
 		`std::tuple<{table.concat(cTypes, ", ")}>`,
 		cIncludes,
-		cForwardStatement,
+		CForwardDeclaration,
 		`({table.concat(luauTypes, ", ")})`
 	)
 end

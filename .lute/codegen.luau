@@ -14,18 +14,20 @@ const task = require("@std/task")
 const useConfiguration = require("@lutelibs/useConfiguration")
 const useNumCpus = require("@lutelibs/useNumCpus")
 const vm = require("@lute/vm")
-local stringext = require("@std/stringext")
+local codegenDatatype = require("@lutelibs/codegenDatatype")
+local luau = require("@std/luau")
+const stringext = require("@std/stringext")
 
 const args = cli.parser()
 do
 	args:add("script", "positional", { help = "this script", hidden = true })
 	args:add("schemas", "variadic", { help = "which schemas to generate, left unspecified regenerates all schemas" })
 	args:add("help", "flag", { help = "whether to show this message", aliases = { "h" } })
-	args:add(
-		"workers",
-		"option",
-		{ help = "amount of worker threads to spawn, defaults to number of logical cores on this system" }
-	)
+	-- args:add(
+	-- 	"workers",
+	-- 	"option",
+	-- 	{ help = "amount of worker threads to spawn, defaults to number of logical cores on this system" }
+	-- )
 
 	args:add("force", "flag", { help = "force regeneration regardless if schemas are fresh" })
 	args:add("noinstances", "flag", { help = "skip regenerating instance classes" })
@@ -44,51 +46,35 @@ do
 	end
 end
 
-const configuration = useConfiguration()
-const codegenConfiguration = configuration.gargantuan.codegen
-local totalThreads, completedThreads = 0, 0
+do
+	const configuration = useConfiguration()
+	const codegenTargets = configuration.gargantuan.codegenTargets
 
-const function generateTarget(numWorkers: number, target: useConfiguration.GargantuanCodegenTarget)
-	const inputs = {}
+	const function generateTarget(target: useConfiguration.GargantuanCodegenTarget)
+		if not fs.exists(target.outputDir) then
+			fs.createDirectory(target.outputDir, { makeParents = true })
+		end
 
-	for _, file in fs.listDirectory(target.schemaDir) do
-		if file.type == "file" and stringext.hasSuffix(file.name, ".luau") then
-			const basename = stringext.removeSuffix(file.name, ".luau")
-			table.insert(inputs, {
-				basename = basename,
-				contents = fs.readFileToString(path.join(target.schemaDir, file.name)),
-				output = path.format(path.join(codegenConfiguration.workerPath, basename .. ".hpp")),
-			})
+		for _, entry in fs.listDirectory(target.schemaDir) do
+			if entry.type == "file" and stringext.hasSuffix(entry.name, ".luau") then
+				const basename = stringext.removeSuffix(entry.name, ".luau")
+				const schemaPath = path.join(target.schemaDir, entry.name)
+				const outputPath = path.join(target.outputDir, basename .. ".hpp")
+				const schema = luau.loadModule(schemaPath)
+				codegenDatatype({
+					schema = schema,
+					schemaPath = schemaPath,
+					outputPath = outputPath,
+				})
+			end
 		end
 	end
 
-	for index = 1, numWorkers do
-		totalThreads += 1
-		task.spawn(function()
-			const worker = vm.create(codegenConfiguration.workerPath)
-			worker[target.workerMethod]({
-				registryPath = target.registryPath,
-				inputs = inputs,
-			})
-			completedThreads += 1
-			print(`Worker {completedThreads} out of {totalThreads} completed`)
-		end)
+	if not args:has("nodatatypes") then
+		generateTarget(codegenTargets.datatypes)
 	end
 end
 
-const totalWorkers = args:has("workers") and tonumber(args:get("workers")) or useNumCpus()
-const workersPerTarget = if args:has("noinstances") or args:has("nodatatypes")
-	then totalWorkers
-	else math.ceil(totalWorkers / 2)
-
-if not args:has("noinstances") then
-	generateTarget(workersPerTarget, codegenConfiguration.targets.instances)
-end
-
-if not args:has("nodatatypes") then
-	generateTarget(workersPerTarget, codegenConfiguration.targets.datatypes)
-end
-
-repeat
-	task.wait(0.1)
-until completedThreads == totalThreads
+-- hi im working on gargantuan codegen
+-- for data types rn
+-- check #engine-dev <----------------------------------------------------------

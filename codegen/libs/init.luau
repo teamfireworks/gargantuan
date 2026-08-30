@@ -10,35 +10,9 @@
 const classes = require("@self/classes")
 const types = require("@self/types")
 
-export type Members = { [string]: classes.ClassMember }
-export type Schema<T, K> = {
-	Kind: K,
-	Prelude: T,
-	Members: Members,
-}
-
-export type InstanceClass = {
-	Name: string,
-	Owner: string?,
-	Abstract: boolean?,
-	Serializable: boolean?,
-	Description: string,
-	Since: vector,
-}
-
-export type InstanceClassSchema = Schema<InstanceClass, "InstanceClass">
-
-export type Datatype = {
-	Name: string,
-	Description: string,
-	Since: vector,
-}
-
-export type DatatypeSchema = Schema<Datatype, "Datatype">
-
 const lib = {}
 
-function lib.InstanceClass(prelude: InstanceClass, members: Members): InstanceClassSchema
+function lib.InstanceClass(prelude: classes.InstanceClass, members: classes.Members): classes.InstanceClassSchema
 	return {
 		Kind = "InstanceClass",
 		Prelude = prelude,
@@ -46,7 +20,7 @@ function lib.InstanceClass(prelude: InstanceClass, members: Members): InstanceCl
 	}
 end
 
-function lib.Datatype(prelude: Datatype, members: Members): DatatypeSchema
+function lib.Datatype(prelude: classes.Datatype, members: classes.Members): classes.DatatypeSchema
 	return {
 		Kind = "Datatype",
 		Prelude = prelude,
