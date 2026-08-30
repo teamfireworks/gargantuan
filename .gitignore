@@ -18,9 +18,4 @@ packages/
 Thumbs.db
 
 # Codegen
-include/gargantuan/classes/generated/
-include/gargantuan/services/generated/
-include/gargantuan/datatypes/generated/
-src/classes/generated/
-src/services/generated/
-src/datatypes/generated/
+src/core/generated/

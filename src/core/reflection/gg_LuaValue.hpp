@@ -18,14 +18,19 @@ public:
   static bool Is(lua_State *L, int idx) = 0;
   static T From(lua_State *L, int idx) = 0;
   static int Push(lua_State *L, const T &self) = 0;
+
+  template <typename Missing>
+  struct GARGANTUAN_STACK_VALUE_IS_UNIMPLEMENTED_FOR {
+    static constexpr bool value = false;
+  };
+
+  static_assert(GARGANTUAN_STACK_VALUE_IS_UNIMPLEMENTED_FOR<T>::value);
 };
 
 template <typename T>
 concept gg_IsLuaValue = requires() { gg_LuaValue<T>::a == false; };
 
-template <typename T>
-  requires gg_IsLuaValue<T>
-T CheckLuaValue(lua_State *L, int idx) {
+template <typename T> T CheckLuaValue(lua_State *L, int idx) {
   if (!gg_LuaValue<T>::Is(L, idx)) {
     luaL_typeerror(L, idx, gg_LuaValue<T>::ExpectedType().c_str());
   }
@@ -35,6 +40,7 @@ T CheckLuaValue(lua_State *L, int idx) {
 template <typename T>
   requires std::is_floating_point_v<T>
 struct gg_LuaValue<T>;
+
 template <> struct gg_LuaValue<bool>;
 template <> struct gg_LuaValue<std::string>;
 
