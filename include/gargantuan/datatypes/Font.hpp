@@ -1,35 +1,26 @@
 #pragma once
 
-#include "gargantuan/reflection/Enums.hpp"
 #include "gargantuan/scripting/Userdata.hpp"
+
 #include <string>
 
 namespace gargantuan {
-	G_ENUM(
-		FontWeight,
-		Thin = 100,
-		ExtraLight = 200,
-		Light = 300,
-		Regular = 400,
-		Medium = 500,
-		SemiBold = 600,
-		Bold = 700,
-		ExtraBold = 800,
-		Heavy = 900
-	);
-
-	G_ENUM(FontStyle, Normal, Italic);
+	namespace Enums {
+		enum class FontWeight;
+		enum class FontStyle;
+	}
 
 	typedef std::string Content;
 
 	G_USERDATA_DECL(
 		Font,
 
-		Font(
-			Content fontContent,
-			Enums::FontWeight weight = Enums::FontWeight::Regular,
-			Enums::FontStyle style = Enums::FontStyle::Normal
-		);
+		Font(){};
+		Font(Content fontContent) : Family(fontContent){};
+		Font(Content fontContent, Enums::FontWeight weight) : Family(fontContent), Weight(weight){};
+		Font(Content fontContent, Enums::FontWeight weight, Enums::FontStyle style) : Family(fontContent),
+		Weight(weight),
+		Style(style){};
 		static Font fromName(std::string name);
 
 		Content Family = "";

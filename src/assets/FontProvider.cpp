@@ -3,11 +3,9 @@
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
 #include "gargantuan/filesystem/Paths.hpp"
 
-#include <SDL3_ttf/SDL_ttf.h>
 #include <glaze/glaze.hpp>
 
-#include <cmath>
-#include <exception>
+#include <expected>
 #include <filesystem>
 #include <string>
 #include <unordered_map>
@@ -26,7 +24,6 @@ namespace gargantuan {
 	};
 
 	void FontProvider::RegisterManifest(const std::filesystem::path &path) {
-		std::vector<std::exception> errors;
 		if (Filesystem->Type(path) != FileType::File) {
 			return LOG_ERROR(App, "Expected font manifest %s to be a file", Paths::ToUtf8(path).c_str());
 		}
@@ -78,47 +75,27 @@ namespace gargantuan {
 			return LOG_ERROR(App, "Font variant %s is not a file", Paths::ToUtf8(variantPath).c_str());
 		}
 
-		SourceKey sourceKey{name, weight, style};
-		SourcePaths[sourceKey] = realVariantPath;
+		CacheKey sourceKey{name, weight, style};
+		Sources[sourceKey] = realVariantPath;
 	}
 
-	const FontAtlas *FontProvider::Get(
-		const std::string &name, const Enums::FontWeight &weight, const Enums::FontStyle &style, uint32_t pointSize
-	) {
-		AtlasKey atlasKey{name, weight, style, pointSize};
-		auto variant = Atlases.find(atlasKey);
-		if (variant != Atlases.end()) return &variant->second;
+	std::expected<const FontAtlas *, std::string>
+	FontProvider::GetAtlas(const std::string &name, const Enums::FontWeight &weight, const Enums::FontStyle &style) {
+		CacheKey cacheKey{name, weight, style};
 
-		SourceKey sourceKey{name, weight, style};
-		auto source = SourcePaths.find(sourceKey);
-		if (source == SourcePaths.end()) {
-			LOG_ERROR(App, "Font is not registered");
-			return nullptr;
-		}
+		auto atlas = Atlases.find(cacheKey);
+		if (atlas != Atlases.end()) return &atlas->second;
 
-		auto createdVariant = CreateFontAtlas(source->second, pointSize);
-		Atlases[atlasKey] = std::move(createdVariant);
-		return &Atlases[atlasKey];
-	}
+		auto source = Sources.find(cacheKey);
+		if (source == Sources.end()) return std::unexpected("font is not registered");
 
-	FontAtlas FontProvider::CreateFontAtlas(const std::filesystem::path &source, float pointSize) {
-		FontAtlas atlas;
+		auto sourceHandle = Filesystem->Open(source->second, FileOpen::Read);
+		auto atlasResult = FontAtlas::fromFileHandle(Gpu, sourceHandle);
+		sourceHandle->Close();
 
-		auto handle = Filesystem->Open(source);
-		if (!handle) {
-			LOG_ERROR(App, "Failed to open font %s", Paths::ToUtf8(source).c_str());
-			return atlas;
-		}
+		if (!atlasResult) return std::unexpected(atlasResult.error().c_str());
 
-		auto rawFont = TTF_OpenFontIO(handle->Stream, false, std::round(pointSize));
-		if (!rawFont) {
-			LOG_ERROR(App, "Failed to load font %s: %s", Paths::ToUtf8(source).c_str(), SDL_GetError());
-			return atlas;
-		}
-
-		atlas.LineHeight = TTF_GetFontHeight(rawFont);
-
-		// Todo: Finish ts
-		// i gotta do ib math aa homework UGHHHHH
+		Atlases[cacheKey] = std::move(atlasResult.value());
+		return &Atlases[cacheKey];
 	}
 }

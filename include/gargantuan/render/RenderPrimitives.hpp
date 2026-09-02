@@ -18,15 +18,16 @@ namespace gargantuan {
 		static std::array<SDL_GPUVertexAttribute, 3> Attributes[];
 	};
 
-	static constexpr int UI_SOLID_COLOR_INDEX = -1;
-	struct UIVertex {
+	enum GuiTextureType : int { Color = -1, Font = -2 };
+
+	struct GuiVertex {
 	  public:
 		glm::vec2 AbsolutePosition;
 		glm::vec2 AbsoluteSize;
 		glm::vec2 UV;
 		glm::vec4 Background = {0.0f, 0.0f, 0.0f, 0.0f};
 		float Rotation = 0;
-		int TextureIndex = UI_SOLID_COLOR_INDEX;
+		GuiTextureType TextureIndex = GuiTextureType::Color;
 
 		static std::array<SDL_GPUVertexBufferDescription, 1> BufferDescriptions[];
 		static std::array<SDL_GPUVertexAttribute, 5> Attributes[];

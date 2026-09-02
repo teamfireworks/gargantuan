@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gargantuan/assets/FontAtlas.hpp"
 #include "gargantuan/filesystem/BaseFilesystem.hpp"
 #include "gargantuan/reflection/Enums.hpp"
 
@@ -7,13 +8,11 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <glm/glm.hpp>
 
-#include <exception>
 #include <filesystem>
 #include <map>
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 namespace gargantuan {
 	G_ENUM(
@@ -31,12 +30,6 @@ namespace gargantuan {
 
 	G_ENUM(FontStyle, Normal, Italic);
 
-	struct FontVariant {
-		SDL_GPUTexture *AtlasTexture = nullptr;
-		std::unordered_map<char, GlyphInfo> Glyphs;
-		float LineHeight = 0.0f;
-	};
-
 	struct FontManifestVariant {
 		std::optional<std::string> Normal;
 		std::optional<std::string> Italic;
@@ -48,49 +41,23 @@ namespace gargantuan {
 		std::unordered_map<std::string, FontManifestVariant> Variants;
 	};
 
-	struct Glyph {
-		glm::vec2 UVMin;
-		glm::vec2 UVMax;
-		glm::vec2 Size;
-		glm::vec2 Bearing;
-		float Advance;
-	};
-
-	class FontAtlas {
-	  public:
-		SDL_GPUTexture *Texture = nullptr;
-		TTF_Font *Font = nullptr;
-
-		int Width = 2048, Height = 2048;
-		int CurrentX = 1, CurrentY = 1;
-		int RowHeight = 0.0f;
-
-		float LineHeight = 0.0f;
-		float PointSize = 0.0f;
-
-		std::unordered_map<char32_t, Glyph> Glyphs;
-	};
-
 	class FontProvider {
 	  public:
-		FontProvider(SDL_GPUDevice *gpu, BaseFilesystem *filesystem);
+		FontProvider(SDL_GPUDevice *gpu, BaseFilesystem *filesystem) : Gpu(gpu), Filesystem(filesystem) {};
 		~FontProvider();
 
 		void RegisterManifest(const std::filesystem::path &path);
 
-		const FontAtlas *GetAtlas(
-			const std::string &name, const Enums::FontWeight &weight, const Enums::FontStyle &style, float pointSize
-		);
+		std::expected<const FontAtlas *, std::string>
+		GetAtlas(const std::string &name, const Enums::FontWeight &weight, const Enums::FontStyle &style);
 
 	  private:
 		SDL_GPUDevice *Gpu;
 		BaseFilesystem *Filesystem;
 
-		using SourceKey = std::tuple<std::string, Enums::FontWeight, Enums::FontStyle>;
-		std::map<SourceKey, std::filesystem::path> SourcePaths;
-
-		using AtlasKey = std::tuple<std::string, Enums::FontWeight, Enums::FontStyle, uint32_t>;
-		std::map<AtlasKey, FontAtlas> Atlases;
+		using CacheKey = std::tuple<std::string, Enums::FontWeight, Enums::FontStyle>;
+		std::map<CacheKey, std::filesystem::path> Sources;
+		std::map<CacheKey, FontAtlas> Atlases;
 
 		void RegisterSource(
 			std::string name,
@@ -99,7 +66,5 @@ namespace gargantuan {
 			const std::filesystem::path &manifestPath,
 			const std::filesystem::path &variantPath
 		);
-
-		[[nodiscard]] FontAtlas CreateFontAtlas(const std::filesystem::path &source, float pointSize);
 	};
 }
