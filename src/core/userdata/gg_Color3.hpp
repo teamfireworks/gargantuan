@@ -13,7 +13,5 @@
 
 struct gg_Color3 {
   GG_COLOR3_START;
-  gg_Color3(const float &r = 0.0f, const float &g = 0.0f,
-            const float &b = 0.0f) noexcept;
   GG_COLOR3_END;
 };

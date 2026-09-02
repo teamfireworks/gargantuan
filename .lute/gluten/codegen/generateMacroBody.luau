@@ -9,6 +9,7 @@
 
 const classes = require("./classes")
 const orderedPairs = require("@gluten/utils/orderedPairs")
+local formatSchemaIdentifier = require("./formatSchemaIdentifier")
 
 const METAMETHOD_OVERRIDES: { [string]: string } = {
 	__add = "operator+",
@@ -129,35 +130,41 @@ const function generateMacroBody(schema: classes.Schema<any, any>)
 					table.insert(body, formatted)
 				end
 			elseif member.ImplementMethod then
-				-- Constructors are expected to be written in the headerfile
-				-- manually cuz we don't have the class name here
-				if name == "new" then
-					continue
-				end
-
-				const isStatic = member.Kind == "ClassStaticMethod"
-				const staticPrefix = isStatic and "static " or ""
+				const isConstructor = name == "new"
+				const isStatic = isConstructor or member.Kind == "ClassStaticMethod"
+				const staticPrefix = not isConstructor and isStatic and "static " or ""
 
 				local formatted = staticPrefix
-				formatted ..= member.ImplementMethod.ReturnType.CType
-				formatted ..= " "
-				formatted ..= METAMETHOD_OVERRIDES[name] or name
+				if isConstructor then
+					formatted ..= formatSchemaIdentifier(schema)
+				else
+					formatted ..= member.ImplementMethod.ReturnType.CType
+					formatted ..= " "
+					formatted ..= METAMETHOD_OVERRIDES[name] or name
+				end
 				formatted ..= "("
 
 				const numParameters = #member.ImplementMethod.Parameters
 				for index, parameter in member.ImplementMethod.Parameters do
-					if not member.ImplementMethod.CanMutate then
+					if not isConstructor and not member.ImplementMethod.CanMutate then
 						formatted ..= "const "
 					end
 
 					formatted ..= parameter.Type.CType
 					formatted ..= " "
 
-					if not member.ImplementMethod.CanMutate then
+					-- TODO: Types need to be modellable so we can choose to
+					-- omit references for primitive types like floats
+					if not isConstructor and not member.ImplementMethod.CanMutate then
 						formatted ..= " &"
 					end
 
 					formatted ..= parameter.Name
+
+					if parameter.DefaultValue then
+						formatted ..= " = "
+						formatted ..= parameter.DefaultValue
+					end
 
 					if index ~= numParameters then
 						formatted ..= ", "
@@ -166,7 +173,6 @@ const function generateMacroBody(schema: classes.Schema<any, any>)
 
 				formatted ..= ")"
 
-				print(name, isStatic, member.ImplementMethod.CanMutate)
 				if not isStatic and not member.ImplementMethod.CanMutate then
 					formatted ..= " const"
 				end
