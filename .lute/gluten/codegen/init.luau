@@ -12,17 +12,23 @@ const types = require("@self/types")
 
 const lib = {}
 
-function lib.InstanceClass(prelude: classes.InstanceClass, members: classes.Members): classes.InstanceClassSchema
+function lib.InstanceClass(
+	name: string,
+	prelude: classes.InstanceClass,
+	members: classes.Members
+): classes.InstanceClassSchema
 	return {
 		Kind = "InstanceClass",
+		Name = name,
 		Prelude = prelude,
 		Members = members,
 	}
 end
 
-function lib.Userdata(prelude: classes.Userdata, members: classes.Members): classes.UserdataSchema
+function lib.Userdata(name: string, prelude: classes.Userdata, members: classes.Members): classes.UserdataSchema
 	return {
 		Kind = "Userdata",
+		Name = name,
 		Prelude = prelude,
 		Members = members,
 	}

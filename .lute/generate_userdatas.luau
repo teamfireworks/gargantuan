@@ -7,6 +7,7 @@
 -- obtain one at:
 --   http://mozilla.org/MPL/2.0/
 
+local appendLuaValue = require("@gluten/codegen/appendLuaValue")
 local classes = require("@gluten/codegen/classes")
 local cli = require("@batteries/cli")
 local collectForwardDeclarations = require("@gluten/codegen/collectForwardDeclarations")
@@ -31,8 +32,7 @@ do
 	const tagEnumMembers: { [string]: true } = {}
 
 	for basename, schema: classes.UserdataSchema in schemas do
-		const prelude, members = schema.Prelude, schema.Members
-		tagEnumMembers[prelude.Name] = true
+		tagEnumMembers[schema.Name] = true
 
 		const macroLines = {}
 		tableext.extend(macroLines, prefixLines("//", configuration.gargantuan.licenseHeader))
@@ -41,7 +41,8 @@ do
 		table.insert(macroLines, "")
 		table.insert(macroLines, "#pragma once")
 
-		const includePaths = collectIncludePaths(members)
+		const includePaths = collectIncludePaths(schema.Members)
+		includePaths["<core/reflection/gg_LuaValue.hpp>"] = true
 		if next(includePaths) then
 			for includePath in orderedPairs(includePaths) do
 				table.insert(macroLines, `#include {includePath} // IWYU pragma: export`)
@@ -49,7 +50,7 @@ do
 			table.insert(macroLines, "")
 		end
 
-		const forwardDeclarations = collectForwardDeclarations(members)
+		const forwardDeclarations = collectForwardDeclarations(schema.Members)
 		if next(forwardDeclarations) then
 			for declaration in orderedPairs(forwardDeclarations) do
 				table.insert(macroLines, declaration .. ";")
@@ -57,10 +58,12 @@ do
 			table.insert(macroLines, "")
 		end
 
-		const macroBody = generateMacroBody(members)
-		table.insert(macroLines, `#define GG_{string.upper(prelude.Name)} \\`)
+		const macroBody = generateMacroBody(schema.Members)
+		table.insert(macroLines, `#define GG_{string.upper(schema.Name)} \\`)
 		tableext.extend(macroLines, macroBody)
 		table.insert(macroLines, "")
+
+		appendLuaValue(macroLines, schema)
 
 		const macroPath = path.join(codegenTarget.outputDir, basename .. ".hpp")
 		fs.writeStringToFile(macroPath, table.concat(macroLines, "\n"))

@@ -180,12 +180,12 @@ export type ClassMember =
 export type Members = { [string]: ClassMember }
 export type Schema<T, K> = {
 	Kind: K,
+	Name: string,
 	Prelude: T,
 	Members: Members,
 }
 
 export type InstanceClass = {
-	Name: string,
 	Owner: string?,
 	Abstract: boolean?,
 	Serializable: boolean?,
@@ -196,7 +196,6 @@ export type InstanceClass = {
 export type InstanceClassSchema = Schema<InstanceClass, "InstanceClass">
 
 export type Userdata = {
-	Name: string,
 	Description: string,
 	Since: vector,
 }

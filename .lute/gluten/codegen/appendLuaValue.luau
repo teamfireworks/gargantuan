@@ -7,7 +7,13 @@
 -- obtain one at:
 --   http://mozilla.org/MPL/2.0/
 
-const function generateLuaValue() end
+const classes = require("./classes")
+
+const function appendLuaValue(body: { string }, userdata: classes.UserdataSchema)
+	table.insert(body, `template <> struct gg_LuaValue<gg_{userdata.Name}> \{`)
+	table.insert(body, "public:")
+	table.insert(body, "};")
+end
 
 -- Instances, Signals -> std::shared_ptr
 -- Color3s --> gg_Color3
@@ -36,4 +42,4 @@ const function generateLuaValue() end
 -- 		}                                                                                                              \
 -- 	};
 
-return generateLuaValue
+return appendLuaValue

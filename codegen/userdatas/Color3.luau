@@ -9,8 +9,7 @@
 
 const l, c, t = require("@gluten/codegen").Unpack()
 
-return l.Userdata({
-	Name = "Color3",
+return l.Userdata("Color3", {
 	Description = "Represents a color made of red, green, and blue components.",
 	Since = vector.create(0, 1, 0),
 }, {
