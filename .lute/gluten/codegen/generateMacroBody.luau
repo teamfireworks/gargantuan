@@ -66,20 +66,20 @@ const function formatWriteMethod(name: string, property: classes.ClassProperty, 
 	return formatted
 end
 
-const function generateMacroBody(members: classes.Members)
+const function generateMacroBody(schema: classes.Schema<any, any>)
 	const body: { string } = {}
 
 	-- TODO: make this protected. the intent here is to fire like propchangedsignal
 	-- for instances but we gotta get data types up first
 	table.insert(body, "public: \\")
-	for name, member in orderedPairs(members) do
+	for name, member in orderedPairs(schema.Members) do
 		if member.Kind == "ClassProperty" and member.ImplementMember then
 			table.insert(body, `{member.Type.CType} {name} = {member.UnmodifiedValue}; \\`)
 		end
 	end
 
 	table.insert(body, "public: \\")
-	for name, member in orderedPairs(members) do
+	for name, member in orderedPairs(schema.Members) do
 		if member.Kind == "ClassProperty" then
 			if member.ImplementManual then
 				for key in member.Permits :: { [string]: classes.SecurityCapabilities } do

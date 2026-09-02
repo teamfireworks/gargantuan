@@ -27,6 +27,8 @@ public:
   static_assert(GARGANTUAN_STACK_VALUE_IS_UNIMPLEMENTED_FOR<T>::value);
 };
 
+// lua_userda
+
 template <typename T>
 concept gg_IsLuaValue = requires() { gg_LuaValue<T>::a == false; };
 

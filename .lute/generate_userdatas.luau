@@ -7,14 +7,17 @@
 -- obtain one at:
 --   http://mozilla.org/MPL/2.0/
 
-local appendLuaValue = require("@gluten/codegen/appendLuaValue")
 local classes = require("@gluten/codegen/classes")
 local cli = require("@batteries/cli")
 local collectForwardDeclarations = require("@gluten/codegen/collectForwardDeclarations")
 local collectIncludePaths = require("@gluten/codegen/collectIncludePaths")
 local collectSchemas = require("@gluten/codegen/collectSchemas")
+local formatUserdataIdentifier = require("@gluten/codegen/userdatas/formatUserdataIdentifier")
+local formatUserdataMacros = require("@gluten/codegen/userdatas/formatUserdataMacros")
 local fs = require("@std/fs")
+local generateLuaValue = require("@gluten/codegen/userdatas/generateLuaValue")
 local generateMacroBody = require("@gluten/codegen/generateMacroBody")
+local generateMacroHeader = require("@gluten/codegen/generateMacroHeader")
 local orderedPairs = require("@gluten/utils/orderedPairs")
 local path = require("@std/path")
 local prefixLines = require("./gluten/prefixLines")
@@ -34,39 +37,34 @@ do
 	for basename, schema: classes.UserdataSchema in schemas do
 		tagEnumMembers[schema.Name] = true
 
-		const macroLines = {}
-		tableext.extend(macroLines, prefixLines("//", configuration.gargantuan.licenseHeader))
-		table.insert(macroLines, "")
-		tableext.extend(macroLines, prefixLines("//", configuration.gargantuan.codegenHeader))
-		table.insert(macroLines, "")
-		table.insert(macroLines, "#pragma once")
-
 		const includePaths = collectIncludePaths(schema.Members)
-		includePaths["<core/reflection/gg_LuaValue.hpp>"] = true
+		const forwardDeclarations = collectForwardDeclarations(schema.Members)
+
+		const macroStart, macroEnd = formatUserdataMacros(schema)
+		const macroBody = {}
+		table.insert(macroBody, `#define {macroStart} \\`)
+		tableext.extend(macroBody, generateMacroBody(schema))
+		table.insert(macroBody, "")
+		table.insert(macroBody, `#define {macroEnd} \\`)
+		tableext.extend(macroBody, generateLuaValue(schema, includePaths))
+
+		const body = generateMacroHeader(configuration)
 		if next(includePaths) then
 			for includePath in orderedPairs(includePaths) do
-				table.insert(macroLines, `#include {includePath} // IWYU pragma: export`)
+				table.insert(body, `#include {includePath} // IWYU pragma: export`)
 			end
-			table.insert(macroLines, "")
+			table.insert(body, "")
 		end
-
-		const forwardDeclarations = collectForwardDeclarations(schema.Members)
 		if next(forwardDeclarations) then
 			for declaration in orderedPairs(forwardDeclarations) do
-				table.insert(macroLines, declaration .. ";")
+				table.insert(body, declaration .. ";")
 			end
-			table.insert(macroLines, "")
+			table.insert(body, "")
 		end
+		tableext.extend(body, macroBody)
 
-		const macroBody = generateMacroBody(schema.Members)
-		table.insert(macroLines, `#define GG_{string.upper(schema.Name)} \\`)
-		tableext.extend(macroLines, macroBody)
-		table.insert(macroLines, "")
-
-		appendLuaValue(macroLines, schema)
-
-		const macroPath = path.join(codegenTarget.outputDir, basename .. ".hpp")
-		fs.writeStringToFile(macroPath, table.concat(macroLines, "\n"))
+		const macroPath = path.join(codegenTarget.outputDir, formatUserdataIdentifier(schema) .. ".hpp")
+		fs.writeStringToFile(macroPath, table.concat(body, "\n"))
 		process.run({ "clang-format", "-i", path.format(macroPath) })
 	end
 

@@ -198,6 +198,7 @@ export type InstanceClassSchema = Schema<InstanceClass, "InstanceClass">
 export type Userdata = {
 	Description: string,
 	Since: vector,
+	Container: "Shared" | "Unique" | nil,
 }
 
 export type UserdataSchema = Schema<Userdata, "Userdata">
