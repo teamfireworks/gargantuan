@@ -46,6 +46,15 @@ return l.Userdata("Color3", {
 		},
 	}),
 
+	Lerp = c.Method({
+		Display = { Description = "Linearly interpolates between two Color3s." },
+		ImplementMethod = {
+			Parameters = { c.Parameter("goal", "Goal Color3.", t.Color3), c.Parameter("alpha", "Progress.", t.Float) },
+			Permits = { Call = { "Basic" }, CallParallel = { "Basic" } },
+			ReturnType = t.Color3,
+		},
+	}),
+
 	__add = c.Method({
 		Display = { Description = "Sum of all components." },
 		ImplementMethod = {
@@ -63,6 +72,34 @@ return l.Userdata("Color3", {
 				c.Parameter("r", "Red component.", t.Float, "0.0f"),
 				c.Parameter("g", "Green component.", t.Float, "0.0f"),
 				c.Parameter("b", "Blue component.", t.Float, "0.0f"),
+			},
+			ReturnType = t.Color3,
+		},
+	}),
+
+	fromRGB = c.StaticMethod({
+		Display = { Description = "Constructs a new Color3 with RGB components from zero to 255" },
+		ImplementMethod = {
+			Permits = { Call = { "Basic" }, CallParallel = { "Basic" } },
+			Parameters = {
+				c.Parameter("r", "Red component.", t.Float, "0.0f"),
+				c.Parameter("g", "Green component.", t.Float, "0.0f"),
+				c.Parameter("b", "Blue component.", t.Float, "0.0f"),
+			},
+			ReturnType = t.Color3,
+		},
+	}),
+
+	fromHSV = c.StaticMethod({
+		Display = {
+			Description = "Constructs a new Color3 with hue, saturation, and value components from zero to one",
+		},
+		ImplementMethod = {
+			Permits = { Call = { "Basic" }, CallParallel = { "Basic" } },
+			Parameters = {
+				c.Parameter("h", "Hue component.", t.Float, "0.0f"),
+				c.Parameter("s", "Saturation component.", t.Float, "0.0f"),
+				c.Parameter("v", "Value component.", t.Float, "0.0f"),
 			},
 			ReturnType = t.Color3,
 		},

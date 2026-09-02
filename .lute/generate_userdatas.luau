@@ -12,7 +12,7 @@ local cli = require("@batteries/cli")
 local collectForwardDeclarations = require("@gluten/codegen/collectForwardDeclarations")
 local collectIncludePaths = require("@gluten/codegen/collectIncludePaths")
 local collectSchemas = require("@gluten/codegen/collectSchemas")
-local formatUserdataIdentifier = require("@gluten/codegen/userdatas/formatUserdataIdentifier")
+local formatSchemaIdentifier = require("@gluten/codegen/formatSchemaIdentifier")
 local formatUserdataMacros = require("@gluten/codegen/userdatas/formatUserdataMacros")
 local fs = require("@std/fs")
 local generateLuaValue = require("@gluten/codegen/userdatas/generateLuaValue")
@@ -35,6 +35,7 @@ do
 	const tagEnumMembers: { [string]: true } = {}
 
 	for basename, schema: classes.UserdataSchema in schemas do
+		print("Generating", basename)
 		tagEnumMembers[schema.Name] = true
 
 		const includePaths = collectIncludePaths(schema.Members)
@@ -63,7 +64,7 @@ do
 		end
 		tableext.extend(body, macroBody)
 
-		const macroPath = path.join(codegenTarget.outputDir, formatUserdataIdentifier(schema) .. ".hpp")
+		const macroPath = path.join(codegenTarget.outputDir, formatSchemaIdentifier(schema) .. ".hpp")
 		fs.writeStringToFile(macroPath, table.concat(body, "\n"))
 		process.run({ "clang-format", "-i", path.format(macroPath) })
 	end

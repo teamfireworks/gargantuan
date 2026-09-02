@@ -8,16 +8,16 @@
 --   http://mozilla.org/MPL/2.0/
 
 const classes = require("@gluten/codegen/classes")
-local formatUserdataContainer = require("./formatUserdataContainer")
-local formatUserdataIdentifier = require("./formatUserdataIdentifier")
-local formatUserdataTag = require("./formatUserdataTag")
+const formatSchemaIdentifier = require("@gluten/codegen/formatSchemaIdentifier")
+const formatUserdataContainer = require("./formatUserdataContainer")
+const formatUserdataTag = require("./formatUserdataTag")
 
 const function generateLuaValue(userdata: classes.UserdataSchema, includes: { [string]: true })
 	includes['"core/generated/gg_UserdataTag.hpp"'] = true
 	includes['"core/reflection/gg_LuaValue.hpp"'] = true
 
 	const container = formatUserdataContainer(userdata)
-	const identifier = formatUserdataIdentifier(userdata)
+	const identifier = formatSchemaIdentifier(userdata)
 	const tag = formatUserdataTag(userdata)
 
 	const body: { string } = {

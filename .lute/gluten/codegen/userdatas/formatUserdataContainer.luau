@@ -8,10 +8,10 @@
 --   http://mozilla.org/MPL/2.0/
 
 const classes = require("@gluten/codegen/classes")
-local formatUserdataIdentifier = require("./formatUserdataIdentifier")
+const formatSchemaIdentifier = require("@gluten/codegen/formatSchemaIdentifier")
 
 const function formatUserdataContainer(userdata: classes.UserdataSchema)
-	const identifier = formatUserdataIdentifier(userdata)
+	const identifier = formatSchemaIdentifier(userdata)
 	return if userdata.Prelude.Container == "Shared"
 		then `std::shared_ptr<{identifier}>`
 		elseif userdata.Prelude.Container == "Unique" then `std::unique_ptr<{identifier}>`
