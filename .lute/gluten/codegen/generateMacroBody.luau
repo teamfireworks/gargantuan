@@ -116,19 +116,16 @@ const function generateMacroBody(schema: classes.Schema<any, any>)
 			-- signals arent supported for now
 		else
 			if member.ImplementManual then
-				for permitted in member.ImplementManual.Permits do
-					local formatted = "static int "
-					formatted ..= permitted
-					formatted ..= name
-					formatted ..= "(lua_State* L)"
+				local formatted = "static int "
+				formatted ..= name
+				formatted ..= "(lua_State* L)"
 
-					if member.ImplementManual.NoThrow then
-						formatted ..= " noexcept"
-					end
-
-					formatted ..= "; \\"
-					table.insert(body, formatted)
+				if member.ImplementManual.NoThrow then
+					formatted ..= " noexcept"
 				end
+
+				formatted ..= "; \\"
+				table.insert(body, formatted)
 			elseif member.ImplementMethod then
 				const isConstructor = name == "new"
 				const isStatic = isConstructor or member.Kind == "ClassStaticMethod"

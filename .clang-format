@@ -1,11 +1,11 @@
 BasedOnStyle: LLVM
 
 SortIncludes: CaseInsensitive
-IncludeBlocks: Regroup
-IncludeCategories:
-    - Regex: '^["](gargantuan)/.*'
-      Priority: 1
-    - Regex: "^[<](box3d/|flecs/|glaze/|Luau/|lua/|magic_enum/|msdf_atlas_gen/|SDL3/|Tracy/).*"
-      Priority: 2
-    - Regex: "^<[^/]*>"
-      Priority: 3
+# IncludeBlocks: Regroup
+# IncludeCategories:
+#     - Regex: '^["](gargantuan)/.*'
+#       Priority: 1
+#     - Regex: "^[<](box3d/|flecs/|glaze/|Luau/|lua/|magic_enum/|msdf_atlas_gen/|SDL3/|Tracy/).*"
+#       Priority: 2
+#     - Regex: "^<[^/]*>"
+#       Priority: 3

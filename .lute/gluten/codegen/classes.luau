@@ -132,9 +132,9 @@ export type ClassMethod = {
 	}?,
 	--- Output static int(lua_State *)
 	ImplementManual: {
+		Signature: string,
 		NoThrow: boolean?,
 		CanYield: boolean?,
-
 		Permits: {
 			Call: SecurityCapabilities?,
 			CallParallel: SecurityCapabilities?,

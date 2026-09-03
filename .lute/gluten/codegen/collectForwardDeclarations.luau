@@ -26,7 +26,7 @@ const function collectForwardDeclarations(members: classes.Members)
 			end
 		elseif member.Kind == "ClassMethod" or member.Kind == "ClassStaticMethod" then
 			if member.ImplementManual then
-				statements["struct lua_State*"] = true
+				statements["struct lua_State"] = true
 			elseif member.ImplementMethod then
 				for _, parameter in member.ImplementMethod.Parameters do
 					if parameter.Type.CForwardDeclaration then

@@ -63,28 +63,9 @@ const function datatype(name: string, cType: string?): Type
 	)
 end
 
-types.Float = newtype("float", nil, nil, "number")
-types.Double = newtype("double", nil, nil, "number")
-types.Int8 = newtype("int8_t", { "<cstdint>" }, nil, "number")
-types.Int16 = newtype("int16_t", { "<cstdint>" }, nil, "number")
-types.Int32 = newtype("int32_t", { "<cstdint>" }, nil, "number")
-types.Uint8 = newtype("uint8_t", { "<cstdint>" }, nil, "number")
-types.Uint16 = newtype("uint16_t", { "<cstdint>" }, nil, "number")
-types.Uint32 = newtype("uint32_t", { "<cstdint>" }, nil, "number")
-types.Bool = newtype("bool", nil, nil, "boolean")
-types.CString = newtype("const char *", nil, nil, "string")
-types.String = newtype("std::string", { "<string>" }, nil, "string")
-types.StringView = newtype("std::string_view", { "<string_view>" }, nil, "string")
-types.Void = newtype("void", nil, nil, "()")
-
-types.Axes = datatype("Axes")
-types.Color3 = datatype("Color3")
-types.CFrame = datatype("CFrame")
-types.SecurityCapabilities = datatype("SecurityCapabilities")
-types.Vector2 = datatype("Vector2")
-
-types.Vector3 = datatype("Vector3", "glm::vec3")
-table.insert(types.Vector3.CIncludes or nil :: never, "<glm/glm.hpp>")
+function types.Shared(inner: Type): Type
+	return inner:Extend(`std::shared_ptr<{inner.CType}>`, { "<shared_ptr>" }, inner.CForwardDeclaration, inner.CType)
+end
 
 function types.Extend(
 	self: Type,
@@ -104,11 +85,11 @@ function types.Extend(
 end
 
 function types.Vector(inner: Type): Type
-	return inner:Extend(`std::vector<{inner.CType}>`, { "<vector>" }, nil, `\{ {inner.CType} }`)
+	return inner:Extend(`std::vector<{inner.CType}>`, { "<vector>" }, inner.CForwardDeclaration, `\{ {inner.CType} }`)
 end
 
 function types.Optional(inner: Type): Type
-	return inner:Extend(`std::optional<{inner.CType}>`, { "<optional>" }, nil, `{inner.CType}?`)
+	return inner:Extend(`std::optional<{inner.CType}>`, { "<optional>" }, inner.CForwardDeclaration, `{inner.CType}?`)
 end
 
 function types.Tuple(...: Type): Type
@@ -128,5 +109,36 @@ function types.Tuple(...: Type): Type
 		`({table.concat(luauTypes, ", ")})`
 	)
 end
+
+function types.Instance(className: string?)
+	className = className or "Instance"
+	return newtype(
+		`"std::shared_ptr<{className}>"`,
+		{ `"core/classes/gg_{className}.hpp"` },
+		`struct gg_{className}`,
+		className
+	)
+end
+
+types.Float = newtype("float", nil, nil, "number")
+types.Double = newtype("double", nil, nil, "number")
+types.Int8 = newtype("int8_t", { "<cstdint>" }, nil, "number")
+types.Int16 = newtype("int16_t", { "<cstdint>" }, nil, "number")
+types.Int32 = newtype("int32_t", { "<cstdint>" }, nil, "number")
+types.Uint8 = newtype("uint8_t", { "<cstdint>" }, nil, "number")
+types.Uint16 = newtype("uint16_t", { "<cstdint>" }, nil, "number")
+types.Uint32 = newtype("uint32_t", { "<cstdint>" }, nil, "number")
+types.Bool = newtype("bool", nil, nil, "boolean")
+types.CString = newtype("const char *", nil, nil, "string")
+types.String = newtype("std::string", { "<string>" }, nil, "string")
+types.StringView = newtype("std::string_view", { "<string_view>" }, nil, "string")
+types.Void = newtype("void", nil, nil, "()")
+
+types.Axes = datatype("Axes")
+types.Color3 = datatype("Color3")
+types.CFrame = datatype("CFrame")
+types.SecurityCapabilities = datatype("SecurityCapabilities")
+types.Vector2 = datatype("Vector2")
+types.Vector3 = datatype("Vector3"):Extend("glm::vec3", { '"<glm/glm.hpp>"' })
 
 return table.freeze(types)
