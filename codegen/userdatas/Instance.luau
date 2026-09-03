@@ -62,4 +62,14 @@ return l.Userdata("Instance", {
 			ReturnType = t.Instance(),
 		},
 	}),
+
+	entityId = c.Property({
+		Type = t.EntityHandle,
+		UnmodifiedValue = "{}",
+		ImplementPrivateMember = true,
+		Permits = { Read = { "Basic" }, ReadParallel = { "Basic" }, Write = { "Basic" }, WriteParallel = { "Basic" } },
+		Display = {
+			Description = "Internal handle to entity representing instance."
+		},
+	})
 })

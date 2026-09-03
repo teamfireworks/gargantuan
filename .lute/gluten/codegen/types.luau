@@ -133,6 +133,7 @@ types.CString = newtype("const char *", nil, nil, "string")
 types.String = newtype("std::string", { "<string>" }, nil, "string")
 types.StringView = newtype("std::string_view", { "<string_view>" }, nil, "string")
 types.Void = newtype("void", nil, nil, "()")
+types.EntityHandle = newtype("flecs::entity", { "<flecs.h>" }, nil, "unknown")
 
 types.Axes = datatype("Axes")
 types.Color3 = datatype("Color3")

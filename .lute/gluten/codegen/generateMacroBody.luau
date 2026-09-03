@@ -72,9 +72,9 @@ const function generateMacroBody(schema: classes.Schema<any, any>)
 
 	-- TODO: make this protected. the intent here is to fire like propchangedsignal
 	-- for instances but we gotta get data types up first
-	table.insert(body, "public: \\")
+	table.insert(body, "protected: \\")
 	for name, member in orderedPairs(schema.Members) do
-		if member.Kind == "ClassProperty" and member.ImplementMember then
+		if member.Kind == "ClassProperty" and (member.ImplementMember or member.ImplementPrivateMember) then
 			table.insert(body, `{member.Type.CType} {name} = {member.UnmodifiedValue}; \\`)
 		end
 	end
