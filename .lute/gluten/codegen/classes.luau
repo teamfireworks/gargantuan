@@ -94,7 +94,7 @@ export type ClassProperty = {
 		WriteParallel: SecurityCapabilities?,
 	},
 	--- Output a class member as a plain property
-	ImplementPrivateMember: boolean?,
+	ImplementProtectedMember: boolean?,
 	--- Output a class member with default reads and writes
 	ImplementMember: boolean?,
 	--- Output header methods to implement reads and writes

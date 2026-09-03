@@ -74,7 +74,7 @@ const function generateMacroBody(schema: classes.Schema<any, any>)
 	-- for instances but we gotta get data types up first
 	table.insert(body, "protected: \\")
 	for name, member in orderedPairs(schema.Members) do
-		if member.Kind == "ClassProperty" and (member.ImplementMember or member.ImplementPrivateMember) then
+		if member.Kind == "ClassProperty" and (member.ImplementMember or member.ImplementProtectedMember) then
 			table.insert(body, `{member.Type.CType} {name} = {member.UnmodifiedValue}; \\`)
 		end
 	end
