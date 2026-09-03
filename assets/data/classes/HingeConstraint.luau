@@ -52,7 +52,7 @@ return c({
 		ServoMaxTorque = {
 			description = "The maximum torque a HingeConstraint with ActuatorType set to Servo can apply when trying to reach its desired TargetAngle.",
 			type = t.Float,
-			unmodified = "0",
+			unmodified = "std::numeric_limits<float>::infinity()",
 			serializable = true,
 		},
 		AngularVelocity = {
@@ -64,13 +64,13 @@ return c({
 		MotorMaxAcceleration = {
 			description = "The maximum angular acceleration a HingeConstraint with ActuatorType set to Motor can apply to achieve its AngularVelocity. Measured in radians/second^2.",
 			type = t.Float,
-			unmodified = "0",
+			unmodified = "std::numeric_limits<float>::infinity()",
 			serializable = true,
 		},
 		MotorMaxTorque = {
 			description = "The maximum torque a HingeConstraint with ActuatorType set to Motor can apply when trying to reach its desired AngularVelocity.",
 			type = t.Float,
-			unmodified = "0",
+			unmodified = "std::numeric_limits<float>::infinity()",
 			serializable = true,
 		},
 	},

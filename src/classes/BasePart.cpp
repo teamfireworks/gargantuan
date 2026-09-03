@@ -29,6 +29,10 @@ namespace gargantuan {
 		AccumulatedImpulse += impulse;
 	}
 
+	void BasePart::ApplyAngularImpulse(glm::vec3 impulse) {
+		AccumulatedAngularImpulse += impulse;
+	}
+
 	glm::mat4 BasePart::GetModelMatrix() {
 		glm::mat4 translation = glm::translate(glm::mat4(1.0f), CFrame.Position);
 		glm::mat4 rotation = CFrame.Rotation;

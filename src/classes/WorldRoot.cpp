@@ -9,6 +9,7 @@
 
 #include <box3d/box3d.h>
 #include <box3d/collision.h>
+#include <box3d/constants.h>
 #include <box3d/id.h>
 #include <box3d/math_functions.h>
 #include <box3d/types.h>
@@ -19,7 +20,6 @@
 #include <vector>
 
 namespace gargantuan {
-	const auto ZERO_VEC3 = glm::vec3(0.0f, 0.0f, 0.0f).value;
 
 	// TODO: Observe properties and reconstruct physics objects when they
 	// change
@@ -76,7 +76,7 @@ namespace gargantuan {
 		auto found = ConstraintJoints.find(it);
 		if (found == ConstraintJoints.end()) return;
 
-		b3DestroyJoint(found->second, true);
+		if (b3Joint_IsValid(found->second)) b3DestroyJoint(found->second, true);
 		ConstraintJoints.erase(found);
 		it->LeJoint = b3_nullJointId;
 	}
@@ -90,6 +90,7 @@ namespace gargantuan {
 		b3WorldDef worldDefinition = b3DefaultWorldDef();
 		worldDefinition.enableSleep = true;
 		worldDefinition.gravity = b3Vec3{0.0f, -Gravity, 0.0f};
+		b3SetLengthUnitsPerMeter(1.0f / 0.28f); // 1 tuan = 0.28 meter (going off of roblox)
 
 		World = b3CreateWorld(&worldDefinition);
 
@@ -139,6 +140,21 @@ namespace gargantuan {
 
 		int steps = 0;
 		while (StepAccumulator >= STEP_INTERVAL && steps < MAX_STEPS_PER_FRAME) {
+			for (const auto &[part, body] : PartBodies) {
+				if (glm::any(glm::notEqual(part->AccumulatedImpulse, glm::vec3(0.0f)))) {
+					b3Body_ApplyLinearImpulseToCenter(body, AsB3Vec3(part->AccumulatedImpulse), true);
+					part->AccumulatedImpulse = {};
+				}
+				if (glm::any(glm::notEqual(part->AccumulatedAngularImpulse, glm::vec3(0.0f)))) {
+					b3Body_ApplyAngularImpulse(body, AsB3Vec3(part->AccumulatedAngularImpulse), true);
+					part->AccumulatedAngularImpulse = {};
+				}
+			}
+
+			for (const auto &[constraint, joint] : ConstraintJoints) {
+				constraint->StepJoint(STEP_INTERVAL);
+			}
+
 			b3World_Step(World, STEP_INTERVAL, SUB_STEP_COUNT);
 
 			b3BodyEvents events = b3World_GetBodyEvents(World);
@@ -153,15 +169,6 @@ namespace gargantuan {
 				part->SetCFrame(
 					gargantuan::CFrame(AsGlmVec3(move.transform.p), glm::mat3_cast(AsGlmVec3(move.transform.q)))
 				);
-
-				if (auto body = PartBodies[part]; part->AccumulatedImpulse.value > ZERO_VEC3) {
-					b3Body_ApplyLinearImpulseToCenter(body, AsB3Vec3(part->AccumulatedImpulse), true);
-					part->AccumulatedImpulse = {};
-				}
-				if (auto body = PartBodies[part]; part->AccumulatedAngularImpulse.value > ZERO_VEC3) {
-					b3Body_ApplyAngularImpulse(body, AsB3Vec3(part->AccumulatedAngularImpulse), true);
-					part->AccumulatedAngularImpulse = {};
-				}
 			}
 
 			for (int i = 0; i < contactEvents.beginCount; ++i) {

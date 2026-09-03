@@ -55,6 +55,12 @@ return c({
 			unmodified = "0",
 			serializable = true,
 		},
+		LinearResponsiveness = {
+			description = 'Specifies the "sharpness" of the linear servo motor in reaching the TargetPosition.',
+			type = t.Float,
+			unmodified = "1",
+			serializable = true,
+		},
 		Velocity = {
 			description = "The PrismaticConstraint's attempted velocity when ActuatorType is set to Motor. Measured in units per second.",
 			type = t.Float,

@@ -39,6 +39,8 @@ namespace gargantuan {
 		bool isServo = this->ActuatorType == Enums::ActuatorType::Servo;
 		b3PrismaticJoint_EnableSpring(LeJoint, isServo);
 		if (isServo) {
+			b3PrismaticJoint_SetSpringDampingRatio(LeJoint, 0.5f);
+			b3PrismaticJoint_SetSpringHertz(LeJoint, 1.0f);
 			b3PrismaticJoint_SetTargetTranslation(LeJoint, this->TargetPosition);
 		}
 	}

@@ -1,5 +1,7 @@
 #include "gargantuan/math/Conversions.hpp"
 
+#include <algorithm>
+#include <cfloat>
 #include <glm/gtc/quaternion.hpp>
 
 namespace gargantuan {
@@ -17,5 +19,10 @@ namespace gargantuan {
 
 	glm::quat AsGlmVec3(const b3Quat &quaternion) {
 		return glm::quat(quaternion.s, quaternion.v.x, quaternion.v.y, quaternion.v.z);
+	}
+
+	float AsB3Limit(float value) {
+		if (std::isnan(value)) return 0.0f;
+		return std::clamp(value, 0.0f, FLT_MAX);
 	}
 }

@@ -25,6 +25,12 @@ namespace gargantuan {
 		virtual b3JointId CreateJoint(b3WorldId *world, b3BodyId body0, b3BodyId body1) = 0;
 		virtual void UpdateJoint() = 0;
 
+		virtual void StepJoint(float deltaTime) {}
+
+		virtual glm::quat GetFrameCorrection() const {
+			return glm::identity<glm::quat>();
+		}
+
 	  protected:
 		void BindJointProperties(std::initializer_list<std::string> propertyNames);
 		void BindStructuralProperties(std::initializer_list<std::string> propertyNames);

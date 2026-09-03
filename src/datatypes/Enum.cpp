@@ -24,6 +24,7 @@ namespace gargantuan {
 			},
 		.Methods = {
 			{"__tostring", Method{&EnumItem::LTostring}},
+			{"__eq", Method{&EnumItem::LEq}},
 		}
 	);
 
@@ -34,6 +35,18 @@ namespace gargantuan {
 		lua_pushlstring(L, str.c_str(), str.size());
 		return 1;
 	};
+
+	int EnumItem::LEq(lua_State *L, EnumItem *self) {
+		if (StackValue<EnumItem>::Is(L, 2)) {
+			EnumItem other = StackValue<EnumItem>::From(L, 2);
+			lua_pushboolean(
+				L, self->Value == other.Value && self->Name == other.Name && self->EnumType == other.EnumType
+			);
+		} else {
+			lua_pushboolean(L, false);
+		}
+		return 1;
+	}
 
 	G_USERDATA_IMPL(
 		Enum,

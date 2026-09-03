@@ -17,7 +17,7 @@ namespace gargantuan {
 		b3SphericalJointDef jointDefinition = b3DefaultSphericalJointDef();
 		jointDefinition.base.bodyIdA = body0;
 		jointDefinition.base.bodyIdB = body1;
-		jointDefinition.base.collideConnected = true;
+		jointDefinition.base.collideConnected = false; // roblox parity again
 		return b3CreateSphericalJoint(*world, &jointDefinition);
 	}
 
@@ -29,5 +29,9 @@ namespace gargantuan {
 
 		b3SphericalJoint_EnableTwistLimit(LeJoint, this->TwistLimitsEnabled);
 		b3SphericalJoint_SetTwistLimits(LeJoint, this->TwistLowerAngle, this->TwistUpperAngle);
+	}
+
+	glm::quat BallSocketConstraint::GetFrameCorrection() const {
+		return glm::angleAxis(glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 }

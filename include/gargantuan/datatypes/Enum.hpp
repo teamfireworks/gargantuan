@@ -22,6 +22,7 @@ namespace gargantuan {
 		EnumType(std::move(enumType)) {}
 
 		static int LTostring(lua_State *L, EnumItem *self);
+		static int LEq(lua_State *L, EnumItem *self);
 	);
 
 	namespace Enums {

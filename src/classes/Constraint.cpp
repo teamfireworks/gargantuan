@@ -50,14 +50,16 @@ namespace gargantuan {
 	}
 
 	void Constraint::UpdateJointFrames() {
+		auto correction = GetFrameCorrection();
+
 		if (Attachment0.has_value()) {
 			auto cframe = Attachment0.value()->GetCFrame();
-			b3Joint_SetLocalFrameA(LeJoint, {AsB3Vec3(cframe.Position), AsB3Quat(cframe.ToQuaternion())});
+			b3Joint_SetLocalFrameA(LeJoint, {AsB3Vec3(cframe.Position), AsB3Quat(cframe.ToQuaternion() * correction)});
 		}
 
 		if (Attachment1.has_value()) {
 			auto cframe = Attachment1.value()->GetCFrame();
-			b3Joint_SetLocalFrameB(LeJoint, {AsB3Vec3(cframe.Position), AsB3Quat(cframe.ToQuaternion())});
+			b3Joint_SetLocalFrameB(LeJoint, {AsB3Vec3(cframe.Position), AsB3Quat(cframe.ToQuaternion() * correction)});
 		}
 	}
 
