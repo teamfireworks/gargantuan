@@ -1,9 +1,0 @@
-{
-	"Name": "EightBitOperatorJVE",
-	"Family": "8bitoperator JVE",
-	"Weights": {
-		"300": {
-			"Normal": "./EightBitOperatorJVE.ttf"
-		}
-	}
-}

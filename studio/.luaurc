@@ -1,7 +1,0 @@
-{
-	"languageMode": "nonstrict",
-	"aliases": {
-		"roblox_packages": "packages/roblox",
-		"src": "src"
-	}
-}

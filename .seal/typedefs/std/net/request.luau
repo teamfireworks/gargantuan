@@ -1,1 +1,0 @@
-return require("@std/net/http").request

@@ -1,7 +1,0 @@
-#:schema https://luaupm.com/lpm.schema.json
-
-[dependencies]
-Fluid = { name = "ffrostfall/fluid", version = "^", index = "wally" }
-
-[indices]
-wally = "https://github.com/UpliftGames/wally-index"
